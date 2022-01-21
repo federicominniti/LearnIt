@@ -6,6 +6,7 @@ import org.bson.types.ObjectId;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -438,5 +439,100 @@ public class Neo4jDriver implements DBDriver {
             e.printStackTrace();
         }
         return users;
+    }
+
+    public boolean registerUser(final String username, final String complete_name, final String dateOfBirth,
+                                final String gender, final String email, final String password, final String profilePicture,
+                                final boolean isAdmin) {
+        try (org.neo4j.driver.Session session = neo4jDriver.session())
+        {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                String query = "CREATE (u:User {username: $username, complete_name: $complete_name, " +
+                        " email: $email, password: $password, date_of_birth: $date_of_birth, gender: $gender," +
+                        " profile_picture: $profile_picture, role: ";
+
+                if(isAdmin)
+                    query += "1";
+                else
+                    query += "0";
+                query += "})";
+
+                tx.run( query,
+                        parameters( "username", username, "complete_name", complete_name,
+                                "date_of_birth", dateOfBirth, "gender", gender, "email", email, "password", password,
+                                profilePicture, "profile_picture"));
+                return null;
+            });
+            return true;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    //Find courses liked or completed by a specific user
+    public List<Course> findCoursesLikedOrCompletedByUser(final String username, final boolean researchFlag) {
+        //0 -> liked
+        //1 -> completed
+        try (org.neo4j.driver.Session session = neo4jDriver.session())
+        {
+            List<Course> resultCourses = session.readTransaction((TransactionWork<List<Course>>) tx -> {
+                String relationship;
+                List<Course> courses = new ArrayList<>();
+                if(researchFlag)
+                    relationship = "REVIEW";
+                else
+                    relationship = "LIKE";
+
+                Result result = tx.run("MATCH (c:Course{username: $username})-[:"+relationship+"]->()" +
+                        "RETURN c");
+                parameters( "username", username);
+                while(result.hasNext()){
+                    Record record = result.next();
+                    courses.add(new Course(new ObjectId(record.get("id").asString()), record.get("title").asString(), record.get("price").asDouble(), record.get("duration").asDouble()));
+                }
+                return courses;
+            });
+            return resultCourses;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    //Find suggested users that have participated to the same courses of you
+    public List<User> findSuggestedUsers(User loggedUser) {
+        try (org.neo4j.driver.Session session = neo4jDriver.session())
+        {
+            List<User> resultUsers = session.readTransaction((TransactionWork<List<User>>) tx -> {
+                String relationship;
+                List<User> users = new ArrayList<>();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                Result result = tx.run("MATCH (u:User{username: $username})-[:REVIEW]->(c)<-[:REVIEW]-(suggested)" +
+                        "WHERE u<>suggested RETURN suggested");
+                parameters( "username", loggedUser.getUsername());
+                while(result.hasNext()){
+                    Record record = result.next();
+                    try {
+                        users.add(new User(record.get("username").asString(), record.get("password").asString(),
+                                record.get("complete_name").asString(), sdf.parse(record.get("date_of_birth").asString()),
+                                record.get("gender").asString(), record.get("email").asString(),
+                                User.Role.fromInteger(record.get("role").asInt()), record.get("profile_picture").asString()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return users;
+            });
+            return resultUsers;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
