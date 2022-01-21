@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnit.controller.LoginPageController">
+   <children>
+      <Button fx:id="loginButton" layoutX="198.0" layoutY="244.0" mnemonicParsing="false" style="-fx-background-color: lightgreen;" text="Login" />
+      <Button fx:id="signUpButton" layoutX="61.0" layoutY="244.0" mnemonicParsing="false" style="-fx-background-color: lightblue;" text="Sign up" />
+      <Label layoutX="62.0" layoutY="125.0" text="username:" />
+      <Label layoutX="62.0" layoutY="172.0" text="password:" />
+      <TextField fx:id="usernameTextField" layoutX="135.0" layoutY="121.0" prefHeight="26.0" prefWidth="110.0" promptText="Lorenzo1" />
+      <PasswordField fx:id="passwordField" layoutX="135.0" layoutY="168.0" prefHeight="26.0" prefWidth="110.0" promptText="Abcd4321" />
+      <ImageView fitHeight="77.0" fitWidth="197.0" layoutX="52.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/learnitlogo.png" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>
