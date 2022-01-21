@@ -409,4 +409,20 @@ public class MongoDBDriver implements DBDriver {
         return c;
     }
 
+    public HashMap<String, Double> getCourseAnnualRatings(Course course) {
+        HashMap<String, Double> annualRatings = new HashMap<>();
+        List<Course> doc = collection.aggregate(Arrays.asList(
+                new Document("$match", new Document("_id", course.getId())),
+                new Document("$unwind", "$reviews"),
+                new Document("$group", new Document("title", new Document("$year", "$reviews.edited_timestamp"))
+                        .append("sum_ratings", new Document("$sum", "$reviews.rating"))
+                        .append("num_reviews", new Document("$sum", 1))
+                ))).into(new ArrayList<>());
+
+        for (Course c: doc) {
+            annualRatings.put(c.getTitle(), ((double)c.getSum_ratings() / c.getNum_reviews()));
+        }
+        return annualRatings;
+    }
+
 }

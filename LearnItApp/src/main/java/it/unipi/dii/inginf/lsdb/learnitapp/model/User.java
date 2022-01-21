@@ -43,7 +43,17 @@ public class User {
 
     public enum Role {
         ADMINISTRATOR,
-        STANDARD
+        STANDARD;
+
+        public static Role fromInteger(int x) {
+            switch(x) {
+                case 0:
+                    return STANDARD;
+                case 1:
+                    return ADMINISTRATOR;
+            }
+            return null;
+        }
     }
 
     public String getUsername() {

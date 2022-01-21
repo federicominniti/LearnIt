@@ -6,12 +6,15 @@ import org.bson.types.ObjectId;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 
 import static org.neo4j.driver.Values.parameters;
+import static org.neo4j.driver.internal.value.NullValue.NULL;
 
 public class Neo4jDriver implements DBDriver {
     private static Neo4jDriver instance = null;
@@ -246,5 +249,194 @@ public class Neo4jDriver implements DBDriver {
             e.printStackTrace();
         }
         return -1;
+    }
+
+    public boolean addCourse(Course course) {
+        try (Session session = neo4jDriver.session()) {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run( "CREATE (c:Course {id: $id, title: $title, duration: $duration, price: $price})",
+                        parameters("id", course.getId().toString(),
+                                "title", course.getTitle(),
+                                "duration", course.getDuration(),
+                                "price", course.getPrice()));
+                return null;
+            });
+            return true;
+        }
+        catch (Exception ex) {
+            System.err.println("Error in adding a new course in Neo4J");
+            return false;
+        }
+    }
+
+    public boolean updateCourse(Course course) {
+        try (Session session = neo4jDriver.session()) {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run("MATCH (c:Course {id: $course_id}" +
+                                "SET c.title = $newtitle, c.duration = $newduration, c.price = $newprice",
+                        parameters("course_id", course.getId().toString(),
+                                "newtitle", course.getTitle(),
+                                "newduration", course.getDuration(),
+                                "newprice", course.getPrice()));
+                return null;
+            });
+
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error in updating a course in Neo4J");
+            return false;
+        }
+    }
+
+    public boolean deleteCourse(Course course) {
+        try (Session session = neo4jDriver.session()) {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run( "MATCH (c:Course) WHERE c.id = $course_id DETACH DELETE c",
+                        parameters( "course_id", course.getId().toString()) );
+                return null;
+            });
+            return true;
+        }
+        catch (Exception ex) {
+            System.err.println("Error while deleting course in Neo4J");
+            return false;
+        }
+    }
+
+    public boolean addReview(Course ratedCourse, User user) {
+        try (Session session = neo4jDriver.session()) {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run("MATCH" +
+                                "  (u:User {username: $username})," +
+                                "  (c:Course {id: $course_id})" +
+                                "MERGE (u)-[:REVIEW]->(c)",
+                        parameters("username", user.getUsername(),
+                                "id", ratedCourse.getId().toString()));
+                return null;
+            });
+            return true;
+        }
+        catch (Exception ex) {
+            System.err.println("Error while adding a review in Neo4J");
+            return false;
+        }
+    }
+
+    public boolean deleteReview(Course ratedCourse, User user) {
+        try (Session session = neo4jDriver.session()) {
+            session.writeTransaction((TransactionWork<Void>) tx -> {
+                tx.run("MATCH (u:User {username: $username})-[r:REVIEW]->(c:Course {id: $course_id}) DELETE r",
+                        parameters("username", user.getUsername(), "id", ratedCourse.getId().toString()));
+                return null;
+            });
+            return true;
+        }
+        catch (Exception ex) {
+            System.err.println("Error while adding a review in Neo4J");
+            return false;
+        }
+    }
+
+    public User login(String username, String password) {
+        User loggedUser = null;
+        try (Session session = neo4jDriver.session()) {
+            loggedUser = session.readTransaction((TransactionWork<User>) tx -> {
+                Result r = tx.run("MATCH (u:User {username: $username, password: $password}) RETURN u" +
+                        parameters("username", username, "password", password));
+
+                User user = null;
+                try {
+                    Record rec = r.next();
+                    String complete_name = rec.get("complete_name").asString();
+                    String email = rec.get("email").asString();
+                    User.Role role = User.Role.fromInteger(rec.get("role").asInt());
+                    Date date_of_birth = null;
+                    String gender = null;
+                    String profile_pic = null;
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                    if (rec.get("date_of_birth") != NULL)
+                        date_of_birth = sdf.parse(rec.get("date_of_birth").asString());
+                    if (rec.get("gender") != NULL)
+                        gender = rec.get("gender").asString();
+                    if (rec.get("picture") != NULL)
+                        profile_pic = rec.get("picture").asString();
+
+                    user = new User(username, password, complete_name, date_of_birth, gender, email, role, profile_pic);
+                } catch (Exception e) {
+                    user = null;
+                }
+
+                return user;
+            });
+
+            return loggedUser;
+        }
+        catch (Exception ex) {
+            System.err.println("Error while trying to login");
+            return null;
+        }
+    }
+
+    public List<Course> findSuggestedCourses(User user, int toSkip, int limit) {
+        List<Course> suggested = new ArrayList<>();
+        try (Session session = neo4jDriver.session()) {
+            session.readTransaction(tx -> {
+                Result r = tx.run("MATCH (u:User {username: $username})-[:FOLLOW]->(friend:User)-[:LIKE|:REVIEW]->(c:Course)" +
+                        "WHERE NOT ((u)-[:OFFER]->(c) OR (u)-[:REVIEW]->(c))" +
+                        "RETURN c.id AS id, c.title AS title, c.duration AS duration, c.price AS price," +
+                        "COUNT(*) AS occurrence " +
+                        "ORDER BY occurrence DESC" +
+                        "SKIP $skip " +
+                        "LIMIT $limit ", parameters("username", user.getUsername(), "skip", toSkip, "limit", limit));
+
+                while (r.hasNext()) {
+                    Record rec = r.next();
+                    ObjectId id = new ObjectId(rec.get("id").asString());
+                    String title = rec.get("title").asString();
+                    double duration = rec.get("duration").asDouble();
+                    double price = rec.get("price").asDouble();
+                    suggested.add(new Course(id, title, duration, price));
+                }
+
+                return null;
+            });
+
+            return suggested;
+        }
+        catch (Exception ex) {
+            System.err.println("Error while retrieving suggestions from Neo4J");
+            return null;
+        }
+    }
+
+    public List<User> searchUserByUsername (int limit, int toSkip, String searchText)
+    {
+        List<User> users = new ArrayList<>();
+        try(Session session = neo4jDriver.session()) {
+            session.readTransaction(tx -> {
+                Result result = tx.run("MATCH (u:User) " +
+                                "WHERE toLower(u.username) CONTAINS toLower($username) " +
+                                "RETURN u.username AS username, u.complete_name AS complete_name, u.profile_picture AS picture " +
+                                "SKIP $skip LIMIT $limit",
+                        parameters("username",searchText, "skip", toSkip, "limit", limit));
+
+                while(result.hasNext()){
+                    Record r = result.next();
+                    String username = r.get("username").asString();
+                    String complete_name = r.get("lastName").asString();
+                    User user = new User(username, complete_name);
+                    if (r.get("picture") != NULL) {
+                        String picture = r.get("picture").asString();
+                        user.setProfilePic(picture);
+                    }
+                    users.add(user);
+                }
+                return null;
+            });
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return users;
     }
 }
