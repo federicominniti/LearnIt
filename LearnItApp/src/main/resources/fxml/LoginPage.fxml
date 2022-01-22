@@ -15,16 +15,16 @@
       <Label layoutX="88.0" layoutY="306.0" text="username:" />
       <Label layoutX="88.0" layoutY="353.0" text="password:" />
       <TextField fx:id="usernameTextField" layoutX="161.0" layoutY="302.0" prefHeight="26.0" prefWidth="110.0" promptText="Lorenzo1" />
-      <PasswordField fx:id="passwordField" layoutX="161.0" layoutY="349.0" prefHeight="26.0" prefWidth="110.0" promptText="Abcd4321" />
       <ImageView fitHeight="153.0" fitWidth="155.0" layoutX="104.0" layoutY="37.0" preserveRatio="true">
          <image>
-            <Image url="@../../../../../../Downloads/Schermata%202022-01-21%20alle%2019.03.58.png" />
+            <Image url="@../img/learnitLogoApp.png" />
          </image>
       </ImageView>
       <ImageView fitHeight="53.0" fitWidth="200.0" layoutX="81.0" layoutY="216.0">
          <image>
-            <Image url="@../../../../../../Downloads/Schermata%202022-01-22%20alle%2009.24.52.png" />
+            <Image url="@../img/learnitLogo.png" />
          </image>
       </ImageView>
+      <PasswordField fx:id="passwordField" layoutX="161.0" layoutY="349.0" prefHeight="26.0" prefWidth="110.0" promptText="Abcd4321" />
    </children>
 </AnchorPane>
