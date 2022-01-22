@@ -8,17 +8,22 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="300.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnit.controller.LoginPageController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="470.0" prefWidth="360.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnit.controller.LoginPageController">
    <children>
-      <Button fx:id="loginButton" layoutX="198.0" layoutY="244.0" mnemonicParsing="false" style="-fx-background-color: lightgreen;" text="Login" />
-      <Button fx:id="signUpButton" layoutX="61.0" layoutY="244.0" mnemonicParsing="false" style="-fx-background-color: lightblue;" text="Sign up" />
-      <Label layoutX="62.0" layoutY="125.0" text="username:" />
-      <Label layoutX="62.0" layoutY="172.0" text="password:" />
-      <TextField fx:id="usernameTextField" layoutX="135.0" layoutY="121.0" prefHeight="26.0" prefWidth="110.0" promptText="Lorenzo1" />
-      <PasswordField fx:id="passwordField" layoutX="135.0" layoutY="168.0" prefHeight="26.0" prefWidth="110.0" promptText="Abcd4321" />
-      <ImageView fitHeight="77.0" fitWidth="197.0" layoutX="52.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true">
+      <Button fx:id="loginButton" layoutX="224.0" layoutY="407.0" mnemonicParsing="false" style="-fx-background-color: lightblue lightblue;" text="Login" />
+      <Button fx:id="signUpButton" layoutX="87.0" layoutY="407.0" mnemonicParsing="false" style="-fx-background-color: lightgreen;" text="Sign up" />
+      <Label layoutX="88.0" layoutY="306.0" text="username:" />
+      <Label layoutX="88.0" layoutY="353.0" text="password:" />
+      <TextField fx:id="usernameTextField" layoutX="161.0" layoutY="302.0" prefHeight="26.0" prefWidth="110.0" promptText="Lorenzo1" />
+      <PasswordField fx:id="passwordField" layoutX="161.0" layoutY="349.0" prefHeight="26.0" prefWidth="110.0" promptText="Abcd4321" />
+      <ImageView fitHeight="153.0" fitWidth="155.0" layoutX="104.0" layoutY="37.0" preserveRatio="true">
          <image>
-            <Image url="@../img/learnitlogo.png" />
+            <Image url="@../../../../../../Downloads/Schermata%202022-01-21%20alle%2019.03.58.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="53.0" fitWidth="200.0" layoutX="81.0" layoutY="216.0">
+         <image>
+            <Image url="@../../../../../../Downloads/Schermata%202022-01-22%20alle%2009.24.52.png" />
          </image>
       </ImageView>
    </children>
