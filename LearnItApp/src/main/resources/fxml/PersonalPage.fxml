@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="681.0" prefWidth="736.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnit.controller.PersonalPageController">
+   <children>
+      <Pane layoutX="104.0" layoutY="112.0" prefHeight="517.0" prefWidth="519.0" style="-fx-background-color: f1f8f6; -fx-background-radius: 30px;">
+         <children>
+            <Label layoutX="45.0" layoutY="24.0" prefHeight="41.0" prefWidth="429.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="Personal information" textAlignment="CENTER" textFill="#1880e1">
+               <font>
+                  <Font size="34.0" />
+               </font>
+            </Label>
+            <Button fx:id="saveButton" layoutX="334.0" layoutY="453.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: lightblue lightblue;" text="save" />
+            <Button fx:id="backToHomeButton" layoutX="75.0" layoutY="456.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: lightblue lightblue;" text="back" />
+            <TextField fx:id="completeNameTextField" layoutX="226.0" layoutY="151.0" prefHeight="24.0" prefWidth="232.0" />
+            <Label layoutX="62.0" layoutY="155.0" text="Complete name:" />
+            <Label layoutX="63.0" layoutY="326.0" text="Email:" />
+            <TextField fx:id="emailTextField" layoutX="226.0" layoutY="321.0" prefHeight="24.0" prefWidth="232.0" />
+            <Label layoutX="59.0" layoutY="195.0" />
+            <PasswordField fx:id="passwordPasswordField" layoutX="226.0" layoutY="362.0" prefHeight="24.0" prefWidth="232.0" />
+            <Label layoutX="63.0" layoutY="365.0" text="Password:" />
+            <PasswordField fx:id="confirmPasswordField" layoutX="225.0" layoutY="402.0" prefHeight="24.0" prefWidth="232.0" />
+            <Label layoutX="63.0" layoutY="405.0" text="Confirm password:" />
+            <Label fx:id="usernameLabel" layoutX="142.0" layoutY="80.0" prefHeight="41.0" prefWidth="232.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="username" textAlignment="CENTER" textFill="#19b2e0">
+               <font>
+                  <Font size="28.0" />
+               </font>
+            </Label>
+            <Label layoutX="62.0" layoutY="241.0" text="Gender:" />
+            <ChoiceBox fx:id="genderChoiceBox" layoutX="225.0" layoutY="236.0" prefHeight="24.0" prefWidth="232.0" />
+            <DatePicker fx:id="birthDatePicker" layoutX="225.0" layoutY="194.0" prefHeight="24.0" prefWidth="232.0" />
+            <Label layoutX="62.0" layoutY="197.0" text="Birth date:" />
+            <TextField fx:id="propicTextField" layoutX="225.0" layoutY="278.0" prefHeight="24.0" prefWidth="232.0" />
+            <Label layoutX="64.0" layoutY="282.0" text="Profile image:" />
+         </children>
+      </Pane>
+      <ImageView fitHeight="53.0" fitWidth="200.0" layoutX="266.0" layoutY="30.0">
+         <image>
+            <Image url="@../img/learnitLogo.png" />
+         </image>
+      </ImageView>
+   </children>
+</AnchorPane>

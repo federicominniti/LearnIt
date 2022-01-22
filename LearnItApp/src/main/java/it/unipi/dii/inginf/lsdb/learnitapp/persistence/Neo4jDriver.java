@@ -535,4 +535,23 @@ public class Neo4jDriver implements DBDriver {
             return null;
         }
     }
+
+    public boolean isUserFollowedByUser(String followed, String follower){
+        try (org.neo4j.driver.Session session = neo4jDriver.session())
+        {
+            int ret = session.readTransaction(tx -> {
+                Result result = tx.run("MATCH (a:User{username: $follower})-[:FOLLOW]->(b:User{username: $followed}) RETURN COUNT(*) as count", parameters( "follower", follower, "followed", followed));
+                Record r = result.next();
+
+                return r.get("count").asInt();
+            });
+            return ret>0;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
 }
