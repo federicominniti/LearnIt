@@ -554,4 +554,62 @@ public class Neo4jDriver implements DBDriver {
         return false;
     }
 
+    public List<User> findFollowerUsers(User followedUser){
+        try (org.neo4j.driver.Session session = neo4jDriver.session())
+        {
+            List<User> resultUsers = session.readTransaction(tx -> {
+                List<User> users = new ArrayList<>();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                Result result = tx.run("MATCH (a:User{username: $username})<-[:FOLLOW]-(b:User) RETURN b", parameters( "username", followedUser.getUsername()));
+                while(result.hasNext()){
+                    Record record = result.next();
+                    try {
+                        users.add(new User(record.get("username").asString(), record.get("password").asString(),
+                                record.get("complete_name").asString(), sdf.parse(record.get("date_of_birth").asString()),
+                                record.get("gender").asString(), record.get("email").asString(),
+                                User.Role.fromInteger(record.get("role").asInt()), record.get("profile_picture").asString()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return users;
+            });
+            return resultUsers;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<User> findFollowedUsers(User followerUser){
+        try (org.neo4j.driver.Session session = neo4jDriver.session())
+        {
+            List<User> resultUsers = session.readTransaction(tx -> {
+                List<User> users = new ArrayList<>();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                Result result = tx.run("MATCH (a:User{username: $username})-[:FOLLOW]->(b:User) RETURN b", parameters( "username", followerUser.getUsername()));
+                while(result.hasNext()){
+                    Record record = result.next();
+                    try {
+                        users.add(new User(record.get("username").asString(), record.get("password").asString(),
+                                record.get("complete_name").asString(), sdf.parse(record.get("date_of_birth").asString()),
+                                record.get("gender").asString(), record.get("email").asString(),
+                                User.Role.fromInteger(record.get("role").asInt()), record.get("profile_picture").asString()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+                return users;
+            });
+            return resultUsers;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }
