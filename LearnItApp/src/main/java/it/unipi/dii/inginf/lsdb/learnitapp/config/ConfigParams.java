@@ -22,6 +22,8 @@ public class ConfigParams {
     private String neo4jUsername;
     private String neo4jPassword;
 
+    private int limitNumber;
+
     public static ConfigParams getInstance() throws IOException {
         if (localConfig == null) {
             synchronized (ConfigParams.class) {
@@ -144,4 +146,12 @@ public class ConfigParams {
     public void setNeo4jPassword(String neo4jPassword) {
             this.neo4jPassword = neo4jPassword;
         }
+
+    public int getLimitNumber() {
+        return limitNumber;
+    }
+
+    public void setLimitNumber(int limitNumber) {
+        this.limitNumber = limitNumber;
+    }
 }

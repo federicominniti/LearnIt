@@ -91,8 +91,7 @@ public class Utils {
         return matcher.matches();
     }
 
-    public static Object changeScene (String fileName, Event event)
-    {
+    public static Object changeScene (String fileName, Event event) {
         Scene scene = null;
         FXMLLoader loader = null;
         try {

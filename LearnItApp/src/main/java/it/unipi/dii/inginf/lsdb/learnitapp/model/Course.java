@@ -15,8 +15,8 @@ public class Course {
     private String title;
     @BsonProperty(value = "description")
     private String description;
-    @BsonProperty(value = "instructors")
-    private List<User> instructors;
+    @BsonProperty(value = "instructor")
+    private User instructor;
     @BsonProperty(value = "language")
     private String language;
     @BsonProperty(value = "category")
@@ -37,12 +37,16 @@ public class Course {
     private int num_reviews;
     @BsonProperty(value="sum_ratings")
     private int sum_ratings;
+    @BsonProperty(value="course_pic")
+    private String coursePic;
 
-    public Course(ObjectId id, String title, String description, List<User> instructors, String language, List<String> category, String level, double duration, double price, String link, String modality, List<Review> reviews, int num_reviews, int sum_ratings) {
+    public Course(ObjectId id, String title, String description, User instructor, String language, List<String> category,
+                  String level, double duration, double price, String link, String modality, List<Review> reviews,
+                  int num_reviews, int sum_ratings, String coursePic) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.instructors = instructors;
+        this.instructor = instructor;
         this.language = language;
         this.category = category;
         this.level = level;
@@ -53,16 +57,19 @@ public class Course {
         this.reviews = reviews;
         this.num_reviews = num_reviews;
         this.sum_ratings = sum_ratings;
+        this.coursePic = coursePic;
     }
 
     public Course(String title) {
         this.title = title;
     }
 
-    public Course(String title, String description, List<User> instructors, String language, List<String> category, String level, double duration, double price, String link, String modality, List<Review> reviews, int num_reviews, int sum_ratings) {
+    public Course(String title, String description, User instructor, String language, List<String> category, String level,
+                  double duration, double price, String link, String modality, List<Review> reviews, int num_reviews,
+                  int sum_ratings, String coursePic) {
         this.title = title;
         this.description = description;
-        this.instructors = instructors;
+        this.instructor = instructor;
         this.language = language;
         this.category = category;
         this.level = level;
@@ -73,6 +80,7 @@ public class Course {
         this.reviews = reviews;
         this.num_reviews = num_reviews;
         this.sum_ratings = sum_ratings;
+        this.coursePic = coursePic;
     }
 
     public Course(ObjectId id, String title, double duration, double price) {
@@ -82,28 +90,43 @@ public class Course {
         this.price = price;
     }
 
+    public Course(String title, double duration, double price) {
+        this.title = title;
+        this.duration = duration;
+        this.price = price;
+    }
+
     public Course() {
 
     }
 
-    public Course(ObjectId oid, String title, String description, List<User> instructors, String language, List<String> category, String level, double duration, double price, String link, String modality, int num_reviews, int sum_ratings) {
-        this(oid, title, description, instructors, language, category, level, duration, price, link, modality, new ArrayList<Review>(), num_reviews, sum_ratings);
+    public Course(ObjectId oid, String title, String description, User instructor, String language, List<String> category,
+                  String level, double duration, double price, String link, String modality, int num_reviews,
+                  int sum_ratings, String coursePic) {
+        this(oid, title, description, instructor, language, category, level, duration, price, link, modality,
+                new ArrayList<Review>(), num_reviews, sum_ratings, coursePic);
     }
 
-    public Course(ObjectId oid, String title, String description, List<User> instructors, String language, String level, double duration, double price, String link, String modality, List<Review> reviews, int num_reviews, int sum_ratings) {
-        this(oid, title, description, instructors, language, new ArrayList<String>(), level, duration, price, link, modality, reviews, num_reviews, sum_ratings);
+    public Course(ObjectId oid, String title, String description, User instructor, String language, String level,
+                  double duration, double price, String link, String modality, List<Review> reviews, int num_reviews,
+                  int sum_ratings, String coursePic) {
+        this(oid, title, description, instructor, language, new ArrayList<String>(), level, duration, price, link,
+                modality, reviews, num_reviews, sum_ratings, coursePic);
     }
 
-    public Course(ObjectId oid, String title, String description, List<User> instructors, String language, String level, double duration, double price, String link, String modality, int num_reviews, int sum_ratings) {
-        this(oid, title, description, instructors, language, new ArrayList<String>(), level, duration, price, link, modality, new ArrayList<Review>(), num_reviews, sum_ratings);
+    public Course(ObjectId oid, String title, String description, User instructor, String language, String level,
+                  double duration, double price, String link, String modality, int num_reviews, int sum_ratings,
+                  String coursePic) {
+        this(oid, title, description, instructor, language, new ArrayList<String>(), level, duration, price, link,
+                modality, new ArrayList<Review>(), num_reviews, sum_ratings, coursePic);
     }
 
     public void addReview(Review review) {
         this.reviews.add(review);
     }
 
-    public void addInstructor(User user) {
-        this.instructors.add(user);
+    public void setInstructor(User user) {
+        this.instructor = user;
     }
 
     public ObjectId getId() {
@@ -120,10 +143,6 @@ public class Course {
 
     public void deleteReview(Review review) {
         this.reviews.remove(review);
-    }
-
-    public void deleteInstructor(User user) {
-        this.instructors.remove(user);
     }
 
     public void deleteCategory(String category) {
@@ -154,12 +173,8 @@ public class Course {
         this.description = description;
     }
 
-    public List<User> getInstructors() {
-        return instructors;
-    }
-
-    public void setInstructors(List<User> instructors) {
-        this.instructors = instructors;
+    public User getInstructor() {
+        return instructor;
     }
 
     public String getLanguage() {
@@ -231,6 +246,14 @@ public class Course {
     }
 
     public void setNum_reviews(int num_reviews) {
-        this.sum_ratings = num_reviews;
+        this.num_reviews = num_reviews;
+    }
+
+    public String  getCoursePic() {
+        return coursePic;
+    }
+
+    public void setCoursePic(String coursePic) {
+        this.coursePic = coursePic;
     }
 }

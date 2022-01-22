@@ -9,4 +9,5 @@
     <mongoDBusername>root</mongoDBusername>
     <mongoDBpassword></mongoDBpassword>
     <mongoDBName>learnitmongo</mongoDBName>
+    <limitNumber>10</limitNumber>
 </it.unipi.dii.inginf.lsdb.learnitapp.config.Config>

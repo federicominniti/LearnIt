@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<ScrollPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="630.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.DiscoveryPageController">
+   <content>
+      <AnchorPane prefHeight="628.0" prefWidth="898.0" style="-fx-background-color: white;">
+         <children>
+            <ImageView fitHeight="48.0" fitWidth="59.0" layoutX="26.0" layoutY="29.0" preserveRatio="true">
+               <image>
+                  <Image url="@../img/learnitLogoApp.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="48.0" fitWidth="122.0" layoutX="89.0" layoutY="37.0" preserveRatio="true">
+               <image>
+                  <Image url="@../img/learnitLogo.png" />
+               </image>
+            </ImageView>
+            <TextField fx:id="searchTextField" layoutX="297.0" layoutY="36.0" prefHeight="33.0" prefWidth="305.0" promptText="Search on LearnIt!" style="-fx-background-radius: 15;">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </TextField>
+            <RadioButton fx:id="coursesRadio" layoutX="310.0" layoutY="80.0" mnemonicParsing="false" text="Courses" textFill="#006aff">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </RadioButton>
+            <RadioButton fx:id="usersRadio" layoutX="310.0" layoutY="113.0" mnemonicParsing="false" text="Users" textFill="#006aff">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </RadioButton>
+            <Button fx:id="searchButton" layoutX="617.0" layoutY="36.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="69.0" style="-fx-background-radius: 13; -fx-background-color: lightblue;" text="Search!" textFill="#006aff">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Button>
+            <ImageView fitHeight="26.0" fitWidth="29.0" layoutX="268.0" layoutY="40.0" preserveRatio="true">
+               <image>
+                  <Image url="@../img/search.png" />
+               </image>
+            </ImageView>
+            <ImageView fx:id="profilePic" fitHeight="39.0" fitWidth="48.0" layoutX="836.0" layoutY="33.0" preserveRatio="true">
+               <image>
+                  <Image url="@../img/userDefault.png" />
+               </image>
+            </ImageView>
+            <Label fx:id="usernameLabel" alignment="CENTER_RIGHT" layoutX="714.0" layoutY="37.0" prefHeight="33.0" prefWidth="114.0" text="User" textAlignment="CENTER">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Label>
+            <ChoiceBox fx:id="durationChoiceBox" layoutX="403.0" layoutY="110.0" prefHeight="26.0" prefWidth="94.0" />
+            <ChoiceBox fx:id="languageChoiceBox" layoutX="403.0" layoutY="77.0" prefHeight="26.0" prefWidth="94.0" />
+            <ChoiceBox fx:id="levelChoiceBox" layoutX="508.0" layoutY="77.0" prefHeight="26.0" prefWidth="94.0" />
+            <ChoiceBox fx:id="priceChoiceBox" layoutX="508.0" layoutY="110.0" prefHeight="26.0" prefWidth="94.0" />
+            <VBox layoutX="19.0" layoutY="166.0" prefHeight="432.0" prefWidth="860.0">
+               <children>
+                  <Label text="Best rating courses" textFill="#006aff">
+                     <font>
+                        <Font name="Arial Bold Italic" size="20.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                     <content>
+                        <HBox fx:id="bestRatingHBox" prefHeight="42.0" prefWidth="857.0" />
+                     </content>
+                  </ScrollPane>
+                  <Label text="Trending courses" textFill="#006aff">
+                     <font>
+                        <Font name="Arial Bold Italic" size="20.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Label>
+                  <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                     <content>
+                        <HBox fx:id="trendingHBox" prefHeight="42.0" prefWidth="858.0" />
+                     </content>
+                  </ScrollPane>
+                  <BorderPane prefHeight="200.0" prefWidth="200.0">
+                     <left>
+                        <Label text="Your friend also liked/compleated.." textFill="#006aff" BorderPane.alignment="CENTER">
+                           <font>
+                              <Font name="Arial Bold Italic" size="20.0" />
+                           </font>
+                        </Label>
+                     </left>
+                     <right>
+                        <ImageView fx:id="readMore1Image" fitHeight="45.0" fitWidth="52.0" preserveRatio="true" BorderPane.alignment="CENTER">
+                           <image>
+                              <Image url="@../img/readMore.png" />
+                           </image>
+                        </ImageView>
+                     </right>
+                  </BorderPane>
+                  <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                     <content>
+                        <HBox fx:id="friendsCompletedLikedHBox" prefHeight="41.0" prefWidth="857.0" />
+                     </content>
+                  </ScrollPane>
+                  <BorderPane prefHeight="200.0" prefWidth="200.0">
+                     <left>
+                        <Label text="Your instructor also created.." textFill="#006aff" BorderPane.alignment="CENTER">
+                           <font>
+                              <Font name="Arial Bold Italic" size="20.0" />
+                           </font>
+                        </Label>
+                     </left>
+                     <right>
+                        <ImageView fx:id="readMore2Image" fitHeight="45.0" fitWidth="52.0" preserveRatio="true" BorderPane.alignment="CENTER">
+                           <image>
+                              <Image url="@../img/readMore.png" />
+                           </image>
+                        </ImageView>
+                     </right>
+                  </BorderPane>
+                  <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                     <content>
+                        <HBox fx:id="instructorSuggestionsHBox" prefHeight="42.0" prefWidth="858.0" />
+                     </content>
+                  </ScrollPane>
+                  <BorderPane prefHeight="200.0" prefWidth="200.0">
+                     <left>
+                        <Label text="Suggested Users" textFill="#006aff" BorderPane.alignment="CENTER">
+                           <font>
+                              <Font name="Arial Bold Italic" size="20.0" />
+                           </font>
+                        </Label>
+                     </left>
+                     <right>
+                        <ImageView fx:id="readMore3Image" fitHeight="45.0" fitWidth="52.0" preserveRatio="true" BorderPane.alignment="CENTER">
+                           <image>
+                              <Image url="@../img/readMore.png" />
+                           </image>
+                        </ImageView>
+                     </right>
+                  </BorderPane>
+                  <ScrollPane prefHeight="200.0" prefWidth="200.0">
+                     <content>
+                        <HBox fx:id="usersHBox" prefHeight="42.0" prefWidth="856.0" />
+                     </content>
+                  </ScrollPane>
+               </children>
+            </VBox>
+         </children>
+      </AnchorPane>
+   </content>
+</ScrollPane>
