@@ -5,7 +5,15 @@ import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
-import org.w3c.dom.events.MouseEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,7 +21,8 @@ import java.util.List;
 
 public class CoursePageController {
 
-    @FXML private Label titleLabel;
+    @FXML
+    private Label titleLabel;
     @FXML private TextArea descriptionTextArea;
     @FXML private ImageView courseImageImageView;
     @FXML private Button likeCourseButton;
@@ -114,9 +123,9 @@ public class CoursePageController {
 
         levelLabel.setText(course.getLevel());
 
-        durationLabel.setText(course.getDuration());
+        durationLabel.setText(Double.toString(course.getDuration()));
 
-        priceLabel.setText(course.getPrice());
+        priceLabel.setText(Double.toString(course.getPrice()));
 
         if(course.getModality()!=null)
             modalityLabel.setText(course.getModality());
@@ -155,9 +164,9 @@ public class CoursePageController {
     }
 
     private void createReviewsElements(List<Review> reviewsList, VBox container){
-        BorderPane* reviewBorderPane;
+        BorderPane reviewBorderPane;
         for(Review r: reviewsList){
-            reviewBorderPane = loadReview();
+            reviewBorderPane = loadReview(r);
             container.getChildren().add(reviewBorderPane);
         }
     }

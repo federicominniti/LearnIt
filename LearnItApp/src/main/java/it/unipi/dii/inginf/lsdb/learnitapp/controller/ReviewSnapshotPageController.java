@@ -1,12 +1,20 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class ReviewSnapshotPageController {
-    @FXML private Label courseTitleLabel;
-    @FXML private ImageView profiePicImageView;
+    @FXML
+    private Label courseTitleLabel;
+    @FXML private ImageView profilePicImageView;
     @FXML private Label usernameLabel;
     @FXML private TextArea commentTextArea;
     @FXML private HBox ratingHBox;
@@ -25,20 +33,30 @@ public class ReviewSnapshotPageController {
         else
             courseTitleLabel.setText("");
 
-        handleReviewRating();
+        try{
+            handleReviewRating();
+        }
+        catch(Exception e){
+            e.printStackTrace(); // handle exception ???
+        }
 
         usernameLabel.setText(review.getAuthor().getUsername());
         completeNameLabel.setText(review.getAuthor().getCompleteName());
+
+        if(review.getAuthor().getProfilePic() != null){
+            Image profilePicture = new Image(review.getAuthor().getProfilePic());
+            profilePicImageView.setImage(profilePicture);
+        }
 
         if(review.getContent() != null)
             commentTextArea.setText(review.getContent());
         else
             commentTextArea.setText("");
 
-        lastModifiedLabel.setText(review.getTimestamp());
+        lastModifiedLabel.setText(review.getTimestamp().toString());
     }
 
-    private void handleReviewRating(){
+    private void handleReviewRating() throws FileNotFoundException {
         int rating = review.getRating();
 
         for(int i=1; i<=rating; i++){

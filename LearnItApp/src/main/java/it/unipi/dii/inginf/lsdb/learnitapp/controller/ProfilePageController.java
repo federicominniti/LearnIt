@@ -6,13 +6,13 @@ import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProfilePageController {
@@ -84,16 +84,13 @@ public class ProfilePageController {
         usernameLabel.setText(profileUser.getUsername());
         birthTextField.setText(profileUser.getDateOfBirth().toString());
         genderTextField.setText(profileUser.getGender());
-        followerNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(0)); // ??? ricontrollare indice
-        followingNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(1)); // ??? ricontrollare indice
+        followerNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(0).toString()); // ??? ricontrollare indice
+        followingNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(1).toString()); // ??? ricontrollare indice
 
-
-        Image profilePicture;
         if(profileUser.getProfilePic() != null){
-            profilePicture = new Image("/img/lernitUserPropic.png"); // ?? da gestire
+            Image profilePicture = new Image(profileUser.getProfilePic());
+            propicImageView.setImage(profilePicture);
         }
-
-        propicImageView..setImage(profilePicture);
 
         birthTextField.setEditable(false);
         genderTextField.setEditable(false);
@@ -109,14 +106,13 @@ public class ProfilePageController {
     }
 
     private void loadCourses(){
-        int skip = ConfigParams.getLocalConfig().getSkipNumber();
-        List<Course> likedCourses = neo4jDriver.findCoursesLikedOrCompletedByUser(profileUser, false, skip, limit);
+        List<Course> likedCourses = neo4jDriver.findCoursesLikedOrCompletedByUser(profileUser, false, 0, limit);
         Utils.createCoursesElements(likedCourses, likedCoursesHBox);
 
-        List<Course> reviewedCourses = neo4jDriver.findCoursesLikedOrCompletedByUser(profileUser, true, skip, limit);
+        List<Course> reviewedCourses = neo4jDriver.findCoursesLikedOrCompletedByUser(profileUser, true, 0, limit);
         Utils.createCoursesElements(reviewedCourses, reviewedCoursesHBox);
 
-        List<Course> offeredCourses = neo4jDriver.findOfferedCourses(profileUser.getUsername());
+        List<Course> offeredCourses = neo4jDriver.findCoursesOfferedByUser(profileUser, 0, limit);
         Utils.createCoursesElements(offeredCourses, offeredCoursesHBox);
     }
 
@@ -145,12 +141,12 @@ public class ProfilePageController {
                 createCoursesElements(courses, reviewedCoursesHBox);
                 break;
             case OFFERED_COURSES:
-                courses = neo4jDriver.findOfferedCourses(profileUser.getUsername(), skip, limit);
+                courses = neo4jDriver.findCoursesOfferedByUser(profileUser, skip, limit);
                 createCoursesElements(courses, offeredCoursesHBox);
                 break;
             case FOLLOWER_USERS:
                 users = neo4jDriver.findFollowerUsers(profileUser, skip, limit);
-                createCoursesElements(courses, followerUsersHBox);
+                createUsersElements(users, followerUsersHBox);
                 break;
             default:
                 users = neo4jDriver.findFollowedUsers(profileUser, skip, limit);
@@ -171,9 +167,7 @@ public class ProfilePageController {
 
             followButton.setText("follow");
 
-            ??? aggiornare la lista di utenti seguiti nella pagina profilo
-
-            followingNumberLabel.setText(Integer.parseInt(followingNumberLabel.getText())-1);
+            followingNumberLabel.setText(Integer.toString((Integer.parseInt(followingNumberLabel.getText())-1)));
         }
         else{
             // Follow operation
@@ -181,10 +175,15 @@ public class ProfilePageController {
 
             followButton.setText("unfollow");
 
-            ??? aggiornare la lista di utenti seguiti nella pagina profilo
-
-            followingNumberLabel.setText(Integer.parseInt(followingNumberLabel.getText())+1);
+            followingNumberLabel.setText(Integer.toString((Integer.parseInt(followingNumberLabel.getText())+1)));
         }
+
+        // update of the shown list of followed users
+        followingUsersHBox.getChildren().clear();
+
+        List<User> followingUsers = neo4jDriver.findFollowedUsers(profileUser, 0, limit);
+        Utils.createUsersElements(followingUsers, followingUsersHBox);
+
     }
 
     public void backToHomeButtonHandler(MouseEvent clickEvent){
