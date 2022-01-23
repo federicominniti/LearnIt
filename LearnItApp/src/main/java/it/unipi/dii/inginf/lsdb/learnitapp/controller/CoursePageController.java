@@ -4,12 +4,15 @@ import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
@@ -44,11 +47,12 @@ public class CoursePageController {
     private int limit;
 
     public void initialize() {
+        User loggedUser = Session.getLocalSession().getLoggedUser();
         limit = ConfigParams.getLocalConfig().getLimitNumber();
 
         backToHomeButton.setOnMouseClicked(clickEvent -> backToHomeButtonHandler(clickEvent));
 
-        if(course.getInstructor().getUsername().equals(Session.getLocalSession().getLoggedUser().getUsername())){ // the session user is the instructor
+        if(course.getInstructor().getUsername().equals(loggedUser.getUsername())){ // own course
             editCourseButton.setOnMouseClicked(clickEvent -> editCourseButtonHandler(clickEvent));
             reviewCourseButton.setVisible(false);
             likeCourseButton.setVisible(false);
@@ -57,6 +61,10 @@ public class CoursePageController {
             editCourseButton.setVisible(false);
             reviewCourseButton.setOnMouseClicked(clickEvent -> reviewCourseButtonHandler(clickEvent));
             likeCourseButton.setOnMouseClicked(clickEvent -> likeCourseButtonHandler(clickEvent));
+
+            if(isCourseLikedByUser(course, loggedUser)){
+                likeCourseButton.setText("dislike");
+            }
         }
 
         loadCourseInformation();
@@ -72,11 +80,21 @@ public class CoursePageController {
     }
 
     public void reviewCourseButtonHandler(MouseEvent clickEvent){
-
+        // gestire ???
     }
 
     public void likeCourseButtonHandler(MouseEvent clickEvent){
-
+        User loggedUser = Session.getLocalSession().getLoggedUser();
+        if(isCourseLikedByUser(course, loggedUser)){
+            //dislike
+            Neo4jDriver.getInstance().dislikeCourse(loggedUser, course);
+            likeCourseButton.setText("like");
+        }
+        else{
+            //like
+            Neo4jDriver.getInstance().likeCourse(loggedUser, course);
+            likeCourseButton.setText("dislike");
+        }
     }
 
     private void loadMore(){
@@ -102,7 +120,8 @@ public class CoursePageController {
         descriptionTextArea.setText(course.getDescription());
 
         if(course.getCoursePic()!=null){
-            // ??? gestione immagine corso
+            Image coursePicture = new Image(course.getCoursePic());
+            courseImageImageView.setImage(coursePicture);
         }
 
         languageLabel.setText(course.getLanguage());
