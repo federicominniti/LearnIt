@@ -5,6 +5,11 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
 import com.thoughtworks.xstream.security.NullPermission;
 import com.thoughtworks.xstream.security.PrimitiveTypePermission;
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
+import it.unipi.dii.inginf.lsdb.learnitapp.controller.CourseSnapshotController;
+import it.unipi.dii.inginf.lsdb.learnitapp.controller.ElementsLineController;
+import it.unipi.dii.inginf.lsdb.learnitapp.controller.UserSnapshotController;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -12,7 +17,11 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.neo4j.driver.internal.InternalPath;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -26,12 +35,18 @@ import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static java.lang.Thread.sleep;
 
 public class Utils {
+    public final static int FRIENDS_COMPLETED_LIKED = 1;
+    public final static int INSTRUCTORS_SUGGESTIONS = 2;
+    public final static int USER_SUGGESTIONS = 3;
+    public final static int BEST_RATING = -1;
+    public final static int TRENDING_COURSE = -2;
 
     public static ConfigParams getParams() {
         if (validConfigParams()) {
@@ -107,8 +122,7 @@ public class Utils {
         return null;
     }
 
-    public static void showErrorAlert (String text)
-    {
+    public static void showErrorAlert (String text) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setContentText(text);
         alert.setHeaderText("Ops.. Something went wrong..");
@@ -118,8 +132,7 @@ public class Utils {
         alert.show();
     }
 
-    public static void showInfoAlert (String text)
-    {
+    public static void showInfoAlert (String text) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(text);
         alert.setHeaderText("Confirm Message");
@@ -130,5 +143,76 @@ public class Utils {
         imageView.setPreserveRatio(true);
         alert.setGraphic(imageView);
         alert.show();
+    }
+
+    public static Pane loadCourseSnapshot(Course course) {
+        Pane pane = null;
+        try {
+            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/courseSnapshot.fxml"));
+            pane = (Pane) loader.load();
+            CourseSnapshotController courseSnapshotController = (CourseSnapshotController) loader.getController();
+            courseSnapshotController.setSnapshotCourse(course);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return pane;
+    }
+
+    public static void addCoursesSnapshot(HBox courseHBox, List<Course> courses) {
+        for(int i = 0; i<courses.size(); i++) {
+            Pane coursePane = loadCourseSnapshot(courses.get(i));
+            courseHBox.getChildren().add(coursePane);
+        }
+    }
+
+    public static void addLine(VBox discoverySections, List<Course> courses, List<User> users, int type) {
+        Pane line = loadElementsLine(courses, users, type);
+        discoverySections.getChildren().add(line);
+    }
+
+    private static Pane loadElementsLine(List<Course> courses, List<User> users, int type) {
+        //coursesUsersLine
+        // 0 -> courses
+        // 1 -> users
+        //buttonLoadMore
+        // 0 -> no button
+        // 1 -> yes button
+        Pane pane = null;
+        try {
+            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/ElementsLine.fxml"));
+            pane = (Pane) loader.load();
+            if(type != USER_SUGGESTIONS) {
+                ElementsLineController<Course> coursesLine = (ElementsLineController<Course>) loader.getController();
+                coursesLine.setCoursesUsers(courses, type);
+            }
+            else {
+                ElementsLineController<User> coursesLine = (ElementsLineController<User>) loader.getController();
+                coursesLine.setCoursesUsers(users, type);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return pane;
+    }
+
+    public static Pane loadUserSnapshot (User user)
+    {
+        Pane pane = null;
+        try {
+            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/userSnapshot.fxml"));
+            pane = (Pane) loader.load();
+            UserSnapshotController userSnapshotController = (UserSnapshotController) loader.getController();
+            userSnapshotController.setSnapshotUser(user);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return pane;
+    }
+
+    public static void addUsersSnapshot(HBox usersHBox, List<User> users) {
+        for(int i = 0; i<users.size(); i++) {
+            Pane coursePane = loadUserSnapshot(users.get(i));
+            usersHBox.getChildren().add(coursePane);
+        }
     }
 }

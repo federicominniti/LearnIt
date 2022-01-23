@@ -7,14 +7,21 @@ import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.geometry.HPos;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontPosture;
@@ -32,60 +39,72 @@ public class DiscoveryPageController {
     @FXML private RadioButton usersRadio;
     @FXML private ChoiceBox languageChoiceBox;
     @FXML private ChoiceBox levelChoiceBox;
-    @FXML private ChoiceBox durationChoiceBox;
-    @FXML private ChoiceBox priceChoiceBox;
+    @FXML private TextField maxDurationTextField;
+    @FXML private TextField maxPriceTextField;
     @FXML private Label usernameLabel;
     @FXML private ImageView profilePic;
-    @FXML private HBox bestRatingHBox;
-    @FXML private HBox trendingHBox;
-    @FXML private HBox friendsCompletedLikedHBox;
-    @FXML private HBox instructorSuggestionsHBox;
-    @FXML private HBox usersHBox;
-    @FXML private ImageView readMore1Image;
-    @FXML private ImageView readMore2Image;
-    @FXML private ImageView readMore3Image;
+    @FXML private VBox elementsVBox;
+
     private int[]pageNumber = {0, 0, 0};
     private ToggleGroup searchType;
     private Neo4jDriver neo4jDriver;
     private MongoDBDriver mongoDBDriver;
     private int limit;
+    private ElementsLineController<Course> bestRating;
+    private ElementsLineController<Course> trendingCourse;
+    private ElementsLineController<Course> friendsCompletedLiked;
+    private ElementsLineController<Course> instructorSuggestions;
+    private ElementsLineController<User> suggestedUsers;
+    private int currentI;
+    private GridPane gridPane;
 
     private String []languages = {"Arabic", "Chinese", "English", "French", "German", "Hebrew", "Hungarian", "Indonesian",
-        "Italian", "Japanese", "Korean", "Portuguese", "Russian", "Spanish", "Swedish", "Turkish", "Ukrainian", "Albanian",
-        "Azeri", "Bengali", "Bulgarian", "Burmese", "Croatian", "Czech", "Greek", "Hindi", "Estonian", "Filipino",
-        "Indonesia", "Lithuanian", "Malay", "Marathi", "Nederlands", "Norwegian", "Persian", "Polski", "Română", "Serbian",
-        "Swahili", "Tamil", "Telugu", "Urdu", "Vietnamese", "русский", "ไทย", "日本語", "简体中文", "繁體中文", "한국어"};
+            "Italian", "Japanese", "Korean", "Portuguese", "Russian", "Spanish", "Swedish", "Turkish", "Ukrainian", "Albanian",
+            "Azeri", "Bengali", "Bulgarian", "Burmese", "Croatian", "Czech", "Greek", "Hindi", "Estonian", "Filipino",
+            "Indonesia", "Lithuanian", "Malay", "Marathi", "Nederlands", "Norwegian", "Persian", "Polski", "Română", "Serbian",
+            "Swahili", "Tamil", "Telugu", "Urdu", "Vietnamese", "русский", "ไทย", "日本語", "简体中文", "繁體中文", "한국어"};
 
     private String []levels = {"All Levels", "Beginner", "Expert", "Intermediate"};
-    private String []durations = {"1-30 ore", "30-60 ore", "60-90 ore", "90-120 ore", ">120 ore"};
-    private String []prices = {"0-30 €", "30-70  €", "70-100 €", "100-200 €", ">200 €"};
     private final static String PROFILE_PAGE = "/fxml/ProfilePage.fxml";
-    private final static String COURSE_DEFAULT_PIC = "/img/courseDefaultPic.png";
-    private final static String USER_DEFAULT_PIC = "/img/userDefaultPic.png";
-    private final static int FRIENDS_COMPLETED_LIKED = 1;
-    private final static int INSTRUCTORS_SUGGESTIONS = 2;
-    private final static int USER_SUGGESTIONS = 3;
+    //private final static String COURSE_DEFAULT_PIC = "/img/courseDefaultPic.png";
+    //private final static String USER_DEFAULT_PIC = "/img/userDefaultPic.png";
+
 
     public void initialize() {
         neo4jDriver = Neo4jDriver.getInstance();
         mongoDBDriver = MongoDBDriver.getInstance();
         limit = ConfigParams.getLocalConfig().getLimitNumber();
 
-        bestRatingHBox.getChildren().clear();
-        trendingHBox.getChildren().clear();
-        friendsCompletedLikedHBox.getChildren().clear();
-        instructorSuggestionsHBox.getChildren().clear();
-        usersHBox.getChildren().clear();
+        elementsVBox.getChildren().clear();
         pageNumber[0] = pageNumber[1] = pageNumber[2] = 0;
+
+        gridPane.setAlignment(Pos.CENTER);
+        gridPane.setPadding(new Insets(10, 10, 10, 10));
 
         fillInterfaceElements();
         usernameLabel.setOnMouseClicked(clickEvent -> Utils.changeScene(PROFILE_PAGE, clickEvent));
         profilePic.setOnMouseClicked(clickEvent -> Utils.changeScene(PROFILE_PAGE,clickEvent));
-        fillSuggestions();
+        initializeSuggestions();
         searchButton.setOnMouseClicked(clickEvent -> searchHandler(clickEvent));
-        readMore1Image.setOnMouseClicked(clickEvent -> loadMore(FRIENDS_COMPLETED_LIKED));
-        readMore2Image.setOnMouseClicked(clickEvent -> loadMore(INSTRUCTORS_SUGGESTIONS));
-        readMore3Image.setOnMouseClicked(clickEvent -> loadMore(USER_SUGGESTIONS));
+
+        searchType.selectedToggleProperty().addListener(
+                (observable, oldToggle, newToggle) -> {
+                    if (newToggle == usersRadio) {
+                        maxDurationTextField.setDisable(true);
+                        maxPriceTextField.setDisable(true);
+                        languageChoiceBox.setDisable(true);
+                        levelChoiceBox.setDisable(true);
+                    } else if (newToggle == coursesRadio) {
+                        maxDurationTextField.setDisable(false);
+                        maxPriceTextField.setDisable(false);
+                        languageChoiceBox.setDisable(false);
+                        levelChoiceBox.setDisable(false);
+                    }
+                }
+        );
+
+
+
     }
 
     private void fillInterfaceElements(){
@@ -95,20 +114,118 @@ public class DiscoveryPageController {
 
         languageChoiceBox = new ChoiceBox(FXCollections.observableArrayList(languages));
         levelChoiceBox = new ChoiceBox(FXCollections.observableArrayList(levels));
-        durationChoiceBox = new ChoiceBox(FXCollections.observableArrayList(durations));
-        priceChoiceBox = new ChoiceBox(FXCollections.observableArrayList(prices));
 
         usernameLabel.setText(Session.getLocalSession().getLoggedUser().getUsername());
         profilePic.setImage(new Image(Session.getLocalSession().getLoggedUser().getProfilePic()));
-
-        bestRatingHBox.setPrefHeight(180);
-        trendingHBox.setPrefHeight(180);
-        friendsCompletedLikedHBox.setPrefHeight(180);
-        instructorSuggestionsHBox.setPrefHeight(180);
-        usersHBox.setPrefHeight(180);
     }
 
-    private void createCoursesElements(List<Course> courses, HBox coursesList){
+    private void initializeSuggestions(){
+        User myUser = Session.getLocalSession().getLoggedUser();
+        int skip = 0;
+
+        List<Course> bestRating = mongoDBDriver.findBestRatings(limit);
+        Utils.addLine(elementsVBox, bestRating, null, Utils.BEST_RATING);
+
+        List<Course> trending = mongoDBDriver.trendingCourses(limit);
+        Utils.addLine(elementsVBox, trending, null, Utils.TRENDING_COURSE);
+
+        List<Course> suggested = neo4jDriver.findSuggestedCourses(myUser, skip, limit);
+        Utils.addLine(elementsVBox, suggested, null, Utils.FRIENDS_COMPLETED_LIKED);
+
+        List<Course> completedSuggestions = neo4jDriver.findSuggestedCoursesByCompletedCourses(myUser, skip, limit);
+        Utils.addLine(elementsVBox, completedSuggestions, null, Utils.INSTRUCTORS_SUGGESTIONS);
+
+        List<User> suggestedUsers = neo4jDriver.findSuggestedUsers(myUser, skip, limit);
+        Utils.addLine(elementsVBox, null, suggestedUsers, Utils.USER_SUGGESTIONS);
+    }
+
+    private void searchHandler(MouseEvent clickEvent){
+        if(searchType.getSelectedToggle() == null) {
+            Utils.showErrorAlert("Please select user or course!");
+            return;
+        }
+
+        RadioButton selected = (RadioButton) searchType.getSelectedToggle();
+        String title = "", level = "", language = "";
+        double duration = -1, price = -1;
+        title = searchTextField.getText();
+        level = levelChoiceBox.getValue().toString();
+        language = languageChoiceBox.getValue().toString();
+        duration = Double.parseDouble(maxDurationTextField.getText());
+        price = Double.parseDouble(maxPriceTextField.getText());
+        if(selected.getText().equals("Courses") && title.equals("") && level.equals("") && language.equals("") &&
+                duration == -1 && price == -1)
+
+            return;
+        else{
+            if(selected.getText().equals("Courses")) {
+                elementsVBox.getChildren().clear();
+                addMoreResearchedCourses(title, level, language, duration, price);
+            }
+            else{
+                if(selected.getText().equals("Users") && searchTextField.getText().equals(""))
+                    return;
+                else{
+                    String username = "";
+                    username = searchTextField.getText();
+                    elementsVBox.getChildren().clear();
+                    addMoreResearchedUsers(username);
+                }
+            }
+        }
+        elementsVBox.getChildren().add(gridPane);
+    }
+
+    private void addMoreResearchedCourses(String title, String level, String language,
+                                          double duration, double price){
+        List<Course> searchedCourses = mongoDBDriver.findCourses(price, duration, title, level, language, ((currentI*4)-1), 15);
+        for(int i = currentI; i<currentI + 4; i++){
+            for(int j = 0; j<4; j++) {
+                if(searchedCourses.get(i*4 + j) != null) {
+                    Pane coursePane = Utils.loadCourseSnapshot(searchedCourses.get(i));
+                    GridPane.setHalignment(coursePane, HPos.CENTER);
+                    GridPane.setValignment(coursePane, VPos.CENTER);
+                    gridPane.add(coursePane, i, j);
+                }
+                if(i == currentI + 3 && j == 3) {
+                    Label more = new Label();
+                    more.setText("Read more element..");
+                    more.setOnMouseClicked(newClickEvent -> addMoreResearchedCourses(title, level, language,
+                            duration, price));
+                    GridPane.setHalignment(more, HPos.CENTER);
+                    GridPane.setValignment(more, VPos.CENTER);
+                    gridPane.add(more, i, j);
+                }
+            }
+        }
+        currentI += 4;
+    }
+
+    private void addMoreResearchedUsers(String username){
+        List<User> searchedUsers = neo4jDriver.searchUserByUsername(15, ((currentI*4)-1), username);
+        for(int i = currentI; i<currentI + 4; i++){
+            for(int j = 0; j<4; j++) {
+                if(searchedUsers.get(i*4 + j) != null) {
+                    Pane coursePane = Utils.loadUserSnapshot(searchedUsers.get(i));
+                    GridPane.setHalignment(coursePane, HPos.CENTER);
+                    GridPane.setValignment(coursePane, VPos.CENTER);
+                    gridPane.add(coursePane, i, j);
+                }
+                if(i == currentI + 3 && j == 3) {
+                    Label more = new Label();
+                    more.setText("Read more element..");
+                    more.setOnMouseClicked(newClickEvent -> addMoreResearchedUsers(username));
+                    GridPane.setHalignment(more, HPos.CENTER);
+                    GridPane.setValignment(more, VPos.CENTER);
+                    gridPane.add(more, i, j);
+                }
+            }
+        }
+        currentI += 4;
+    }
+
+
+    /*private void createCoursesElements(List<Course> courses, HBox coursesList){
         for(int i = 0; i<courses.size(); i++){
             VBox course = new VBox();
             course.setAlignment(Pos.CENTER);
@@ -147,9 +264,9 @@ public class DiscoveryPageController {
             coursesList.getChildren().add(course);
         }
 
-    }
+    }*/
 
-    private void createUsersElements(List<User> users, HBox usersList){
+    /*private void createUsersElements(List<User> users, HBox usersList){
         for(int i = 0; i<users.size(); i++){
             VBox user = new VBox();
             user.setAlignment(Pos.CENTER);
@@ -191,9 +308,9 @@ public class DiscoveryPageController {
             usersList.getChildren().add(user);
         }
 
-    }
+    }*/
 
-    private void loadMore(int index){
+    /*private void loadMore(int index){
         User myUser = Session.getLocalSession().getLoggedUser();
         int skip = pageNumber[index-1]*limit;
         pageNumber[index-1]++;
@@ -202,32 +319,19 @@ public class DiscoveryPageController {
         switch (index){
             case FRIENDS_COMPLETED_LIKED:
                 courses = neo4jDriver.findSuggestedCourses(myUser, skip, limit);
-                createCoursesElements(courses, friendsCompletedLikedHBox);
+                //createCoursesElements(courses, friendsCompletedLikedHBox);
+                Utils.addCoursesSnapshot(friendsCompletedLikedHBox, courses);
                 break;
             case INSTRUCTORS_SUGGESTIONS:
                 courses = neo4jDriver.findSuggestedCoursesByCompletedCourses(myUser, skip, limit);
-                createCoursesElements(courses, instructorSuggestionsHBox);
+                //createCoursesElements(courses, instructorSuggestionsHBox);
+                Utils.addCoursesSnapshot(friendsCompletedLikedHBox, courses);
                 break;
             default:
                 users = neo4jDriver.findSuggestedUsers(myUser, skip, limit);
-                createUsersElements(users, usersHBox);
+                //createUsersElements(users, usersHBox);
+                Utils.addUsersSnapshot(usersHBox, users);
         }
-    }
-
-    private void fillSuggestions(){
-        bestRatingHBox.getChildren().clear();
-        List<Course> bestRating = mongoDBDriver.findBestRatings(limit);
-        createCoursesElements(bestRating, bestRatingHBox);
-
-        trendingHBox.getChildren().clear();
-        List<Course> trending = mongoDBDriver.trendingCourses(limit);
-        createCoursesElements(trending, trendingHBox);
-
-        loadMore(FRIENDS_COMPLETED_LIKED);
-        loadMore(INSTRUCTORS_SUGGESTIONS);
-        loadMore(USER_SUGGESTIONS);
-    }
-
-    private void searchHandler(MouseEvent clickEvent){}
+    }*/
 
 }

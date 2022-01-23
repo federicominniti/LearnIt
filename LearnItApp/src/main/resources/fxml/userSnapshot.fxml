@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="userSnapshot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="230.0" style="-fx-background-color: white; -fx-background-position: center; -fx-border-radius: 20px; -fx-border-style: solid; -fx-border-color: #006aff#006aff; -fx-border-width: 2px;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.UserSnapshotController">
+   <children>
+      <ImageView fx:id="userPicImage" fitHeight="106.0" fitWidth="90.0" layoutX="69.0" layoutY="57.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/userDefault.png" />
+         </image>
+      </ImageView>
+      <Label fx:id="usernameLabel" alignment="CENTER" layoutX="3.0" layoutY="25.0" prefHeight="17.0" prefWidth="223.0" text="Username" />
+      <Label fx:id="completeNameLabel" alignment="CENTER" layoutX="3.0" layoutY="161.0" prefHeight="17.0" prefWidth="223.0" text="Complete name " />
+      <Label fx:id="genderLabel" alignment="CENTER" layoutX="3.0" layoutY="184.0" prefHeight="17.0" prefWidth="223.0" text="Gender" />
+      <Label fx:id="totalCoursesLabel" alignment="CENTER" layoutX="4.0" layoutY="207.0" prefHeight="17.0" prefWidth="223.0" text="Tot Courses" />
+   </children>
+</AnchorPane>
