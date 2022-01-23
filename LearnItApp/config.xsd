@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="it.unipi.dii.inginf.lsdb.learnitapp.config.Config">
+    <xs:element name="it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams">
         <xs:complexType>
             <xs:sequence>
                 <xs:element name="mongoDBPrimaryIP" type="xs:string"/>
@@ -13,6 +13,10 @@
                 <xs:element name="mongoDBPassword" type="xs:string"/>
                 <xs:element name="mongoDBName" type="xs:string"/>
                 <xs:element name="limitNumber" type="xs:int"/>
+                <xs:element name="neo4jIP" type="xs:string"/>
+                <xs:element name="neo4jPort" type="xs:int"/>
+                <xs:element name="neo4jUsername" type="xs:string"/>
+                <xs:element name="neo4jPassword" type="xs:string"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

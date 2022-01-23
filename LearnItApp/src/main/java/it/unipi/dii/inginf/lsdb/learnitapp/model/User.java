@@ -41,6 +41,13 @@ public class User {
         this.completeName = completeName;
     }
 
+
+    public User(String username, String completeName, String picture) {
+        this.username = username;
+        this.completeName = completeName;
+        this.profilePic = picture;
+    }
+
     public enum Role {
         ADMINISTRATOR,
         STANDARD;

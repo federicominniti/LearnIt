@@ -39,6 +39,16 @@ public class Course {
     private int sum_ratings;
     @BsonProperty(value="course_pic")
     private String coursePic;
+    @BsonProperty(value="year")
+    private int year;
+
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
 
     public Course(ObjectId id, String title, String description, User instructor, String language, List<String> category,
                   String level, double duration, double price, String link, String modality, List<Review> reviews,
@@ -63,6 +73,8 @@ public class Course {
     public Course(String title) {
         this.title = title;
     }
+
+    public Course(ObjectId id) { this.id = id; }
 
     public Course(String title, String description, User instructor, String language, List<String> category, String level,
                   double duration, double price, String link, String modality, List<Review> reviews, int num_reviews,
@@ -90,10 +102,11 @@ public class Course {
         this.price = price;
     }
 
-    public Course(String title, double duration, double price) {
+    public Course(String title, double duration, double price, String coursePic) {
         this.title = title;
         this.duration = duration;
         this.price = price;
+        this.coursePic = coursePic;
     }
 
     public Course() {

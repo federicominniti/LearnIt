@@ -60,6 +60,7 @@ public class MongoDBDriver implements DBDriver {
     public static MongoDBDriver getInstance() {
         if (mongoDBInstance == null) {
             mongoDBInstance = new MongoDBDriver(ConfigParams.getLocalConfig());
+            mongoDBInstance.initConnection();
         }
 
         return mongoDBInstance;
@@ -107,7 +108,7 @@ public class MongoDBDriver implements DBDriver {
 
             DBObject ping = new BasicDBObject("ping","1");
 
-            collection = database.getCollection("prova2", Course.class);
+            collection = database.getCollection("learnit", Course.class);
             database.runCommand((Bson) ping);
         } catch (Exception e) {
             System.err.println("MongoDB unavailable");
@@ -123,6 +124,7 @@ public class MongoDBDriver implements DBDriver {
             mongoClient.close();
     }
 
+    //provata
     public boolean addCourse(Course newCourse) {
         try {
             collection.insertOne(newCourse);
@@ -135,10 +137,21 @@ public class MongoDBDriver implements DBDriver {
         return true;
     }
 
+    //provata
+    public Course getCourseByTitle(String title) {
+        try {
+            Course c = collection.find(Filters.eq("title", title)).first();
+            return c;
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    //provata
     public boolean updateCourse(Course editedCourse) {
         try {
             Document d = new Document("title", editedCourse.getTitle())
-                    .append("instructors", editedCourse.getInstructors())
+                    .append("instructor", editedCourse.getInstructor())
                     .append("description", editedCourse.getDescription())
                     .append("language", editedCourse.getLanguage())
                     .append("level", editedCourse.getLevel())
@@ -167,6 +180,7 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
+    //provata
     public boolean deleteCourse(Course toBeDeleted) {
         try {
             collection.deleteOne(new Document("_id", toBeDeleted.getId()));
@@ -177,9 +191,10 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
+    //provata
     public boolean deleteUserCourses(User user) { // aggiungere indice per la find ???
 
-        List<Course> toBeDeleted = collection.find(Filters.elemMatch("instructors", Filters.eq("username", user.getUsername()))).into(new ArrayList<>());
+        List<Course> toBeDeleted = collection.find(Filters.eq("instructor", user.getUsername())).into(new ArrayList<>());
 
         List<String> oids = new ArrayList<>();
 
@@ -192,9 +207,10 @@ public class MongoDBDriver implements DBDriver {
 
 
 
+    //provata
     public Course getCourseFromId(ObjectId oid){
         try {
-            return  (Course) collection.find(eq("_id", oid.toString())).first();
+            return  (Course) collection.find(eq("_id", oid)).first();
         }
         catch (Exception ex) {
             return null;
@@ -209,8 +225,9 @@ public class MongoDBDriver implements DBDriver {
      * @param quantity number of courses to retrieve
      * @return a list of courses
      */
-    public List<Course> searchCoursesByTitle (String title, int toSkip, int quantity)
-    {
+
+    //provata
+    public List<Course> searchCoursesByTitle (String title, int toSkip, int quantity) {
         Pattern pattern = Pattern.compile("^.*" + title + ".*$", Pattern.CASE_INSENSITIVE);
         Bson match = Aggregates.match(Filters.regex("title", pattern));
         Bson skip = skip(toSkip);
@@ -220,9 +237,12 @@ public class MongoDBDriver implements DBDriver {
         return results;
     }
 
+    //provata
     public boolean addReview(Course course, Review review) {
         try {
             List<Review> reviewsList = course.getReviews();
+            if (reviewsList == null)
+                reviewsList = new ArrayList<>();
             reviewsList.add(review);
             updateReviews(course.getId(), reviewsList);
             return true;
@@ -231,14 +251,18 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
-
+    //provata
     public boolean addReviewRedundancies(Course course, Review review) {
         try {
             boolean result = addReview(course, review);
+            System.out.println(result);
             if(result){
+                System.out.println(course.getNum_reviews());
+                System.out.println(course.getSum_ratings());
+                System.out.println(review.getRating());
                 course.setNum_reviews(course.getNum_reviews() + 1);
                 course.setSum_ratings(course.getSum_ratings() + review.getRating());
-                return  updateCourse(course);
+                return updateCourse(course);
             }
             return false;
         } catch (Exception e) {
@@ -246,12 +270,14 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
+    //provata
     public boolean updateReviews(ObjectId id, List<Review> reviews) {
         Bson update = new Document("reviews", reviews);
         Bson updateOperation = new Document("$set", update);
-        return collection.updateOne(new Document("_id", id.toString()), updateOperation).wasAcknowledged();
+        return collection.updateOne(new Document("_id", id), updateOperation).wasAcknowledged();
     }
 
+    //provata
     public boolean editReview(Course course, Review review){
         List<Review> reviewsList = course.getReviews();
         int count = 0;
@@ -264,32 +290,41 @@ public class MongoDBDriver implements DBDriver {
             }
             count++;
         }
-        return updateCourse(course);
+        return updateCourse(course) && updateReviews(course.getId(), reviewsList);
     }
 
+    //provata
     public boolean deleteReview(Course course, Review review){
         List<Review> reviewsList  = course.getReviews();
         reviewsList.remove(review);
         course.setNum_reviews(course.getNum_reviews()-1);
         course.setSum_ratings(course.getSum_ratings()-review.getRating());
-        return updateCourse(course);
+        return updateCourse(course) && updateReviews(course.getId(), reviewsList);
     }
 
+    //provata
     public boolean deleteUserReviewsRedundancies(User user){
         boolean result = true;
-        List<Course> toBeDeleted = collection.find(Filters.elemMatch("reviews", Filters.eq("username", user.getUsername()))).into(new ArrayList<>());
-
+        List<Course> toBeDeleted = collection.find(Filters.elemMatch("reviews", Filters.eq("author.username", user.getUsername()))).into(new ArrayList<>());
+        System.out.println(toBeDeleted.get(1).getTitle());
         for(int i=0; i<toBeDeleted.size(); i++){
 
             List<Review> review = toBeDeleted.get(i).getReviews();
 
             for(int j=0; j<review.size(); j++){
-                if(review.get(j).getAuthor().equals(user.getUsername())){
+                if(review.get(j).getAuthor().getUsername().equals(user.getUsername())){
                     Course c = toBeDeleted.get(i);
                     Review r = review.get(j);
 
-                    c.setSum_ratings(c.getSum_ratings()-r.getRating());
-                    c.setNum_reviews(c.getNum_reviews()-1);
+                    if (c.getSum_ratings()-r.getRating() < 0)
+                        c.setSum_ratings(0);
+                    else
+                        c.setSum_ratings(c.getSum_ratings()-r.getRating());
+
+                    if (c.getNum_reviews() == 0)
+                        c.setNum_reviews(0);
+                    else
+                        c.setNum_reviews(c.getNum_reviews()-1);
 
                     result = result && updateCourse(c);
                     break;
@@ -300,28 +335,31 @@ public class MongoDBDriver implements DBDriver {
         return result;
     }
 
+    //provata
     public boolean deleteUserReviews(User user){
 
         if(deleteUserReviewsRedundancies(user)){
-            Bson pullFilter = Updates.pull("reviews", Filters.eq("author", user.getUsername()));
+            System.out.println("qui");
+            Bson pullFilter = Updates.pull("reviews", Filters.eq("author.username", user.getUsername()));
             return collection.updateMany(new Document(), pullFilter).wasAcknowledged();
         }
         return false;
     }
 
-    public List<Course> findCourses(int priceThreshold, int durationThreshold, String title, String level, String language, int toSkip, int quantity){
+    //provata
+    public List<Course> findCourses(double priceThreshold, double durationThreshold, String title, String level, String language, int toSkip, int quantity){
 
         List<Course> courses = null;
 
         Bson filter = null;
 
         if(priceThreshold != -1){
-            filter = Filters.lte("price", priceThreshold);
+            filter = Filters.or(Filters.lte("price", priceThreshold), Filters.eq("price", 0), Filters.eq("price", null));
         }
 
         if(durationThreshold != -1){
             if(filter!=null)
-                filter = Filters.and(filter, Filters.lte("duration", durationThreshold));
+                filter = Filters.and(filter, Filters.or(Filters.lte("duration", durationThreshold), Filters.eq("duration", 0), Filters.eq("duration", null)));
             else
                 filter = Filters.lte("duration", durationThreshold);
         }
@@ -361,10 +399,11 @@ public class MongoDBDriver implements DBDriver {
         return courses;
     }
 
+    //provata
     public List<Course> findBestRatings(int limit){ // trasformare come trindingCourses se funziona ???
 
         String json = "[{'$addFields': {" +
-                "'avg': { '$divide': ['$sum_ratings', '$num_ratings']}" +
+                "'avg': { '$divide': ['$sum_ratings', '$num_reviews']}" +
                 "}}, {'$sort': {'avg': -1}}, {'$limit': "+limit+"}]";
 
         List<BsonDocument> pipeline = new BsonArrayCodec().decode(new JsonReader(json), DecoderContext.builder().build())
@@ -375,8 +414,8 @@ public class MongoDBDriver implements DBDriver {
         return c;
     }
 
+    //provata
     public List<Course> trendingCourses(int limit){
-        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         Date d = new Date();
 
         Calendar cal = Calendar.getInstance();
@@ -387,40 +426,53 @@ public class MongoDBDriver implements DBDriver {
         Date d2 = cal.getTime();
 
         List<Course> c = collection.aggregate(Arrays.asList(
+                new Document("$match", new Document("reviews.edited_timestamp", new Document("$gte", d2))),
                 new Document("$unwind", "$reviews"),
-                new Document("$match", new Document("$reviews.edited_timestamp", new Document("$lte", inputFormat.format(d)))),
-                new Document("$match", new Document("$reviews.edited_timestamp", new Document("$gte", inputFormat.format(d2)))),
                 new Document("$group", new Document("_id", "$_id")
-                        .append("reviews", new Document("$push","$reviews"))
-                        .append("size", new Document("$sum", 1))
-                        .append("price", new Document("$first", "$price"))
-                        .append("language", new Document("$first", "$language"))
-                        .append("category", new Document("$first", "$category"))
-                        .append("description", new Document("$first", "$description"))
-                        .append("instructors", new Document("$first", "$instructors"))
-                        .append("duration", new Document("$first", "$duration"))
-                        .append("level", new Document("$first", "$level"))
-                        .append("link", new Document("$first", "$link"))
-                        .append("title", new Document("$first", "$title"))),
+                        .append("size", new Document("$sum", 1))),
                 new Document("$sort", new Document("size", -1)),
                 new Document("$limit", limit)
         )).into(new ArrayList<>());
 
-        return c;
+
+        List<ObjectId> ids = new ArrayList<>();
+        for (Course item: c) {
+            ids.add(item.getId());
+        }
+        List<Course> res = findSnapshotsByIds(ids);
+        return res;
     }
 
+    public List<Course> findSnapshotsByIds(List<ObjectId> ids) {
+        List<Course> res = collection.find(Filters.in("_id", ids)).into(new ArrayList<>());
+        return res;
+    }
+
+
+    /*
+db.learnit.aggregate([{"$match": {"title": " Atención prehospitalaria del ictus agudo y selección de pacientes para tratamiento endovascular con la escala RACE"}},
+{"$unwind": "$reviews"},
+{"$group": {_id: {year: {"$year": "$reviews.edited_timestamp"}}, num_reviews: {"$sum": 1}}},
+{"$set": {title: "$_id.year"}}, {"$unset": ["_id"]}])
+
+    */
+
+    //provata
     public HashMap<String, Double> getCourseAnnualRatings(Course course) {
         HashMap<String, Double> annualRatings = new HashMap<>();
         List<Course> doc = collection.aggregate(Arrays.asList(
                 new Document("$match", new Document("_id", course.getId())),
                 new Document("$unwind", "$reviews"),
-                new Document("$group", new Document("title", new Document("$year", "$reviews.edited_timestamp"))
+                new Document("$group", new Document("_id", new Document("year", new Document("$year", "$reviews.edited_timestamp")))
                         .append("sum_ratings", new Document("$sum", "$reviews.rating"))
-                        .append("num_reviews", new Document("$sum", 1))
-                ))).into(new ArrayList<>());
+                        .append("num_reviews", new Document("$sum", 1))),
+                new Document("$set", new Document("year", "$_id.year")),
+                new Document("$unset", "_id")
+                )).into(new ArrayList<>());
 
         for (Course c: doc) {
-            annualRatings.put(c.getTitle(), ((double)c.getSum_ratings() / c.getNum_reviews()));
+            System.out.println(c.getYear());
+            annualRatings.put(String.valueOf(c.getYear()), ((double)c.getSum_ratings() / c.getNum_reviews()));
         }
         return annualRatings;
     }

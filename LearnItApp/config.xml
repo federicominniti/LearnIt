@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<it.unipi.dii.inginf.lsdb.learnitapp.config.Config>
+<it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams>
     <mongoDBPrimaryIP>172.16.4.75</mongoDBPrimaryIP>
     <mongoDBPrimaryPort>27017</mongoDBPrimaryPort>
     <mongoDBSecondIP>172.16.4.76</mongoDBSecondIP>
     <mongoDBSecondPort>27017</mongoDBSecondPort>
     <mongoDBThirdIP>172.16.4.77</mongoDBThirdIP>
     <mongoDBThirdPort>27017</mongoDBThirdPort>
-    <mongoDBusername>root</mongoDBusername>
-    <mongoDBpassword></mongoDBpassword>
+    <mongoDBUsername>root</mongoDBUsername>
+    <mongoDBPassword></mongoDBPassword>
     <mongoDBName>learnitmongo</mongoDBName>
     <limitNumber>10</limitNumber>
-</it.unipi.dii.inginf.lsdb.learnitapp.config.Config>
+    <neo4jIP>127.0.0.1</neo4jIP>
+    <neo4jPort>7687</neo4jPort>
+    <neo4jUsername>neo4j</neo4jUsername>
+    <neo4jPassword>password</neo4jPassword>
+</it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams>

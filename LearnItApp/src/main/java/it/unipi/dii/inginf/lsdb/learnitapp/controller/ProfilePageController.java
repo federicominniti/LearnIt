@@ -51,7 +51,7 @@ public class ProfilePageController {
 
         loadStatistics();
 
-        loadCourses();
+        //loadCourses();
 
     }
 
@@ -73,6 +73,7 @@ public class ProfilePageController {
         avgPriceTextField.setText(Double.toString(neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "price")));
     }
 
+    /*
     private void loadCourses(){
 
         List<Course> likedCourses = neo4jDriver.findCoursesLikedOrCompletedByUser(profileUser.getUsername(), false);
@@ -80,7 +81,7 @@ public class ProfilePageController {
 
         List<Course> reviewedCourses = neo4jDriver.findCoursesLikedOrCompletedByUser(profileUser.getUsername(), true);
         Utils.createCoursesElements(reviewedCourses, reviewedCoursesHBox);
-    }
+    }*/
 
     public  void setProfileUser(User user){
         profileUser = user;
