@@ -19,7 +19,6 @@ public class ReviewSnapshotPageController {
     @FXML private TextArea commentTextArea;
     @FXML private HBox ratingHBox;
     @FXML private Label lastModifiedLabel;
-    @FXML private Label completeNameLabel;
 
     private Review review;
 
@@ -41,7 +40,6 @@ public class ReviewSnapshotPageController {
         }
 
         usernameLabel.setText(review.getAuthor().getUsername());
-        completeNameLabel.setText(review.getAuthor().getCompleteName());
 
         if(review.getAuthor().getProfilePic() != null){
             Image profilePicture = new Image(review.getAuthor().getProfilePic());

@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -16,128 +17,180 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="801.0" prefWidth="736.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnit.controller.CoursePageController">
-   <children>
-      <ImageView fitHeight="53.0" fitWidth="200.0" layoutX="266.0" layoutY="30.0">
-         <image>
-            <Image url="@../img/learnitLogo.png" />
-         </image>
-      </ImageView>
-      <VBox layoutX="132.0" layoutY="97.0" prefHeight="670.0" prefWidth="489.0" style="-fx-alignment: center; -fx-background-color: f1f8f6;">
+<ScrollPane prefHeight="966.0" prefWidth="1100.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.CoursePageController">
+   <content>
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="925.0" prefWidth="1082.0" style="-fx-background-color: white;">
          <children>
-            <BorderPane prefHeight="200.0" prefWidth="200.0">
-               <top>
-                  <VBox prefHeight="17.0" prefWidth="449.0" BorderPane.alignment="CENTER">
-                     <children>
-                        <Label fx:id="titleLabel" prefHeight="41.0" prefWidth="481.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="Title of course" textAlignment="CENTER" textFill="#1880e1">
-                           <font>
-                              <Font size="34.0" />
-                           </font>
-                        </Label>
-                        <TextArea fx:id="descriptionTextArea" editable="false" prefHeight="84.0" prefWidth="439.0" text="A description of the course." />
-                     </children>
-                     <BorderPane.margin>
-                        <Insets bottom="20.0" />
-                     </BorderPane.margin>
-                  </VBox>
-               </top>
-               <padding>
-                  <Insets bottom="10.0" right="10.0" top="10.0" />
-               </padding>
-               <center>
-                  <ImageView fx:id="courseImageImageView" fitHeight="89.0" fitWidth="97.0" preserveRatio="true" BorderPane.alignment="CENTER">
-                     <image>
-                        <Image url="@../img/learnitUserPropic.png" />
-                     </image>
-                  </ImageView>
-               </center>
-               <bottom>
-                  <HBox prefHeight="24.0" prefWidth="211.0" style="-fx-alignment: center; -fx-spacing: 30px;" BorderPane.alignment="CENTER">
-                     <children>
-                        <Button fx:id="likeCourseButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold;" text="Like" textFill="WHITE" />
-                        <Button fx:id="reviewCourseButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold;" text="Review" textFill="WHITE" />
-                     </children>
-                     <BorderPane.margin>
-                        <Insets bottom="10.0" top="10.0" />
-                     </BorderPane.margin>
-                  </HBox>
-               </bottom>
-            </BorderPane>
-            <Button fx:id="editCourseButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold;" text="Edit" textFill="WHITE">
-               <VBox.margin>
-                  <Insets bottom="10.0" top="10.0" />
-               </VBox.margin>
-            </Button>
-            <BorderPane prefHeight="226.0" prefWidth="449.0">
-               <top>
-                  <Label prefHeight="24.0" prefWidth="477.0" style="-fx-font-weight: bold;" text="Course's information" textFill="#1880e1" BorderPane.alignment="CENTER" />
-               </top>
-               <center>
-                  <GridPane prefHeight="163.0" prefWidth="449.0" BorderPane.alignment="CENTER">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="219.0" minWidth="10.0" prefWidth="152.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="297.0" minWidth="10.0" prefWidth="297.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Label text="Language:" GridPane.rowIndex="1" />
-                        <Label text="Category:" GridPane.rowIndex="2" />
-                        <Label text="Level:" GridPane.rowIndex="3" />
-                        <Label text="Duration:" GridPane.rowIndex="4" />
-                        <Label text="Price:" GridPane.rowIndex="5" />
-                        <Label text="Modality:" GridPane.rowIndex="6" />
-                        <Label fx:id="languageLabel" prefHeight="16.0" prefWidth="326.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <Label fx:id="categoryLabel" prefHeight="16.0" prefWidth="326.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <Label fx:id="levelLabel" prefHeight="16.0" prefWidth="326.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                        <Label fx:id="durationLabel" prefHeight="16.0" prefWidth="326.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                        <Label fx:id="priceLabel" prefHeight="16.0" prefWidth="326.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                        <Label fx:id="modalityLabel" prefHeight="16.0" prefWidth="326.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                        <Label text="Instructor:" />
-                        <Label fx:id="instructorLabel" prefHeight="16.0" prefWidth="376.0" GridPane.columnIndex="1" />
-                     </children>
-                  </GridPane>
-               </center>
-            </BorderPane>
-            <BorderPane prefHeight="87.0" prefWidth="449.0">
-               <center>
-                  <ScrollPane prefHeight="102.0" prefWidth="449.0" BorderPane.alignment="CENTER">
-                     <content>
-                        <VBox fx:id="reviewsVBox" prefHeight="40.0" prefWidth="447.0" />
-                     </content>
-                  </ScrollPane>
-               </center>
-               <top>
-                  <BorderPane prefHeight="0.0" prefWidth="449.0" BorderPane.alignment="CENTER">
+            <ImageView fitHeight="53.0" fitWidth="200.0" layoutX="442.0" layoutY="30.0">
+               <image>
+                  <Image url="@../img/learnitLogo.png" />
+               </image>
+            </ImageView>
+            <VBox layoutX="74.0" layoutY="103.0" prefHeight="806.0" prefWidth="935.0" style="-fx-alignment: center; -fx-background-color: f1f8f6;">
+               <children>
+                  <BorderPane prefHeight="200.0" prefWidth="200.0">
+                     <top>
+                        <VBox prefHeight="17.0" prefWidth="449.0" BorderPane.alignment="CENTER">
+                           <children>
+                              <Label fx:id="titleLabel" prefHeight="41.0" prefWidth="905.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="Title of course" textAlignment="CENTER" textFill="#1880e1">
+                                 <font>
+                                    <Font size="34.0" />
+                                 </font>
+                              </Label>
+                              <TextArea fx:id="descriptionTextArea" editable="false" prefHeight="84.0" prefWidth="439.0" text="A description of the course.&#10;" />
+                           </children>
+                           <BorderPane.margin>
+                              <Insets bottom="20.0" />
+                           </BorderPane.margin>
+                        </VBox>
+                     </top>
+                     <padding>
+                        <Insets bottom="10.0" right="10.0" top="10.0" />
+                     </padding>
                      <center>
-                        <Label prefHeight="24.0" prefWidth="494.0" style="-fx-font-weight: bold; -fx-alignment: left;" text="Reviews" textFill="#1880e1" BorderPane.alignment="CENTER" />
-                     </center>
-                     <right>
-                        <ImageView fx:id="moreReviewsImageView" fitHeight="34.0" fitWidth="49.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+                        <ImageView fx:id="courseImageImageView" fitHeight="89.0" fitWidth="97.0" preserveRatio="true" BorderPane.alignment="CENTER">
                            <image>
-                              <Image url="@../img/readMore.png" />
+                              <Image url="@../img/learnitUserPropic.png" />
                            </image>
                         </ImageView>
-                     </right>
+                     </center>
+                     <bottom>
+                        <HBox prefHeight="24.0" prefWidth="211.0" style="-fx-alignment: center; -fx-spacing: 30px;" BorderPane.alignment="CENTER">
+                           <children>
+                              <Button fx:id="likeCourseButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold;" text="Like" textFill="WHITE" />
+                              <Button fx:id="reviewCourseButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold;" text="Review" textFill="WHITE" />
+                           </children>
+                           <BorderPane.margin>
+                              <Insets bottom="10.0" top="10.0" />
+                           </BorderPane.margin>
+                        </HBox>
+                     </bottom>
                   </BorderPane>
-               </top>
-            </BorderPane>
-            <Button fx:id="backToHomeButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold;" text="back" textFill="WHITE">
-               <VBox.margin>
-                  <Insets bottom="10.0" top="10.0" />
-               </VBox.margin>
-            </Button>
+                  <Button fx:id="editCourseButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold;" text="Edit" textFill="WHITE">
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Button>
+                  <VBox fx:id="newReviewVBox" alignment="TOP_CENTER" prefHeight="132.0" prefWidth="880.0">
+                     <children>
+                        <BorderPane fx:id="reviewBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="893.0">
+                           <VBox.margin>
+                              <Insets bottom="10.0" top="10.0" />
+                           </VBox.margin>
+                           <right>
+                              <HBox fx:id="ratingHBox" alignment="TOP_CENTER" prefHeight="25.0" prefWidth="150.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <ImageView fitHeight="29.0" fitWidth="33.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../img/star-off.png" />
+                                       </image>
+                                    </ImageView>
+                                    <ImageView fitHeight="29.0" fitWidth="33.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../img/star-off.png" />
+                                       </image>
+                                    </ImageView>
+                                    <ImageView fitHeight="29.0" fitWidth="33.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../img/star-off.png" />
+                                       </image>
+                                    </ImageView>
+                                    <ImageView fitHeight="29.0" fitWidth="33.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../img/star-off.png" />
+                                       </image>
+                                    </ImageView>
+                                    <ImageView fitHeight="29.0" fitWidth="33.0" pickOnBounds="true" preserveRatio="true">
+                                       <image>
+                                          <Image url="@../img/star-off.png" />
+                                       </image>
+                                    </ImageView>
+                                 </children>
+                              </HBox>
+                           </right>
+                           <left>
+                              <TextField fx:id="reviewTitleTextField" prefHeight="24.0" prefWidth="391.0" promptText="Review's title" BorderPane.alignment="CENTER" />
+                           </left>
+                        </BorderPane>
+                        <TextArea fx:id="commentTextArea" editable="false" prefHeight="69.0" prefWidth="454.0" promptText="Review main content" />
+                        <Button fx:id="saveReviewButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold;" text="Save" textFill="WHITE">
+                           <VBox.margin>
+                              <Insets bottom="10.0" top="10.0" />
+                           </VBox.margin>
+                        </Button>
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="20.0" top="20.0" />
+                     </VBox.margin>
+                  </VBox>
+                  <BorderPane prefHeight="226.0" prefWidth="449.0">
+                     <top>
+                        <Label prefHeight="24.0" prefWidth="981.0" style="-fx-font-weight: bold;" text="Course's information" textFill="#1880e1" BorderPane.alignment="CENTER" />
+                     </top>
+                     <center>
+                        <GridPane prefHeight="163.0" prefWidth="449.0" vgap="15.0" BorderPane.alignment="CENTER">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="219.0" minWidth="10.0" prefWidth="152.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="297.0" minWidth="10.0" prefWidth="297.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label text="Language:" GridPane.rowIndex="1" />
+                              <Label text="Category:" GridPane.rowIndex="2" />
+                              <Label text="Level:" GridPane.rowIndex="3" />
+                              <Label text="Duration:" GridPane.rowIndex="4" />
+                              <Label text="Price:" GridPane.rowIndex="5" />
+                              <Label text="Modality:" GridPane.rowIndex="6" />
+                              <Label text="Instructor:" />
+                              <TextField fx:id="instructorTextField" editable="false" GridPane.columnIndex="1" />
+                              <TextField fx:id="languageTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                              <TextField fx:id="categoryTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                              <TextField fx:id="levelTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                              <TextField fx:id="durationTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                              <TextField fx:id="priceTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                              <TextField fx:id="modalityTextField" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                           </children>
+                        </GridPane>
+                     </center>
+                  </BorderPane>
+                  <BorderPane prefHeight="87.0" prefWidth="449.0">
+                     <top>
+                        <BorderPane prefHeight="0.0" prefWidth="449.0" BorderPane.alignment="CENTER">
+                           <center>
+                              <Label prefHeight="24.0" prefWidth="898.0" style="-fx-font-weight: bold; -fx-alignment: left;" text="Reviews" textFill="#1880e1" BorderPane.alignment="CENTER" />
+                           </center>
+                           <right>
+                              <ImageView fx:id="moreReviewsImageView" fitHeight="34.0" fitWidth="49.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+                                 <image>
+                                    <Image url="@../img/readMore.png" />
+                                 </image>
+                              </ImageView>
+                           </right>
+                        </BorderPane>
+                     </top>
+                     <center>
+                        <VBox fx:id="reviewsVBox" prefHeight="53.0" prefWidth="895.0" BorderPane.alignment="CENTER" />
+                     </center>
+                  </BorderPane>
+                  <Button fx:id="backToHomeButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold;" text="back" textFill="WHITE">
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+               </padding>
+            </VBox>
          </children>
-         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-         </padding>
-      </VBox>
-   </children>
-</AnchorPane>
+      </AnchorPane>
+   </content>
+</ScrollPane>
