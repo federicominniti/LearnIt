@@ -68,6 +68,11 @@
             <artifactId>neo4j-java-driver</artifactId>
             <version>4.1.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>17.0.2-ea+1</version>
+        </dependency>
     </dependencies>
 
     <build>

@@ -16,6 +16,7 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -58,6 +59,7 @@ public class DiscoveryPageController {
     private ElementsLineController<Course> instructorSuggestions;
     private ElementsLineController<User> suggestedUsers;
     private int currentI = 0;
+    private int currentJ = 0;
     private GridPane gridPane;
 
     private final String[] languages = {"Arabic", "Chinese", "English", "French", "German", "Hebrew", "Hungarian", "Indonesian",
@@ -81,7 +83,9 @@ public class DiscoveryPageController {
 
         gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
-        gridPane.setPadding(new Insets(10, 10, 10, 10));
+        gridPane.setHgap(15);
+        gridPane.setVgap(15);
+        //GridPane.setMargin(gridPane, new Insets(10, 10, 10, 10));
 
         fillInterfaceElements();
         usernameLabel.setOnMouseClicked(clickEvent -> Utils.changeScene(PROFILE_PAGE, clickEvent));
@@ -104,9 +108,6 @@ public class DiscoveryPageController {
                     }
                 }
         );
-
-
-
     }
 
     private void fillInterfaceElements(){
@@ -142,11 +143,6 @@ public class DiscoveryPageController {
     }
 
     private void searchHandler(MouseEvent clickEvent){
-        if(searchType.getSelectedToggle() == null) {
-            Utils.showErrorAlert("Please select user or course!");
-            return;
-        }
-
         RadioButton selected = (RadioButton) searchType.getSelectedToggle();
         String title = "", level = "", language = "";
         double duration = -1, price = -1;
@@ -169,11 +165,24 @@ public class DiscoveryPageController {
             price = -1;
         else
             price = Double.parseDouble(maxPriceTextField.getText());
+
+        if(searchType.getSelectedToggle() == null && title.equals("") && level.equals("") && language.equals("") &&
+                duration == -1 && price == -1) {
+            elementsVBox.getChildren().clear();
+            initializeSuggestions();
+            return;
+        }
+
+        if(searchType.getSelectedToggle() == null){
+            Utils.showErrorAlert("Please select user or course!");
+            return;
+        }
+
         if(selected.getText().equals("Courses") && title.equals("") && level.equals("") && language.equals("") &&
-                duration == -1 && price == -1)
+                duration == -1 && price == -1) {
 
             return;
-        else{
+        }else{
             if(selected.getText().equals("Courses")) {
                 elementsVBox.getChildren().clear();
                 addMoreResearchedCourses(title, level, language, duration, price);
@@ -190,171 +199,90 @@ public class DiscoveryPageController {
             }
         }
         elementsVBox.getChildren().add(gridPane);
+        searchTextField.setText("");
+        searchType.selectToggle(null);
+        levelChoiceBox.setDisable(false);
+        levelChoiceBox.setValue(null);
+        languageChoiceBox.setDisable(false);
+        languageChoiceBox.setValue(null);
+        maxPriceTextField.setText("");
+        maxDurationTextField.setText("");
     }
 
     private void addMoreResearchedCourses(String title, String level, String language,
                                           double duration, double price){
         List<Course> searchedCourses = mongoDBDriver.findCourses(price, duration, title, level, language, ((currentI*4)-1), 15);
         for(int i = currentI; i<currentI + 4; i++){
-            for(int j = 0; j<4; j++) {
-                if((i*4+j) < searchedCourses.size() && searchedCourses.get(i*4 + j) != null) {
+            int j;
+            if(i == currentI)
+                j = currentJ;
+            else
+                j = 0;
+            for(; j<4; j++) {
+                System.out.println("i"+i+"j"+j);
+                if(((i-currentI)*4+j) < searchedCourses.size() && searchedCourses.get((i-currentI)*4 + j) != null) {
                     Pane coursePane = Utils.loadCourseSnapshot(searchedCourses.get(i));
                     GridPane.setHalignment(coursePane, HPos.CENTER);
                     GridPane.setValignment(coursePane, VPos.CENTER);
-                    gridPane.add(coursePane, i, j);
+                    gridPane.add(coursePane, j, i);
                 }
-                if((i == currentI + 3 && j == 3) || (i*4+j) >= searchedCourses.size()) {
-                    Label more = new Label();
-                    more.setText("Read more element..");
+                if((i == currentI + 3 && j == 3) || ((i-currentI)*4+j) >= searchedCourses.size()) {
+                    ImageView more = new ImageView(new Image(
+                            String.valueOf(DiscoveryPageController.class.getResource(Utils.READ_MORE))));
+                    more.setPreserveRatio(true);
+                    more.setFitWidth(100);
+                    more.setFitWidth(100);
+                    more.setCursor(Cursor.HAND);
                     more.setOnMouseClicked(newClickEvent -> addMoreResearchedCourses(title, level, language,
                             duration, price));
                     GridPane.setHalignment(more, HPos.CENTER);
                     GridPane.setValignment(more, VPos.CENTER);
-                    gridPane.add(more, i, j);
-                    i = 4; j = 4;
+                    gridPane.add(more, j, i);
+                    currentI += i;
+                    currentJ += j;
+                    return;
                 }
             }
         }
-        currentI += 4;
     }
 
-    private void addMoreResearchedUsers(String username){
+    private void addMoreResearchedUsers(String username) {
         List<User> searchedUsers;
         if (currentI == 0)
             searchedUsers = neo4jDriver.searchUserByUsername(15, 0, username);
         else
-            searchedUsers = neo4jDriver.searchUserByUsername(15, ((currentI*4)-1), username);
-        for(int i = currentI; i<currentI + 4; i++){
-            for(int j = 0; j<4; j++) {
-                if(((i*4+j) < searchedUsers.size()) && searchedUsers.get(i*4 + j) != null) {
-                    Pane coursePane = Utils.loadUserSnapshot(searchedUsers.get(i));
-                    GridPane.setHalignment(coursePane, HPos.CENTER);
-                    GridPane.setValignment(coursePane, VPos.CENTER);
-                    gridPane.add(coursePane, i, j);
+            searchedUsers = neo4jDriver.searchUserByUsername(15, ((currentI * 4) - 1), username);
+        for (int i = currentI; i < currentI + 4; i++) {
+            int j;
+            if (i == currentI)
+                j = currentJ;
+            else
+                j = 0;
+            for (; j < 4; j++) {
+                System.out.println("i" + i + "j" + j);
+                if (((i - currentI) * 4 + j) < searchedUsers.size() && searchedUsers.get((i - currentI) * 4 + j) != null) {
+                    Pane userPane = Utils.loadUserSnapshot(searchedUsers.get(i));
+                    GridPane.setHalignment(userPane, HPos.CENTER);
+                    GridPane.setValignment(userPane, VPos.CENTER);
+                    gridPane.add(userPane, j, i);
                 }
-                if((i == currentI + 3 && j == 3) || (i*4+j) >= searchedUsers.size()) {
-                    Label more = new Label();
-                    more.setText("Read more element..");
+                if ((i == currentI + 3 && j == 3) || ((i - currentI) * 4 + j) >= searchedUsers.size()) {
+                    ImageView more = new ImageView(new Image(
+                            String.valueOf(DiscoveryPageController.class.getResource(Utils.READ_MORE))));
+                    more.setPreserveRatio(true);
+                    more.setFitWidth(100);
+                    more.setFitWidth(100);
+                    more.setCursor(Cursor.HAND);
                     more.setOnMouseClicked(newClickEvent -> addMoreResearchedUsers(username));
                     GridPane.setHalignment(more, HPos.CENTER);
                     GridPane.setValignment(more, VPos.CENTER);
-                    gridPane.add(more, i, j);
-                    i = 4;
-                    j = 4;
+                    gridPane.add(more, j, i);
+                    currentI += i;
+                    currentJ += j;
+                    return;
                 }
             }
         }
-        currentI += 4;
     }
-
-
-    /*private void createCoursesElements(List<Course> courses, HBox coursesList){
-        for(int i = 0; i<courses.size(); i++){
-            VBox course = new VBox();
-            course.setAlignment(Pos.CENTER);
-            course.setPrefHeight(180);
-            course.setPrefWidth(180);
-            Label title = new Label();
-            title.setText(courses.get(i).getTitle());
-            title.setFont(Font.font("Arial", FontPosture.ITALIC, 15));
-            course.getChildren().add(title);
-
-            ImageView coursePic;
-            if(courses.get(i).getCoursePic() != null)
-                coursePic = new ImageView(new Image(courses.get(i).getCoursePic()));
-            else
-                coursePic = new ImageView(new Image(COURSE_DEFAULT_PIC));
-            coursePic.setFitHeight(77);
-            coursePic.setFitWidth(83);
-            coursePic.setPreserveRatio(true);
-            course.getChildren().add(coursePic);
-
-            Label instructor = new Label();
-            instructor.setText(courses.get(i).getInstructor().getUsername());
-            instructor.setFont(Font.font(instructor.getFont().getFamily(), FontWeight.NORMAL, 15));
-            course.getChildren().add(instructor);
-
-            Label rating = new Label();
-            rating.setText(String.valueOf(courses.get(i).getSum_ratings()/courses.get(i).getNum_reviews()) + "/5");
-            rating.setFont(Font.font(rating.getFont().getFamily(), FontWeight.NORMAL, 15));
-            course.getChildren().add(rating);
-
-            Label price = new Label();
-            price.setText(courses.get(i).getPrice() + "€");
-            price.setFont(Font.font(price.getFont().getFamily(), FontWeight.NORMAL, 15));
-            course.getChildren().add(price);
-
-            coursesList.getChildren().add(course);
-        }
-
-    }*/
-
-    /*private void createUsersElements(List<User> users, HBox usersList){
-        for(int i = 0; i<users.size(); i++){
-            VBox user = new VBox();
-            user.setAlignment(Pos.CENTER);
-            user.setPrefHeight(180);
-            user.setPrefWidth(180);
-            Label username = new Label();
-            username.setText(users.get(i).getUsername());
-            username.setFont(Font.font("Arial", FontPosture.ITALIC, 15));
-            user.getChildren().add(username);
-
-            ImageView userPic;
-            if(users.get(i).getProfilePic() != null)
-                userPic = new ImageView(new Image(users.get(i).getProfilePic()));
-            else
-                userPic = new ImageView(new Image(USER_DEFAULT_PIC));
-            userPic.setFitHeight(77);
-            userPic.setFitWidth(83);
-            userPic.setPreserveRatio(true);
-            user.getChildren().add(userPic);
-
-            Label completeName = new Label();
-            completeName.setText(users.get(i).getCompleteName());
-            completeName.setFont(Font.font(completeName.getFont().getFamily(), FontWeight.NORMAL, 15));
-            user.getChildren().add(completeName);
-
-            Label gender = new Label();
-            if(users.get(i).getGender() != null)
-                gender.setText(users.get(i).getGender());
-            else
-                gender.setText("-");
-            gender.setFont(Font.font(gender.getFont().getFamily(), FontWeight.NORMAL, 15));
-            user.getChildren().add(gender);
-
-            Label totCourses = new Label();
-            totCourses.setText("Completed courses: " + neo4jDriver.findTotCourses(users.get(i)));
-            totCourses.setFont(Font.font(totCourses.getFont().getFamily(), FontWeight.NORMAL, 15));
-            user.getChildren().add(totCourses);
-
-            usersList.getChildren().add(user);
-        }
-
-    }*/
-
-    /*private void loadMore(int index){
-        User myUser = Session.getLocalSession().getLoggedUser();
-        int skip = pageNumber[index-1]*limit;
-        pageNumber[index-1]++;
-        List<Course> courses = new ArrayList<>();
-        List<User> users = new ArrayList<>();
-        switch (index){
-            case FRIENDS_COMPLETED_LIKED:
-                courses = neo4jDriver.findSuggestedCourses(myUser, skip, limit);
-                //createCoursesElements(courses, friendsCompletedLikedHBox);
-                Utils.addCoursesSnapshot(friendsCompletedLikedHBox, courses);
-                break;
-            case INSTRUCTORS_SUGGESTIONS:
-                courses = neo4jDriver.findSuggestedCoursesByCompletedCourses(myUser, skip, limit);
-                //createCoursesElements(courses, instructorSuggestionsHBox);
-                Utils.addCoursesSnapshot(friendsCompletedLikedHBox, courses);
-                break;
-            default:
-                users = neo4jDriver.findSuggestedUsers(myUser, skip, limit);
-                //createUsersElements(users, usersHBox);
-                Utils.addUsersSnapshot(usersHBox, users);
-        }
-    }*/
 
 }

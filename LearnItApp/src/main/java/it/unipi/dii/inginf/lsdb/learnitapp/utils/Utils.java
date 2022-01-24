@@ -21,7 +21,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.neo4j.driver.internal.InternalPath;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -47,6 +46,7 @@ public class Utils {
     public final static int USER_SUGGESTIONS = 3;
     public final static int BEST_RATING = -1;
     public final static int TRENDING_COURSE = -2;
+    public static final String READ_MORE = "/img/readMore.png";
 
     public static ConfigParams getParams() {
         if (validConfigParams()) {
@@ -123,13 +123,16 @@ public class Utils {
     }
 
     public static void showErrorAlert (String text) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setContentText(text);
-        alert.setHeaderText("Ops.. Something went wrong..");
-        alert.setTitle("Error");
-        ImageView imageView = new ImageView(new Image("/img/error.png"));
-        alert.setGraphic(imageView);
-        alert.show();
+        Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+        errorAlert.setContentText(text);
+        errorAlert.setHeaderText("Please click 'OK' and try again");
+        errorAlert.setTitle("Error...");
+        Image errorImage = new Image(Utils.class.getResource("/img/error.png").toString());
+        ImageView errorImageView = new ImageView(errorImage);
+        errorImageView.setFitHeight(70);
+        errorImageView.setFitWidth(70);
+        errorAlert.setGraphic(errorImageView);
+        errorAlert.show();
     }
 
     public static void showInfoAlert (String text) {
@@ -137,7 +140,7 @@ public class Utils {
         alert.setContentText(text);
         alert.setHeaderText("Confirm Message");
         alert.setTitle("Information");
-        ImageView imageView = new ImageView(new Image("/img/success.png"));
+        ImageView imageView = new ImageView(new Image(String.valueOf(Utils.class.getResource("/img/success.png"))));
         imageView.setFitHeight(60);
         imageView.setFitWidth(60);
         imageView.setPreserveRatio(true);
@@ -148,7 +151,7 @@ public class Utils {
     public static Pane loadCourseSnapshot(Course course) {
         Pane pane = null;
         try {
-            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/fxml/courseSnapshot.fxml"));
+            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/fxml/CourseSnapshot.fxml"));
             pane = (Pane) loader.load();
             CourseSnapshotController courseSnapshotController = (CourseSnapshotController) loader.getController();
             courseSnapshotController.setSnapshotCourse(course);
@@ -183,11 +186,11 @@ public class Utils {
             pane = (Pane) loader.load();
             if(type != USER_SUGGESTIONS) {
                 ElementsLineController<Course> coursesLine = (ElementsLineController<Course>) loader.getController();
-                coursesLine.setCoursesUsers(courses, type);
+                coursesLine.setCoursesUsers(/*courses,*/ type);
             }
             else {
                 ElementsLineController<User> coursesLine = (ElementsLineController<User>) loader.getController();
-                coursesLine.setCoursesUsers(users, type);
+                coursesLine.setCoursesUsers(/*users,*/ type);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -199,7 +202,7 @@ public class Utils {
     {
         Pane pane = null;
         try {
-            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/fxml/userSnapshot.fxml"));
+            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/fxml/UserSnapshot.fxml"));
             pane = (Pane) loader.load();
             UserSnapshotController userSnapshotController = (UserSnapshotController) loader.getController();
             userSnapshotController.setSnapshotUser(user);

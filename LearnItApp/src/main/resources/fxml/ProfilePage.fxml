@@ -4,7 +4,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -16,27 +15,31 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1052.0" prefWidth="736.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnit.controller.PersonalPageController">
-   <children>
-      <ImageView fitHeight="53.0" fitWidth="200.0" layoutX="266.0" layoutY="30.0">
-         <image>
-            <Image url="@../img/learnitLogo.png" />
-         </image>
-      </ImageView>
-      <VBox layoutX="132.0" layoutY="97.0" prefHeight="909.0" prefWidth="489.0" style="-fx-alignment: center; -fx-background-color: f1f8f6;">
+
+<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnit.controller.PersonalPageController">
+   <content>
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="630.0" prefWidth="1100.0" style="-fx-background-color: white;">
          <children>
-            <BorderPane prefHeight="200.0" prefWidth="200.0">
+            <ImageView fitHeight="53.0" fitWidth="200.0" layoutX="450.0" layoutY="30.0">
+               <image>
+                  <Image url="@../img/learnitLogo.png" />
+               </image>
+            </ImageView>
+            <BorderPane layoutX="114.0" layoutY="104.0" style="-fx-background-color: f1f8f6;">
+               <center>
+                  <HBox />
+               </center>
                <top>
                   <VBox prefHeight="17.0" prefWidth="449.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Label fx:id="completeNameLabel" prefHeight="41.0" prefWidth="481.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="Complete Name" textAlignment="CENTER" textFill="#1880e1">
+                        <Label fx:id="completeNameLabel" prefHeight="40.0" prefWidth="930.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="Complete Name" textAlignment="CENTER" textFill="#1880e1">
                            <font>
-                              <Font size="34.0" />
+                              <Font name="Arial Bold Italic" size="34.0" />
                            </font>
                         </Label>
-                        <Label fx:id="usernameLabel" prefHeight="35.0" prefWidth="516.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="username" textAlignment="CENTER" textFill="#19b2e0">
+                        <Label fx:id="usernameLabel" prefHeight="32.0" prefWidth="877.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="username" textAlignment="CENTER" textFill="#19b2e0">
                            <font>
-                              <Font size="28.0" />
+                              <Font name="Arial Bold Italic" size="28.0" />
                            </font>
                         </Label>
                      </children>
@@ -46,213 +49,136 @@
                   </VBox>
                </top>
                <left>
-                  <VBox style="-fx-alignment: center;" BorderPane.alignment="CENTER">
-                     <children>
-                        <ImageView fx:id="propicImageView" fitHeight="89.0" fitWidth="97.0" preserveRatio="true">
-                           <image>
-                              <Image url="@../img/learnitUserPropic.png" />
-                           </image>
-                        </ImageView>
-                        <GridPane hgap="10.0" style="-fx-alignment: center;" vgap="5.0">
-                           <columnConstraints>
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" />
-                              <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
+                  <BorderPane prefHeight="235.0" prefWidth="322.0" BorderPane.alignment="CENTER">
+                     <left>
+                        <VBox style="-fx-alignment: center;" BorderPane.alignment="CENTER">
                            <children>
-                              <Label style="-fx-font-weight: bold;" text="Follower" GridPane.rowIndex="1" />
-                              <Label style="-fx-font-weight: bold;" text="Following" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                              <Label fx:id="followerNumberLabel" style="-fx-text-alignment: center;" text="0" />
-                              <Label fx:id="folliwingNumberLabel" style="-fx-text-alignment: center;" text="0" GridPane.columnIndex="1" />
+                              <ImageView fx:id="propicImageView" fitHeight="89.0" fitWidth="97.0" preserveRatio="true">
+                                 <image>
+                                    <Image url="@../img/learnitUserPropic.png" />
+                                 </image>
+                              </ImageView>
+                              <GridPane hgap="10.0" style="-fx-alignment: center;" vgap="5.0">
+                                 <columnConstraints>
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" />
+                                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                 </rowConstraints>
+                                 <children>
+                                    <Label style="-fx-font-weight: bold;" text="Follower" GridPane.rowIndex="1">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font>
+                                    </Label>
+                                    <Label style="-fx-font-weight: bold;" text="Following" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="followerNumberLabel" alignment="CENTER" prefHeight="17.0" prefWidth="51.0" style="-fx-text-alignment: center;" text="0" textAlignment="CENTER" />
+                                    <Label fx:id="folliwingNumberLabel" alignment="CENTER" prefHeight="19.0" prefWidth="58.0" style="-fx-text-alignment: center;" text="0" textAlignment="CENTER" GridPane.columnIndex="1">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="5.0" />
+                                 </VBox.margin>
+                              </GridPane>
                            </children>
-                           <VBox.margin>
-                              <Insets top="5.0" />
-                           </VBox.margin>
-                        </GridPane>
-                     </children>
-                  </VBox>
+                        </VBox>
+                     </left>
+                     <padding>
+                        <Insets bottom="10.0" right="10.0" top="10.0" />
+                     </padding>
+                     <right>
+                        <BorderPane prefHeight="119.0" prefWidth="291.0" BorderPane.alignment="CENTER">
+                           <center>
+                              <VBox alignment="CENTER" prefHeight="4.0" prefWidth="291.0" BorderPane.alignment="CENTER">
+                                 <children>
+                                    <Label fx:id="birthDateLabel" alignment="CENTER" prefHeight="17.0" prefWidth="345.0" text="Birth date:" textAlignment="CENTER">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets bottom="2.5" top="2.5" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="genderLabel" alignment="CENTER" prefHeight="17.0" prefWidth="324.0" text="Gender:" textAlignment="CENTER">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets bottom="2.5" top="2.5" />
+                                       </VBox.margin>
+                                    </Label>
+                                 </children>
+                              </VBox>
+                           </center>
+                           <bottom>
+                              <Button fx:id="followButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-background-radius: 13;" text="Follow" textFill="WHITE" BorderPane.alignment="CENTER">
+                                 <BorderPane.margin>
+                                    <Insets bottom="20.0" top="10.0" />
+                                 </BorderPane.margin>
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </Button>
+                           </bottom>
+                        </BorderPane>
+                     </right>
+                  </BorderPane>
                </left>
                <right>
-                  <GridPane prefHeight="74.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints maxHeight="69.0" minHeight="10.0" prefHeight="59.0" vgrow="SOMETIMES" />
-                      <RowConstraints maxHeight="83.0" minHeight="10.0" prefHeight="60.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
+                  <VBox alignment="CENTER" prefHeight="89.0" prefWidth="449.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Label text="Birth date:" />
-                        <TextField fx:id="birthTextField" prefHeight="24.0" prefWidth="112.0" GridPane.columnIndex="1" />
-                        <Label text="Gender:" GridPane.rowIndex="1" />
-                        <TextField fx:id="genderTextField" prefHeight="24.0" prefWidth="112.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                        <Label alignment="CENTER" prefHeight="24.0" prefWidth="477.0" style="-fx-font-weight: bold;" text="Statistics about completed courses" textFill="#1880e1">
+                           <font>
+                              <Font name="System Bold" size="15.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="5.0" top="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <Label fx:id="reviewedCoursesLabel" alignment="CENTER" prefHeight="19.0" prefWidth="457.0" text="Reviewed courses:">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="5.0" top="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <Label fx:id="averageDurationLabel" alignment="CENTER" prefHeight="19.0" prefWidth="476.0" text="Average duration:">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="5.0" top="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <Label fx:id="averagePriceLabel" alignment="CENTER" prefHeight="19.0" prefWidth="505.0" text="Average price:" textAlignment="CENTER">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                           <VBox.margin>
+                              <Insets bottom="25.0" top="5.0" />
+                           </VBox.margin>
+                        </Label>
+                        <Button fx:id="backToHomeButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-background-radius: 13;" text="Back" textFill="WHITE">
+                           <font>
+                              <Font size="15.0" />
+                           </font>
+                        </Button>
                      </children>
-                  </GridPane>
+                  </VBox>
                </right>
-               <bottom>
-                  <Button fx:id="followButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold;" text="follow" textFill="WHITE" BorderPane.alignment="CENTER">
-                     <BorderPane.margin>
-                        <Insets bottom="20.0" top="10.0" />
-                     </BorderPane.margin></Button>
-               </bottom>
-               <padding>
-                  <Insets bottom="10.0" right="10.0" top="10.0" />
-               </padding>
             </BorderPane>
-            <BorderPane prefHeight="110.0" prefWidth="477.0">
-               <top>
-                  <Label prefHeight="24.0" prefWidth="477.0" style="-fx-font-weight: bold;" text="Statistics about completed courses" textFill="#1880e1" BorderPane.alignment="CENTER" />
-               </top>
-               <center>
-                  <GridPane prefHeight="83.0" prefWidth="798.0" BorderPane.alignment="CENTER">
-                    <columnConstraints>
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="219.0" minWidth="10.0" prefWidth="152.0" />
-                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="297.0" minWidth="10.0" prefWidth="297.0" />
-                    </columnConstraints>
-                    <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                    </rowConstraints>
-                     <children>
-                        <Label text="Reviewed courses:" />
-                        <Label text="Average duration:" GridPane.rowIndex="1" />
-                        <Label text="Average price:" GridPane.rowIndex="2" />
-                        <TextField fx:id="avgDurationTextField" prefHeight="24.0" prefWidth="71.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                        <TextField fx:id="avgPriceTextField" prefHeight="24.0" prefWidth="99.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                        <TextField fx:id="totReviewedCoursesTextField" prefHeight="24.0" prefWidth="168.0" GridPane.columnIndex="1" />
-                     </children>
-                  </GridPane>
-               </center>
-            </BorderPane>
-            <BorderPane prefHeight="89.0" prefWidth="471.0">
-               <center>
-                  <ScrollPane prefHeight="87.0" prefWidth="493.0" BorderPane.alignment="CENTER">
-                     <content>
-                        <HBox fx:id="likedCoursesHBox" prefHeight="50.0" prefWidth="447.0" />
-                     </content>
-                  </ScrollPane>
-               </center>
-               <top>
-                  <BorderPane prefHeight="0.0" prefWidth="449.0" BorderPane.alignment="CENTER">
-                     <center>
-                        <Label prefHeight="24.0" prefWidth="494.0" style="-fx-font-weight: bold; -fx-alignment: left;" text="Liked courses" textFill="#1880e1" BorderPane.alignment="CENTER" />
-                     </center>
-                     <right>
-                        <ImageView fx:id="moreLikedImageView" fitHeight="34.0" fitWidth="49.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
-                           <image>
-                              <Image url="@../img/readMore.png" />
-                           </image>
-                        </ImageView>
-                     </right>
-                  </BorderPane>
-               </top>
-            </BorderPane>
-            <BorderPane prefHeight="89.0" prefWidth="471.0">
-               <center>
-                  <ScrollPane prefHeight="87.0" prefWidth="493.0" BorderPane.alignment="CENTER">
-                     <content>
-                        <HBox fx:id="reviewedCoursesHBox" prefHeight="50.0" prefWidth="447.0" />
-                     </content>
-                  </ScrollPane>
-               </center>
-               <top>
-                  <BorderPane prefHeight="0.0" prefWidth="449.0" BorderPane.alignment="CENTER">
-                     <center>
-                        <Label prefHeight="24.0" prefWidth="494.0" style="-fx-font-weight: bold; -fx-alignment: left;" text="Reviewed courses" textFill="#1880e1" BorderPane.alignment="CENTER" />
-                     </center>
-                     <right>
-                        <ImageView fx:id="moreReviewedImageView" fitHeight="34.0" fitWidth="49.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
-                           <image>
-                              <Image url="@../img/readMore.png" />
-                           </image>
-                        </ImageView>
-                     </right>
-                  </BorderPane>
-               </top>
-            </BorderPane>
-            <BorderPane fx:id="reviewedCoursesHBox" prefHeight="89.0" prefWidth="471.0">
-               <center>
-                  <ScrollPane prefHeight="87.0" prefWidth="493.0" BorderPane.alignment="CENTER">
-                     <content>
-                        <HBox fx:id="reviewedCoursesHBox1" prefHeight="50.0" prefWidth="447.0" />
-                     </content>
-                  </ScrollPane>
-               </center>
-               <top>
-                  <BorderPane prefHeight="0.0" prefWidth="449.0" BorderPane.alignment="CENTER">
-                     <center>
-                        <Label prefHeight="24.0" prefWidth="494.0" style="-fx-font-weight: bold; -fx-alignment: left;" text="Offered courses" textFill="#1880e1" BorderPane.alignment="CENTER" />
-                     </center>
-                     <right>
-                        <ImageView fx:id="moreOfferedLikedView" fitHeight="34.0" fitWidth="49.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
-                           <image>
-                              <Image url="@../img/readMore.png" />
-                           </image>
-                        </ImageView>
-                     </right>
-                  </BorderPane>
-               </top>
-            </BorderPane>
-            <BorderPane fx:id="reviewedCoursesHBox1" prefHeight="89.0" prefWidth="471.0">
-               <center>
-                  <ScrollPane prefHeight="87.0" prefWidth="493.0" BorderPane.alignment="CENTER">
-                     <content>
-                        <HBox fx:id="followerUsersHBox" prefHeight="50.0" prefWidth="447.0" />
-                     </content>
-                  </ScrollPane>
-               </center>
-               <top>
-                  <BorderPane prefHeight="0.0" prefWidth="389.0" BorderPane.alignment="CENTER">
-                     <center>
-                        <Label prefHeight="24.0" prefWidth="494.0" style="-fx-font-weight: bold; -fx-alignment: left;" text="Follower users" textFill="#1880e1" BorderPane.alignment="CENTER" />
-                     </center>
-                     <right>
-                        <ImageView fx:id="moreFollowerImageView" fitHeight="34.0" fitWidth="49.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
-                           <image>
-                              <Image url="@../img/readMore.png" />
-                           </image>
-                        </ImageView>
-                     </right>
-                  </BorderPane>
-               </top>
-            </BorderPane>
-            <BorderPane fx:id="reviewedCoursesHBox11" prefHeight="89.0" prefWidth="471.0">
-               <center>
-                  <ScrollPane prefHeight="87.0" prefWidth="493.0" BorderPane.alignment="CENTER">
-                     <content>
-                        <HBox fx:id="followingUsersHBox" prefHeight="49.0" prefWidth="447.0" />
-                     </content>
-                  </ScrollPane>
-               </center>
-               <top>
-                  <BorderPane prefHeight="34.0" prefWidth="449.0" BorderPane.alignment="CENTER">
-                     <right>
-                        <ImageView fx:id="moreFollowingImageView" fitHeight="117.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
-                           <image>
-                              <Image url="@../img/readMore.png" />
-                           </image>
-                        </ImageView>
-                     </right>
-                     <center>
-                        <Label prefHeight="24.0" prefWidth="494.0" style="-fx-font-weight: bold; -fx-alignment: left;" text="Following users" textFill="#1880e1" BorderPane.alignment="CENTER" />
-                     </center>
-                  </BorderPane>
-               </top>
-            </BorderPane>
-            <Button fx:id="backToHomeButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold;" text="back" textFill="WHITE">
-               <VBox.margin>
-                  <Insets bottom="10.0" top="10.0" />
-               </VBox.margin>
-            </Button>
+            <VBox fx:id="elementsVBox" layoutX="29.0" layoutY="430.0" prefHeight="201.0" prefWidth="1042.0" style="-fx-background-color: white;" />
          </children>
-         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-         </padding>
-      </VBox>
-   </children>
-</AnchorPane>
+      </AnchorPane>
+   </content>
+</ScrollPane>
