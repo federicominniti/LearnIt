@@ -10,6 +10,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Aggregates;
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.Projections;
 import com.mongodb.client.model.Updates;
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
@@ -476,6 +477,46 @@ db.learnit.aggregate([{"$match": {"title": " Atención prehospitalaria del ictus
             annualRatings.put(String.valueOf(c.getYear()), ((double)c.getSum_ratings() / c.getNum_reviews()));
         }
         return annualRatings;
+    }
+
+    public Course getCourseInfoFromId(ObjectId id) {
+        Bson filter = Filters.eq("_id", id);
+        Bson projection = Projections.fields(Projections.exclude("reviews"));
+        Course c = collection.find(filter).projection(projection).first();
+        return c;
+    }
+
+    public Review getCourseReviewByUser(Course course, User user) {
+        Course c = collection.aggregate(Arrays.asList(
+                new Document("$match", new Document("_id", course.getId())),
+                new Document("$project", new Document("_id", 1)
+                        .append("reviews", 1)),
+                new Document("$unwind", "$reviews"),
+                new Document("$match", new Document("reviews.author.username", user.getUsername())),
+                new Document("$group", new Document("_id", "$_id")
+                        .append("reviews", new Document("$push", "$reviews")))
+        )).first();
+
+        if (c == null)
+            return null;
+        else
+            return c.getReviews().get(0);
+    }
+
+    public List<Review> getCourseReviewsFromId(ObjectId id, int skip, int limit) {
+        Course c = collection.aggregate(Arrays.asList(
+                new Document("$match", new Document("_id", id)),
+                new Document("$project", new Document("_id", 1)
+                        .append("reviews", 1)),
+                new Document("$unwind", "$reviews"),
+                new Document("$skip", skip),
+                new Document("$limit", limit),
+                new Document("$group", new Document("_id", "$_id")
+                        .append("reviews", new Document("$push", "$reviews")))
+
+        )).first();
+
+        return c.getReviews();
     }
 
 }

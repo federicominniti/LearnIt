@@ -126,20 +126,20 @@ public class DiscoveryPageController {
         User myUser = Session.getLocalSession().getLoggedUser();
         int skip = 0;
 
-        List<Course> bestRating = mongoDBDriver.findBestRatings(limit);
-        Utils.addLine(elementsVBox, bestRating, null, Utils.BEST_RATING);
+        //List<Course> bestRating = mongoDBDriver.findBestRatings(limit);
+        Utils.addLine(elementsVBox, null, null, Utils.BEST_RATING);
 
-        List<Course> trending = mongoDBDriver.trendingCourses(limit);
-        Utils.addLine(elementsVBox, trending, null, Utils.TRENDING_COURSE);
+        //List<Course> trending = mongoDBDriver.trendingCourses(limit);
+        Utils.addLine(elementsVBox, null, null, Utils.TRENDING_COURSE);
 
-        List<Course> suggested = neo4jDriver.findSuggestedCourses(myUser, skip, limit);
-        Utils.addLine(elementsVBox, suggested, null, Utils.FRIENDS_COMPLETED_LIKED);
+        //List<Course> suggested = neo4jDriver.findSuggestedCourses(myUser, skip, limit);
+        Utils.addLine(elementsVBox, null, null, Utils.FRIENDS_COMPLETED_LIKED);
 
-        List<Course> completedSuggestions = neo4jDriver.findSuggestedCoursesByCompletedCourses(myUser, skip, limit);
-        Utils.addLine(elementsVBox, completedSuggestions, null, Utils.INSTRUCTORS_SUGGESTIONS);
+        //List<Course> completedSuggestions = neo4jDriver.findSuggestedCoursesByCompletedCourses(myUser, skip, limit);
+        Utils.addLine(elementsVBox, null, null, Utils.INSTRUCTORS_SUGGESTIONS);
 
-        List<User> suggestedUsers = neo4jDriver.findSuggestedUsers(myUser, skip, limit);
-        Utils.addLine(elementsVBox, null, suggestedUsers, Utils.USER_SUGGESTIONS);
+        //List<User> suggestedUsers = neo4jDriver.findSuggestedUsers(myUser, skip, limit);
+        Utils.addLine(elementsVBox, null, null, Utils.USER_SUGGESTIONS);
     }
 
     private void searchHandler(MouseEvent clickEvent){

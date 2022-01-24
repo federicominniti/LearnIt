@@ -41,6 +41,12 @@ import java.util.regex.Pattern;
 import static java.lang.Thread.sleep;
 
 public class Utils {
+
+    public final static int LIKED_COURSES = 4;
+    public final static int REVIEWED_COURSES = 5;
+    public final static int OFFERED_COURSES = 6;
+    public final static int FOLLOWER_USERS = 7;
+    public final static int FOLLOWING_USERS = 8;
     public final static int FRIENDS_COMPLETED_LIKED = 1;
     public final static int INSTRUCTORS_SUGGESTIONS = 2;
     public final static int USER_SUGGESTIONS = 3;
@@ -168,12 +174,12 @@ public class Utils {
         }
     }
 
-    public static void addLine(VBox discoverySections, List<Course> courses, List<User> users, int type) {
-        Pane line = loadElementsLine(courses, users, type);
+    public static void addLine(VBox discoverySections, Course course, User user, int type) {
+        Pane line = loadElementsLine(course, user, type);
         discoverySections.getChildren().add(line);
     }
 
-    private static Pane loadElementsLine(List<Course> courses, List<User> users, int type) {
+    private static Pane loadElementsLine(Course course, User user, int type) {
         //coursesUsersLine
         // 0 -> courses
         // 1 -> users
@@ -186,11 +192,11 @@ public class Utils {
             pane = (Pane) loader.load();
             if(type != USER_SUGGESTIONS) {
                 ElementsLineController<Course> coursesLine = (ElementsLineController<Course>) loader.getController();
-                coursesLine.setCoursesUsers(/*courses,*/ type);
+                coursesLine.setCoursesUsers(course, type);
             }
             else {
                 ElementsLineController<User> coursesLine = (ElementsLineController<User>) loader.getController();
-                coursesLine.setCoursesUsers(/*users,*/ type);
+                coursesLine.setCoursesUsers(user, type);
             }
         } catch (IOException e) {
             e.printStackTrace();

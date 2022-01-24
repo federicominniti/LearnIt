@@ -12,6 +12,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
+import javafx.scene.layout.VBox;
 
 import java.util.List;
 
@@ -19,26 +20,17 @@ public class ProfilePageController {
 
     @FXML private Label completeNameLabel;
     @FXML private Button backToHomeButton;
-    @FXML private TextField birthTextField;
+    @FXML private Label birthDateLabel;
     @FXML private Label usernameLabel;
-    @FXML private TextField genderTextField;
+    @FXML private Label genderLabel;
     @FXML private ImageView propicImageView;
     @FXML private Button followButton;
-    @FXML private TextField totReviewedCoursesTextField;
-    @FXML private TextField avgDurationTextField;
-    @FXML private TextField avgPriceTextField;
-    @FXML private HBox likedCoursesHBox;
-    @FXML private HBox reviewedCoursesHBox;
-    @FXML private HBox offeredCoursesHBox;
-    @FXML private HBox followerUsersHBox;
-    @FXML private HBox followingUsersHBox;
+    @FXML private Label reviewedCoursesLabel;
+    @FXML private Label averageDurationLabel;
+    @FXML private Label averagePriceLabel;
     @FXML private Label followingNumberLabel;
     @FXML private Label followerNumberLabel;
-    @FXML private ImageView moreLikedImageView;
-    @FXML private ImageView moreReviewedImageView;
-    @FXML private ImageView moreOfferedImageView;
-    @FXML private ImageView moreFollowerImageView;
-    @FXML private ImageView moreFollowingImageView;
+    @FXML private VBox elementsVBox;
 
 
     private Neo4jDriver neo4jDriver;
@@ -46,23 +38,11 @@ public class ProfilePageController {
     private int[]pageNumber = {0, 0, 0, 0, 0};
     private int limit;
 
-    private final static int LIKED_COURSES = 1;
-    private final static int REVIEWED_COURSES = 2;
-    private final static int OFFERED_COURSES = 3;
-    private final static int FOLLOWER_USERS = 4;
-    private final static int FOLLOWING_USERS = 5;
-
     public void initialize() {
         neo4jDriver = Neo4jDriver.getInstance();
         limit = ConfigParams.getLocalConfig().getLimitNumber();
 
         backToHomeButton.setOnMouseClicked(clickEvent -> backToHomeButtonHandler(clickEvent));
-
-        moreLikedImageView.setOnMouseClicked(clickEvent -> loadMore(LIKED_COURSES));
-        moreReviewedImageView.setOnMouseClicked(clickEvent -> loadMore(REVIEWED_COURSES));
-        moreOfferedImageView.setOnMouseClicked(clickEvent -> loadMore(OFFERED_COURSES));
-        moreFollowerImageView.setOnMouseClicked(clickEvent -> loadMore(FOLLOWER_USERS));
-        moreFollowingImageView.setOnMouseClicked(clickEvent -> loadMore(FOLLOWING_USERS));
 
         if(profileUser.getUsername().equals(Session.getLocalSession().getLoggedUser().getUsername())){ // personal profile
 
@@ -75,15 +55,13 @@ public class ProfilePageController {
 
         loadProfileInformation();
         loadStatistics();
-        loadCourses();
-        loadUsers();
     }
 
     private void loadProfileInformation(){
         completeNameLabel.setText(profileUser.getCompleteName());
         usernameLabel.setText(profileUser.getUsername());
-        birthTextField.setText(profileUser.getDateOfBirth().toString());
-        genderTextField.setText(profileUser.getGender());
+        birthDateLabel.setText(profileUser.getDateOfBirth().toString());
+        genderLabel.setText(profileUser.getGender());
         followerNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(0).toString()); // ??? ricontrollare indice
         followingNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(1).toString()); // ??? ricontrollare indice
 
@@ -92,66 +70,12 @@ public class ProfilePageController {
             propicImageView.setImage(profilePicture);
         }
 
-        birthTextField.setEditable(false);
-        genderTextField.setEditable(false);
-        totReviewedCoursesTextField.setEditable(false);
-        avgPriceTextField.setEditable(false);
-        avgDurationTextField.setEditable(false);
     }
 
     private void loadStatistics(){
-        totReviewedCoursesTextField.setText(Integer.toString(neo4jDriver.findTotCourses(profileUser)));
-        avgDurationTextField.setText(Double.toString(neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "duration")));
-        avgPriceTextField.setText(Double.toString(neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "price")));
-    }
-
-    private void loadCourses(){
-        List<Course> likedCourses = neo4jDriver.findCoursesLikedOrCompletedByUser(profileUser, false, 0, limit);
-        Utils.createCoursesElements(likedCourses, likedCoursesHBox);
-
-        List<Course> reviewedCourses = neo4jDriver.findCoursesLikedOrCompletedByUser(profileUser, true, 0, limit);
-        Utils.createCoursesElements(reviewedCourses, reviewedCoursesHBox);
-
-        List<Course> offeredCourses = neo4jDriver.findCoursesOfferedByUser(profileUser, 0, limit);
-        Utils.createCoursesElements(offeredCourses, offeredCoursesHBox);
-    }
-
-    private void loadUsers(){
-        List<User> followerUsers = neo4jDriver.findFollowerUsers(profileUser, 0, limit);
-        Utils.createUsersElements(followerUsers, followerUsersHBox);
-
-        List<User> followingUsers = neo4jDriver.findFollowedUsers(profileUser, 0, limit);
-        Utils.createUsersElements(followingUsers, followingUsersHBox);
-    }
-
-    private void loadMore(int index){
-        List<Course> courses;
-        List<User> users;
-        int skip = pageNumber[index-1]*limit;
-
-        pageNumber[index-1]++;
-
-        switch (index){
-            case LIKED_COURSES:
-                courses = neo4jDriver.findCoursesLikedOrCompletedByUser(profileUser, false, skip, limit);
-                createCoursesElements(courses, likedCoursesHBox);
-                break;
-            case REVIEWED_COURSES:
-                courses = neo4jDriver.findCoursesLikedOrCompletedByUser(profileUser, true, skip, limit);
-                createCoursesElements(courses, reviewedCoursesHBox);
-                break;
-            case OFFERED_COURSES:
-                courses = neo4jDriver.findCoursesOfferedByUser(profileUser, skip, limit);
-                createCoursesElements(courses, offeredCoursesHBox);
-                break;
-            case FOLLOWER_USERS:
-                users = neo4jDriver.findFollowerUsers(profileUser, skip, limit);
-                createUsersElements(users, followerUsersHBox);
-                break;
-            default:
-                users = neo4jDriver.findFollowedUsers(profileUser, skip, limit);
-                createUsersElements(users, followingUsersHBox);
-        }
+        reviewedCoursesLabel.setText(Integer.toString(neo4jDriver.findTotCourses(profileUser)));
+        averageDurationLabel.setText(Double.toString(neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "duration")));
+        averagePriceLabel.setText(Double.toString(neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "price")));
     }
 
     public  void setProfileUser(User user){
@@ -177,12 +101,6 @@ public class ProfilePageController {
 
             followingNumberLabel.setText(Integer.toString((Integer.parseInt(followingNumberLabel.getText())+1)));
         }
-
-        // update of the shown list of followed users
-        followingUsersHBox.getChildren().clear();
-
-        List<User> followingUsers = neo4jDriver.findFollowedUsers(profileUser, 0, limit);
-        Utils.createUsersElements(followingUsers, followingUsersHBox);
 
     }
 

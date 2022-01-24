@@ -1,6 +1,7 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.persistence;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import org.bson.types.ObjectId;
 import org.neo4j.driver.*;
@@ -600,13 +601,14 @@ public class Neo4jDriver implements DBDriver {
     }
 
     //provata
-    public List<User> findFollowerUsers(User followedUser){
+    public List<User> findFollowerUsers(User followedUser, int toSkip, int limit){
         List<User> users = new ArrayList<>();
         try (Session session = neo4jDriver.session())
         {
             session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (a:User{username: $username})<-[:FOLLOW]-(b:User) " +
-                                "RETURN b.username as username, b.complete_name as name, b.profile_picture as pic ",
+                                "RETURN b.username as username, b.complete_name as name, b.profile_picture as pic " +
+                                "SKIP " + toSkip + " LIMIT " + limit,
                         parameters( "username", followedUser.getUsername()));
 
                 while(result.hasNext()){
@@ -626,14 +628,51 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
+    public boolean isCourseLikedByUser(Course course, User user) {
+        try (Session session = neo4jDriver.session()) {
+            boolean res = session.readTransaction(tx -> {
+                Result r = tx.run("MATCH (u:User {username: $username})-[:LIKE]->(c:Course {title: $title}) RETURN u",
+                        parameters("username", user.getUsername(), "title", course.getTitle()));
+                if (r.hasNext())
+                    return true;
+                return false;
+            });
+
+            return res;
+        }
+        catch (Exception ex) {
+            System.err.println("Error while retrieving suggestions from Neo4J");
+            return false;
+        }
+    }
+
+    public boolean isCourseReviewedByUser(Course course, User user) {
+        try (Session session = neo4jDriver.session()) {
+            boolean res = session.readTransaction(tx -> {
+                Result r = tx.run("MATCH (u:User {username: $username})-[:REVIEW]->(c:Course {title: $title}) RETURN u",
+                        parameters("username", user.getUsername(), "title", course.getTitle()));
+                if (r.hasNext())
+                    return true;
+                return false;
+            });
+
+            return res;
+        }
+        catch (Exception ex) {
+            System.err.println("Error while retrieving suggestions from Neo4J");
+            return false;
+        }
+    }
+
     //provata
-    public List<User> findFollowedUsers(User followedUser){
+    public List<User> findFollowedUsers(User followedUser, int toSkip, int limit){
         List<User> users = new ArrayList<>();
         try (Session session = neo4jDriver.session())
         {
             session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (a:User{username: $username})-[:FOLLOW]->(b:User) " +
-                                "RETURN b.username as username, b.complete_name as name, b.profile_picture as pic ",
+                                "RETURN b.username as username, b.complete_name as name, b.profile_picture as pic " +
+                                "SKIP " + toSkip + " LIMIT " + limit,
                         parameters( "username", followedUser.getUsername()));
 
                 while(result.hasNext()){

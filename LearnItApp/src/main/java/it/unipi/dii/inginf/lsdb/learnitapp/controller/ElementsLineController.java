@@ -24,7 +24,7 @@ public class ElementsLineController<T> {
     @FXML private HBox itemsHBox;
 
     private Neo4jDriver neo4jDriver;
-    //private List<T> coursesOrUsers;
+    private T coursesOrUsers;
     private int listType;
     private int pageNumber;
     private int limit;
@@ -37,10 +37,25 @@ public class ElementsLineController<T> {
         mongoDBDriver = MongoDBDriver.getInstance();
     }
 
-    public void setCoursesUsers(/*List<T> coursesOrUsers,*/ int type){
+    public void setCoursesUsers(T coursesOrUsers, int type){
         listType = type;
-        //this.coursesOrUsers = coursesOrUsers;
+        this.coursesOrUsers = coursesOrUsers;
         switch (listType){
+            case Utils.REVIEWED_COURSES:
+                headerLabel.setText("Reviewed courses");
+                break;
+            case Utils.OFFERED_COURSES:
+                headerLabel.setText("Offered courses");
+                break;
+            case Utils.LIKED_COURSES:
+                headerLabel.setText("Liked courses");
+                break;
+            case Utils.FOLLOWING_USERS:
+                headerLabel.setText("Users you are following");
+                break;
+            case Utils.FOLLOWER_USERS:
+                headerLabel.setText("Users following you");
+                break;
             case Utils.BEST_RATING:
                 headerLabel.setText("Best rating courses");
                 break;
@@ -93,6 +108,31 @@ public class ElementsLineController<T> {
         List<Course> moreCourses = null;
         List<User> moreUsers = null;
         switch (listType) {
+            case Utils.OFFERED_COURSES:
+                moreCourses = neo4jDriver.findCoursesOfferedByUser((User)coursesOrUsers, skip, limit);
+                if (moreCourses != null)
+                    Utils.addCoursesSnapshot(itemsHBox, moreCourses);
+                break;
+            case Utils.REVIEWED_COURSES:
+                moreCourses = neo4jDriver.findCoursesCompletedByUser((User)coursesOrUsers, skip, limit);
+                if (moreCourses != null)
+                    Utils.addCoursesSnapshot(itemsHBox, moreCourses);
+                break;
+            case Utils.LIKED_COURSES:
+                moreCourses = neo4jDriver.findCoursesLikedByUser((User)coursesOrUsers, skip, limit);
+                if (moreCourses != null)
+                    Utils.addCoursesSnapshot(itemsHBox, moreCourses);
+                break;
+            case Utils.FOLLOWING_USERS:
+                moreUsers = neo4jDriver.findFollowedUsers((User)coursesOrUsers, skip, limit);
+                if (moreUsers != null)
+                    Utils.addUsersSnapshot(itemsHBox, moreUsers);
+                break;
+            case Utils.FOLLOWER_USERS:
+                moreUsers = neo4jDriver.findFollowerUsers((User)coursesOrUsers, skip, limit);
+                if (moreUsers != null)
+                    Utils.addUsersSnapshot(itemsHBox, moreUsers);
+                break;
             case Utils.FRIENDS_COMPLETED_LIKED:
                 moreCourses = neo4jDriver.findSuggestedCourses(myUser, skip, limit);
                 if (moreCourses != null)
