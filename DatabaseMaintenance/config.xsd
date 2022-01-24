@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="it.unipi.dii.inginf.lsdb.databasemaintenance.ConfigParams">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="mongoDBPrimaryIP" type="xs:string"/>
+                <xs:element name="mongoDBPrimaryPort" type="xs:int"/>
+                <xs:element name="mongoDBSecondIP" type="xs:string"/>
+                <xs:element name="mongoDBSecondPort" type="xs:int"/>
+                <xs:element name="mongoDBThirdIP" type="xs:string"/>
+                <xs:element name="mongoDBThirdPort" type="xs:int"/>
+                <xs:element name="mongoDBUsername" type="xs:string"/>
+                <xs:element name="mongoDBPassword" type="xs:string"/>
+                <xs:element name="mongoDBName" type="xs:string"/>
+                <xs:element name="maxReviews" type="xs:int"/>
+                <xs:element name="maxReviewsAfterDiscard" type="xs:int"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
