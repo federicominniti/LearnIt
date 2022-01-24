@@ -114,12 +114,12 @@ public class ElementsLineController<T> {
                     Utils.addCoursesSnapshot(itemsHBox, moreCourses);
                 break;
             case Utils.REVIEWED_COURSES:
-                moreCourses = neo4jDriver.findCoursesCompletedByUser((User)coursesOrUsers, skip, limit);
+                moreCourses = neo4jDriver.findCoursesLikedOrCompletedByUser((User)coursesOrUsers,true ,skip, limit);
                 if (moreCourses != null)
                     Utils.addCoursesSnapshot(itemsHBox, moreCourses);
                 break;
             case Utils.LIKED_COURSES:
-                moreCourses = neo4jDriver.findCoursesLikedByUser((User)coursesOrUsers, skip, limit);
+                moreCourses = neo4jDriver.findCoursesLikedOrCompletedByUser((User)coursesOrUsers, false, skip, limit);
                 if (moreCourses != null)
                     Utils.addCoursesSnapshot(itemsHBox, moreCourses);
                 break;

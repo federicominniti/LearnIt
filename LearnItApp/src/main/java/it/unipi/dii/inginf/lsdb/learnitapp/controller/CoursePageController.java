@@ -73,7 +73,7 @@ public class CoursePageController {
             editCourseButton.setVisible(false);
 
             if(Neo4jDriver.getInstance().isCourseReviewedByUser(course, loggedUser)){ // logged user has already written a review of the course
-                myReview = isReviewedByUser(course, loggedUser);
+                myReview = MongoDBDriver.getInstance().getCourseReviewByUser(course, loggedUser);
                 if(myReview != null){ // review was found
                     reviewCourseButton.setVisible(false);
                     newReviewVBox.setVisible(true);
@@ -107,7 +107,7 @@ public class CoursePageController {
 
             likeCourseButton.setOnMouseClicked(clickEvent -> likeCourseButtonHandler(clickEvent));
 
-            if(isCourseLikedByUser(course, loggedUser)){
+            if(Neo4jDriver.getInstance().isCourseLikedByUser(course, loggedUser)){
                 likeCourseButton.setText("dislike");
             }
         }
@@ -296,7 +296,7 @@ public class CoursePageController {
 
     public void likeCourseButtonHandler(MouseEvent clickEvent){
         User loggedUser = Session.getLocalSession().getLoggedUser();
-        if(isCourseLikedByUser(course, loggedUser)){
+        if(Neo4jDriver.getInstance().isCourseLikedByUser(course, loggedUser)){
             //dislike
             Neo4jDriver.getInstance().dislikeCourse(loggedUser, course);
             likeCourseButton.setText("like");
@@ -352,7 +352,7 @@ public class CoursePageController {
 
     private void loadMore(){
         int skip = pageNumber*limit;
-        List<Review> toAdd = MongoDBDriver.getInstance().getCourseReviewFromId(course.getId(), skip, limit);
+        List<Review> toAdd = MongoDBDriver.getInstance().getCourseReviewsFromId(course.getId(), skip, limit);
 
         pageNumber++;
 
@@ -363,7 +363,7 @@ public class CoursePageController {
     }
 
     private void loadReviews(){
-        course.setReviews(MongoDBDriver.getInstance().getCourseReviewFromId(course.getId(), 0, limit));
+        course.setReviews(MongoDBDriver.getInstance().getCourseReviewsFromId(course.getId(), 0, limit));
         createReviewsElements(course.getReviews(), reviewsVBox);
     }
 
