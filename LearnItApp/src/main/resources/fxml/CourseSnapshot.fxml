@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
@@ -16,4 +17,10 @@
       <Label fx:id="durationLabel" alignment="CENTER" layoutX="3.0" layoutY="213.0" prefHeight="17.0" prefWidth="224.0" text="Duration " />
       <Label fx:id="priceLabel" alignment="CENTER" layoutX="3.0" layoutY="186.0" prefHeight="17.0" prefWidth="224.0" text="Price" />
    </children>
+   <opaqueInsets>
+      <Insets />
+   </opaqueInsets>
+   <padding>
+      <Insets left="10.0" right="10.0" />
+   </padding>
 </AnchorPane>

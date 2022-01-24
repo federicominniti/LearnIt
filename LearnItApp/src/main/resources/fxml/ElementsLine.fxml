@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.ImageView?>
@@ -8,24 +9,32 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.text.Font?>
 
-
-<AnchorPane fx:id="elementsLine" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="857.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.ElementsLineController">
+<AnchorPane fx:id="elementsLine" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="328.0" prefWidth="1042.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.ElementsLineController">
    <children>
-      <BorderPane prefHeight="45.0" prefWidth="857.0">
+      <BorderPane fx:id="headerBorderPane" prefHeight="45.0" prefWidth="1041.0" style="-fx-background-color: white; -fx-border-style: none; -fx-border-width: 0;">
          <left>
             <Label fx:id="headerLabel" text="Text" textFill="#006aff" BorderPane.alignment="CENTER">
                <font>
                   <Font name="Arial" size="20.0" />
                </font>
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
             </Label>
          </left>
          <right>
-            <ImageView fx:id="buttonImage" fitHeight="45.0" fitWidth="52.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+            <ImageView fx:id="buttonImage" fitHeight="45.0" fitWidth="52.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets right="16.0" />
+               </BorderPane.margin></ImageView>
          </right>
+         <padding>
+            <Insets left="20.0" />
+         </padding>
       </BorderPane>
-      <ScrollPane layoutY="45.0" prefHeight="355.0" prefWidth="857.0">
+      <ScrollPane layoutY="45.0" prefHeight="280.0" prefWidth="1041.0" style="-fx-background-color: white; -fx-border-width: 0;">
          <content>
-            <HBox fx:id="itemsHBox" alignment="CENTER" prefHeight="353.0" prefWidth="855.0" />
+            <HBox fx:id="itemsHBox" alignment="TOP_CENTER" prefHeight="263.0" prefWidth="1023.0" spacing="15.0" style="-fx-background-color: white; -fx-border-width: 0;" />
          </content>
       </ScrollPane>
    </children>

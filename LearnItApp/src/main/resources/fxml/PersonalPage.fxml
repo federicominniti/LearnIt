@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="537.0" prefWidth="666.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnit.controller.PersonalPageController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="537.0" prefWidth="666.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.PersonalPageController">
    <children>
       <ImageView fitHeight="53.0" fitWidth="200.0" layoutX="232.0" layoutY="28.0">
          <image>
@@ -25,14 +25,14 @@
       </ImageView>
       <VBox alignment="TOP_CENTER" layoutX="75.0" layoutY="108.0" prefHeight="388.0" prefWidth="519.0" style="-fx-background-color: f1f8f6; -fx-background-radius: 15px; -fx-padding: 15px;">
          <children>
-            <Label prefHeight="41.0" prefWidth="429.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="Personal information" textAlignment="CENTER" textFill="#1880e1">
+            <Label prefHeight="41.0" prefWidth="429.0" style="-fx-alignment: center;" text="Personal information" textAlignment="CENTER" textFill="#1880e1">
                <font>
-                  <Font size="34.0" />
+                  <Font name="Arial Bold Italic" size="34.0" />
                </font>
             </Label>
             <Label fx:id="usernameLabel" prefHeight="41.0" prefWidth="232.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="username" textAlignment="CENTER" textFill="#19b2e0">
                <font>
-                  <Font size="28.0" />
+                  <Font name="Arial Bold Italic" size="28.0" />
                </font>
             </Label>
             <GridPane prefHeight="214.0" prefWidth="482.0">
@@ -50,19 +50,40 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="Complete name:" />
+                  <Label text="Complete name:">
+                     <font>
+                        <Font size="15.0" />
+                     </font></Label>
                   <TextField fx:id="completeNameTextField" prefHeight="24.0" prefWidth="232.0" GridPane.columnIndex="1" />
-                  <Label text="Birth date:" GridPane.rowIndex="1" />
+                  <Label text="Birth date:" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="15.0" />
+                     </font></Label>
                   <DatePicker fx:id="birthDatePicker" prefHeight="24.0" prefWidth="330.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Label text="Gender:" GridPane.rowIndex="2" />
+                  <Label text="Gender:" GridPane.rowIndex="2">
+                     <font>
+                        <Font size="15.0" />
+                     </font></Label>
                   <ChoiceBox fx:id="genderChoiceBox" prefHeight="24.0" prefWidth="354.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                  <Label text="Profile image:" GridPane.rowIndex="3" />
+                  <Label text="Profile image:" GridPane.rowIndex="3">
+                     <font>
+                        <Font size="15.0" />
+                     </font></Label>
                   <TextField fx:id="propicTextField" prefHeight="24.0" prefWidth="232.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <Label text="Email:" GridPane.rowIndex="4" />
+                  <Label text="Email:" GridPane.rowIndex="4">
+                     <font>
+                        <Font size="15.0" />
+                     </font></Label>
                   <TextField fx:id="emailTextField" prefHeight="24.0" prefWidth="232.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                  <Label text="Password:" GridPane.rowIndex="5" />
+                  <Label text="Password:" GridPane.rowIndex="5">
+                     <font>
+                        <Font size="15.0" />
+                     </font></Label>
                   <PasswordField fx:id="passwordPasswordField" prefHeight="24.0" prefWidth="232.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                  <Label text="Confirm password:" GridPane.rowIndex="6" />
+                  <Label text="Confirm password:" GridPane.rowIndex="6">
+                     <font>
+                        <Font size="15.0" />
+                     </font></Label>
                   <PasswordField fx:id="confirmPasswordField" prefHeight="24.0" prefWidth="232.0" GridPane.columnIndex="1" GridPane.rowIndex="6" />
                </children>
                <VBox.margin>
@@ -78,8 +99,14 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Button fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold;" text="save" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
-                  <Button fx:id="backToHomeButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold;" text="back" textFill="WHITE" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
+                  <Button fx:id="saveButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold; -fx-background-radius: 13;" text="save" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                     <font>
+                        <Font size="15.0" />
+                     </font></Button>
+                  <Button fx:id="backToHomeButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-font-weight: bold; -fx-background-radius: 13;" text="back" textFill="WHITE" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                     <font>
+                        <Font size="15.0" />
+                     </font></Button>
                </children>
                <VBox.margin>
                   <Insets />

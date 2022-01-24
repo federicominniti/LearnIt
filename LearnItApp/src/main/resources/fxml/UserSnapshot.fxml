@@ -5,7 +5,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<AnchorPane fx:id="userSnapshot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="230.0" style="-fx-background-color: white; -fx-background-position: center; -fx-border-radius: 20px; -fx-border-style: solid; -fx-border-color: #006aff#006aff; -fx-border-width: 2px;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.UserSnapshotController">
+<AnchorPane fx:id="userSnapshot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="230.0" style="-fx-background-color: white; -fx-background-position: center; -fx-border-radius: 20px; -fx-border-style: solid; -fx-border-color: #006aff#006aff; -fx-border-width: 2px;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.UserSnapshotController">
    <children>
       <ImageView fx:id="userPicImage" fitHeight="106.0" fitWidth="90.0" layoutX="69.0" layoutY="57.0" pickOnBounds="true" preserveRatio="true">
          <image>
