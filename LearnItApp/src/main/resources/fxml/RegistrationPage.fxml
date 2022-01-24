@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="785.0" prefWidth="360.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnit.controller.RegistrationPageController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="785.0" prefWidth="360.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.RegistrationPageController">
    <children>
       <Button fx:id="backToLoginButton" layoutX="94.0" layoutY="698.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="67.0" style="-fx-background-color: lightblue lightblue;" text="back" />
       <Button fx:id="signUpButton" layoutX="200.0" layoutY="698.0" mnemonicParsing="false" style="-fx-background-color: lightgreen;" text="Sign up" />

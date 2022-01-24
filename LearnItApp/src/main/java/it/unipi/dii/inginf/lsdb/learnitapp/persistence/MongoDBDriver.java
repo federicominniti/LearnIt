@@ -386,7 +386,8 @@ public class MongoDBDriver implements DBDriver {
             Pattern pattern = Pattern.compile("^.*" + title + ".*$", Pattern.CASE_INSENSITIVE);
             if (filter != null) {
                 filter = Filters.and(Filters.regex("title", pattern), filter);
-            }
+            } else
+                filter = Filters.regex("title", pattern);
         }
 
         Bson skip = skip(toSkip);
@@ -468,7 +469,7 @@ db.learnit.aggregate([{"$match": {"title": " Atención prehospitalaria del ictus
                         .append("num_reviews", new Document("$sum", 1))),
                 new Document("$set", new Document("year", "$_id.year")),
                 new Document("$unset", "_id")
-                )).into(new ArrayList<>());
+        )).into(new ArrayList<>());
 
         for (Course c: doc) {
             System.out.println(c.getYear());

@@ -4,6 +4,7 @@ import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
@@ -26,13 +27,15 @@ public class ElementsLineController<T> {
     private int listType;
     private int pageNumber;
     private int limit;
+    private MongoDBDriver mongoDBDriver;
 
     private static final String READ_MORE = "/img/readMore.png";
 
     public void initialize(){
-        pageNumber = 1;
+        pageNumber = 0;
         limit = ConfigParams.getLocalConfig().getLimitNumber();
         neo4jDriver = Neo4jDriver.getInstance();
+        mongoDBDriver = MongoDBDriver.getInstance();
     }
 
     public void setCoursesUsers(List<T> coursesOrUsers, int type){
@@ -56,7 +59,8 @@ public class ElementsLineController<T> {
                 break;
         }
 
-        buttonImage = new ImageView(new Image(READ_MORE));
+        loadMore();
+        buttonImage = new ImageView(new Image(String.valueOf(DiscoveryPageController.class.getResource(READ_MORE))));
         buttonImage.setOnMouseClicked(clickEvent -> loadMore());
     }
 
@@ -67,6 +71,16 @@ public class ElementsLineController<T> {
         List<Course> moreCourses = null;
         List<User> moreUsers = null;
         switch (listType){
+            case Utils.BEST_RATING:
+                moreCourses = mongoDBDriver.findBestRatings(limit);
+                if(moreCourses != null)
+                    Utils.addCoursesSnapshot(itemsHBox, moreCourses);
+                break;
+            case Utils.TRENDING_COURSE:
+                moreCourses = mongoDBDriver.trendingCourses(limit);
+                if(moreCourses != null)
+                    Utils.addCoursesSnapshot(itemsHBox, moreCourses);
+                break;
             case Utils.FRIENDS_COMPLETED_LIKED:
                 moreCourses = neo4jDriver.findSuggestedCourses(myUser, skip, limit);
                 if(moreCourses != null)

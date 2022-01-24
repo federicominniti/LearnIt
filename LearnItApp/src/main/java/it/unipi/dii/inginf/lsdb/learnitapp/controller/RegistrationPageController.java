@@ -2,6 +2,7 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
@@ -10,6 +11,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.List;
 
 public class RegistrationPageController {
 
@@ -25,13 +27,17 @@ public class RegistrationPageController {
     @FXML private TextField propicTextField;
 
     public void initialize() {
+
+        genderChoiceBox.getItems().add("Man");
+        genderChoiceBox.getItems().add("Woman");
+        genderChoiceBox.getItems().add("-");
         backToLoginButton.setOnMouseClicked(clickEvent -> backToLoginButtonHandler(clickEvent));
         signUpButton.setOnMouseClicked(clickEvent -> signUpHandler(clickEvent));
 
     }
 
     public void backToLoginButtonHandler(MouseEvent clickEvent) {
-        Utils.changeScene("/LoginPage.fxml", clickEvent);
+        Utils.changeScene("/fxml/LoginPage.fxml", clickEvent);
     }
 
     public void signUpHandler(MouseEvent clickEvent) {
@@ -77,7 +83,7 @@ public class RegistrationPageController {
 
         if (ret) {
             Utils.showInfoAlert("User registered with success");
-            Utils.changeScene("/LoginPage.fxml", clickEvent);
+            Utils.changeScene("/fxml/LoginPage.fxml", clickEvent);
         } else {
             Utils.showInfoAlert("Error, registration failed");
         }

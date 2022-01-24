@@ -2,7 +2,7 @@ package it.unipi.dii.inginf.lsdb.learnitapp.model;
 
 public class Session {
     private static Session localSession = null; // Singleton
-    private User loggedUser;
+    private static User loggedUser;
 
     public static Session getLocalSession()
     {
@@ -13,12 +13,8 @@ public class Session {
 
     private Session () {}
 
-    public static void setLoggedUser(User loggedUser) {
-        localSession.loggedUser = loggedUser;
-    }
-
-    public void updateLoggedUserInfo(User user) {
-        localSession.loggedUser = user;
+    public void setLoggedUser(User loggedUser) {
+        this.loggedUser = loggedUser;
     }
 
     public User getLoggedUser() {

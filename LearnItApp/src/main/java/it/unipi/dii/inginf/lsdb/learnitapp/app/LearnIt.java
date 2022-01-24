@@ -24,7 +24,7 @@ public class LearnIt extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        /*FXMLLoader loader = new FXMLLoader();
+        FXMLLoader loader = new FXMLLoader();
         loader.setLocation(LearnIt.class.getResource(LOGIN_PAGE));
         Parent root = loader.load();
 
@@ -32,20 +32,21 @@ public class LearnIt extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("LearnIt!");
         primaryStage.show();
-        primaryStage.setResizable(false);*/
+        primaryStage.setResizable(false);
         ConfigParams.getInstance();
 
         MongoDBDriver m = MongoDBDriver.getInstance();
         Neo4jDriver neo4j = Neo4jDriver.getInstance();
 
-
-        List<Course> courses = m.trendingCourses(5);
+        List<Course> courses = m.findBestRatings(10);
         for (Course c: courses) {
             System.out.println(c.getTitle());
         }
+
         primaryStage.setOnCloseRequest(windowEvent -> {
             m.closeConnection();
             neo4j.closeConnection();
+            System.exit(0);
         });
     }
 

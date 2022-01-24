@@ -186,9 +186,9 @@ public class Neo4jDriver implements DBDriver {
 
             session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (c:Course)<-[:OFFER]-(u2: User)-[:OFFER]->(c2:Course)<-[:REVIEW]-(u:User {username : $username }) " +
-                        "WHERE NOT ( (u)-[:REVIEW]->(c) ) AND (c.id <> c2.id) AND (u2.username <> u.username)"+
-                        "RETURN c.title as title, c.duration as duration, c.price as price, c.course_pic as pic " +
-                        "SKIP $skip LIMIT $limit",
+                                "WHERE NOT ( (u)-[:REVIEW]->(c) ) AND (c.id <> c2.id) AND (u2.username <> u.username)"+
+                                "RETURN c.title as title, c.duration as duration, c.price as price, c.course_pic as pic " +
+                                "SKIP $skip LIMIT $limit",
                         parameters("username", user.getUsername(), "skip", skip, "limit", limit));
 
                 while(result.hasNext()){
@@ -388,7 +388,7 @@ public class Neo4jDriver implements DBDriver {
             session.readTransaction(tx -> {
                 Result r = tx.run("MATCH (u:User {username: $username})-[:FOLLOW]->(friend:User)-[:LIKE|:REVIEW]->(c:Course) " +
                         "WHERE NOT ((u)-[:OFFER]->(c) OR (u)-[:REVIEW]->(c)) " +
-                        "RETURN c.title AS title, c.duration AS duration, c.price AS price, c.course_pic AS pic" +
+                        "RETURN c.title AS title, c.duration AS duration, c.price AS price, c.course_pic AS pic, " +
                         "COUNT(*) AS occurrence " +
                         "ORDER BY occurrence DESC " +
                         "SKIP $skip " +
@@ -606,7 +606,7 @@ public class Neo4jDriver implements DBDriver {
         {
             session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (a:User{username: $username})<-[:FOLLOW]-(b:User) " +
-                        "RETURN b.username as username, b.complete_name as name, b.profile_picture as pic ",
+                                "RETURN b.username as username, b.complete_name as name, b.profile_picture as pic ",
                         parameters( "username", followedUser.getUsername()));
 
                 while(result.hasNext()){
@@ -683,13 +683,13 @@ public class Neo4jDriver implements DBDriver {
     }
 
     //provata
-    public List<Course> findCoursesOfferedByUser(User user) {
+    public List<Course> findCoursesOfferedByUser(User user, int toSkip, int limit) {
         List<Course> courses = new ArrayList<>();
         try (Session session = neo4jDriver.session()) {
             session.readTransaction(tx -> {
                 Result r = tx.run("MATCH (u:User {username: $username})-[:OFFER]->(c:Course)" +
-                                " RETURN c.title AS title, c.duration AS duration, c.price AS price, c.course_pic AS pic",
-                        parameters("username", user.getUsername()));
+                                " RETURN c.title AS title, c.duration AS duration, c.price AS price, c.course_pic AS pic SKIP $skip LIMIT $limit",
+                        parameters("username", user.getUsername(), "skip", toSkip, "limit", limit));
 
                 while (r.hasNext()) {
                     Record rec = r.next();

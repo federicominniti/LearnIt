@@ -148,7 +148,7 @@ public class Utils {
     public static Pane loadCourseSnapshot(Course course) {
         Pane pane = null;
         try {
-            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/courseSnapshot.fxml"));
+            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/fxml/courseSnapshot.fxml"));
             pane = (Pane) loader.load();
             CourseSnapshotController courseSnapshotController = (CourseSnapshotController) loader.getController();
             courseSnapshotController.setSnapshotCourse(course);
@@ -179,7 +179,7 @@ public class Utils {
         // 1 -> yes button
         Pane pane = null;
         try {
-            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/ElementsLine.fxml"));
+            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/fxml/ElementsLine.fxml"));
             pane = (Pane) loader.load();
             if(type != USER_SUGGESTIONS) {
                 ElementsLineController<Course> coursesLine = (ElementsLineController<Course>) loader.getController();
@@ -199,7 +199,7 @@ public class Utils {
     {
         Pane pane = null;
         try {
-            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/userSnapshot.fxml"));
+            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/fxml/userSnapshot.fxml"));
             pane = (Pane) loader.load();
             UserSnapshotController userSnapshotController = (UserSnapshotController) loader.getController();
             userSnapshotController.setSnapshotUser(user);

@@ -10,6 +10,7 @@ import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -30,6 +31,7 @@ import org.neo4j.driver.internal.shaded.io.netty.handler.ssl.ClientAuth;
 import org.w3c.dom.events.Event;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class DiscoveryPageController {
@@ -37,8 +39,8 @@ public class DiscoveryPageController {
     @FXML private Button searchButton;
     @FXML private RadioButton coursesRadio;
     @FXML private RadioButton usersRadio;
-    @FXML private ChoiceBox languageChoiceBox;
-    @FXML private ChoiceBox levelChoiceBox;
+    @FXML private ChoiceBox<Object> languageChoiceBox;
+    @FXML private ChoiceBox<Object> levelChoiceBox;
     @FXML private TextField maxDurationTextField;
     @FXML private TextField maxPriceTextField;
     @FXML private Label usernameLabel;
@@ -55,16 +57,16 @@ public class DiscoveryPageController {
     private ElementsLineController<Course> friendsCompletedLiked;
     private ElementsLineController<Course> instructorSuggestions;
     private ElementsLineController<User> suggestedUsers;
-    private int currentI;
+    private int currentI = 0;
     private GridPane gridPane;
 
-    private String []languages = {"Arabic", "Chinese", "English", "French", "German", "Hebrew", "Hungarian", "Indonesian",
+    private final String[] languages = {"Arabic", "Chinese", "English", "French", "German", "Hebrew", "Hungarian", "Indonesian",
             "Italian", "Japanese", "Korean", "Portuguese", "Russian", "Spanish", "Swedish", "Turkish", "Ukrainian", "Albanian",
             "Azeri", "Bengali", "Bulgarian", "Burmese", "Croatian", "Czech", "Greek", "Hindi", "Estonian", "Filipino",
             "Indonesia", "Lithuanian", "Malay", "Marathi", "Nederlands", "Norwegian", "Persian", "Polski", "Română", "Serbian",
             "Swahili", "Tamil", "Telugu", "Urdu", "Vietnamese", "русский", "ไทย", "日本語", "简体中文", "繁體中文", "한국어"};
 
-    private String []levels = {"All Levels", "Beginner", "Expert", "Intermediate"};
+    private final String[] levels  = {"All Levels", "Beginner", "Expert", "Intermediate"};
     private final static String PROFILE_PAGE = "/fxml/ProfilePage.fxml";
     //private final static String COURSE_DEFAULT_PIC = "/img/courseDefaultPic.png";
     //private final static String USER_DEFAULT_PIC = "/img/userDefaultPic.png";
@@ -75,9 +77,9 @@ public class DiscoveryPageController {
         mongoDBDriver = MongoDBDriver.getInstance();
         limit = ConfigParams.getLocalConfig().getLimitNumber();
 
-        elementsVBox.getChildren().clear();
         pageNumber[0] = pageNumber[1] = pageNumber[2] = 0;
 
+        gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
         gridPane.setPadding(new Insets(10, 10, 10, 10));
 
@@ -112,8 +114,8 @@ public class DiscoveryPageController {
         coursesRadio.setToggleGroup(searchType);
         usersRadio.setToggleGroup(searchType);
 
-        languageChoiceBox = new ChoiceBox(FXCollections.observableArrayList(languages));
-        levelChoiceBox = new ChoiceBox(FXCollections.observableArrayList(levels));
+        languageChoiceBox.setItems(FXCollections.observableArrayList(languages));
+        levelChoiceBox.setItems(FXCollections.observableArrayList(levels));
 
         usernameLabel.setText(Session.getLocalSession().getLoggedUser().getUsername());
         profilePic.setImage(new Image(Session.getLocalSession().getLoggedUser().getProfilePic()));
@@ -149,10 +151,24 @@ public class DiscoveryPageController {
         String title = "", level = "", language = "";
         double duration = -1, price = -1;
         title = searchTextField.getText();
-        level = levelChoiceBox.getValue().toString();
-        language = languageChoiceBox.getValue().toString();
-        duration = Double.parseDouble(maxDurationTextField.getText());
-        price = Double.parseDouble(maxPriceTextField.getText());
+        if (levelChoiceBox.getValue() == null)
+            level = "";
+        else
+            level = levelChoiceBox.getValue().toString();
+        if (languageChoiceBox.getValue() == null)
+            language = "";
+        else
+            language = languageChoiceBox.getValue().toString();
+
+        if (maxDurationTextField.getText().equals(""))
+            duration = -1;
+        else
+            duration = Double.parseDouble(maxDurationTextField.getText());
+
+        if (maxPriceTextField.getText().equals(""))
+            price = -1;
+        else
+            price = Double.parseDouble(maxPriceTextField.getText());
         if(selected.getText().equals("Courses") && title.equals("") && level.equals("") && language.equals("") &&
                 duration == -1 && price == -1)
 
@@ -181,13 +197,13 @@ public class DiscoveryPageController {
         List<Course> searchedCourses = mongoDBDriver.findCourses(price, duration, title, level, language, ((currentI*4)-1), 15);
         for(int i = currentI; i<currentI + 4; i++){
             for(int j = 0; j<4; j++) {
-                if(searchedCourses.get(i*4 + j) != null) {
+                if((i*4+j) < searchedCourses.size() && searchedCourses.get(i*4 + j) != null) {
                     Pane coursePane = Utils.loadCourseSnapshot(searchedCourses.get(i));
                     GridPane.setHalignment(coursePane, HPos.CENTER);
                     GridPane.setValignment(coursePane, VPos.CENTER);
                     gridPane.add(coursePane, i, j);
                 }
-                if(i == currentI + 3 && j == 3) {
+                if((i == currentI + 3 && j == 3) || (i*4+j) >= searchedCourses.size()) {
                     Label more = new Label();
                     more.setText("Read more element..");
                     more.setOnMouseClicked(newClickEvent -> addMoreResearchedCourses(title, level, language,
@@ -195,6 +211,7 @@ public class DiscoveryPageController {
                     GridPane.setHalignment(more, HPos.CENTER);
                     GridPane.setValignment(more, VPos.CENTER);
                     gridPane.add(more, i, j);
+                    i = 4; j = 4;
                 }
             }
         }
@@ -202,22 +219,28 @@ public class DiscoveryPageController {
     }
 
     private void addMoreResearchedUsers(String username){
-        List<User> searchedUsers = neo4jDriver.searchUserByUsername(15, ((currentI*4)-1), username);
+        List<User> searchedUsers;
+        if (currentI == 0)
+            searchedUsers = neo4jDriver.searchUserByUsername(15, 0, username);
+        else
+            searchedUsers = neo4jDriver.searchUserByUsername(15, ((currentI*4)-1), username);
         for(int i = currentI; i<currentI + 4; i++){
             for(int j = 0; j<4; j++) {
-                if(searchedUsers.get(i*4 + j) != null) {
+                if(((i*4+j) < searchedUsers.size()) && searchedUsers.get(i*4 + j) != null) {
                     Pane coursePane = Utils.loadUserSnapshot(searchedUsers.get(i));
                     GridPane.setHalignment(coursePane, HPos.CENTER);
                     GridPane.setValignment(coursePane, VPos.CENTER);
                     gridPane.add(coursePane, i, j);
                 }
-                if(i == currentI + 3 && j == 3) {
+                if((i == currentI + 3 && j == 3) || (i*4+j) >= searchedUsers.size()) {
                     Label more = new Label();
                     more.setText("Read more element..");
                     more.setOnMouseClicked(newClickEvent -> addMoreResearchedUsers(username));
                     GridPane.setHalignment(more, HPos.CENTER);
                     GridPane.setValignment(more, VPos.CENTER);
                     gridPane.add(more, i, j);
+                    i = 4;
+                    j = 4;
                 }
             }
         }
