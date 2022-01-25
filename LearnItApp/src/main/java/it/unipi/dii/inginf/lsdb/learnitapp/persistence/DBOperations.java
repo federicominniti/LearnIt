@@ -53,6 +53,21 @@ public class DBOperations {
         return false;
     }
 
+    public static boolean deleteReview(Review review, Course course){
+        if (mongoDBDriver.deleteReview(course, review)) {
+            if (!neo4jDriver.deleteReview(course, review.getAuthor())) {
+                mongoDBDriver.addReview(course, review);
+                Utils.showErrorAlert("Something has gone wrong");
+                return false;
+            } else {
+                Utils.showInfoAlert("Review deleted");
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     public static boolean addCourse(Course course){
         if (mongoDBDriver.addCourse(course)) {
             if (!neo4jDriver.addCourse(course)) {

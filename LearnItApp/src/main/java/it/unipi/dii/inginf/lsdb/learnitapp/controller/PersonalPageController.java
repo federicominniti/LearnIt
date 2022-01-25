@@ -55,7 +55,9 @@ public class PersonalPageController {
     }
 
     public void backToHomeButtonHandler(MouseEvent clickEvent) {
-        Utils.changeScene("/ProfilePage.fxml", clickEvent);
+        ProfilePageController profilePageController =
+                (ProfilePageController) Utils.changeScene(Utils.PROFILE_PAGE, clickEvent);
+        profilePageController.setProfileUser(Session.getLocalSession().getLoggedUser());
     }
 
     public void saveButtonHandler(MouseEvent clickEvent) {
@@ -100,7 +102,7 @@ public class PersonalPageController {
 
         if(flag){
             Utils.showInfoAlert("Changes applied!");
-            Utils.changeScene("/ProfilePage.fxml", clickEvent);
+            Utils.changeScene("/fxml/ProfilePage.fxml", clickEvent);
         }
         else
             Utils.showErrorAlert("Error, changes not applied");

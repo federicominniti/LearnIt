@@ -76,47 +76,53 @@ public class CoursePageController {
         moreReviewsImageView.setOnMouseClicked(clickEvent -> loadMore());
 
         User loggedUser = Session.getLocalSession().getLoggedUser();
-        if(course.getInstructor().getUsername().equals(loggedUser.getUsername())){ // own course
-            //editCourseButton.setOnMouseClicked(clickEvent -> editCourseButtonHandler());
-            likeCourseButton.setVisible(false);
+        if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
+            likeCourseButton.setText("Delete course");
+            likeCourseButton.setOnMouseClicked(clickEvent -> deleteCourse(clickEvent));
             newReviewVBox.setVisible(false);
-            editCourseButton.setText("Apply changes");
-        }
-        else{ // course not owned
-            if(neo4jDriver.isCourseReviewedByUser(course, loggedUser)){ // logged user has already written a review of the course
-                myReview = mongoDBDriver.getCourseReviewByUser(course, loggedUser);
-                if(myReview != null){ // review was found
-                    newReviewVBox.setVisible(true);
-                    reviewTitleTextField.setEditable(false);
-                    commentTextArea.setEditable(false);
-                    saveReviewButton.setText("Edit");
-                    saveReviewButton.setOnMouseClicked(clickEvent -> saveReviewButtonHandler());
+            editCourseButton.setVisible(false);
+            saveReviewButton.setVisible(false);
+        } else {
+            if (course.getInstructor().getUsername().equals(loggedUser.getUsername())) { // own course
+                //editCourseButton.setOnMouseClicked(clickEvent -> editCourseButtonHandler());
+                likeCourseButton.setVisible(false);
+                newReviewVBox.setVisible(false);
+                editCourseButton.setText("Apply changes");
+            } else { // course not owned
+                if (neo4jDriver.isCourseReviewedByUser(course, loggedUser)) { // logged user has already written a review of the course
+                    myReview = mongoDBDriver.getCourseReviewByUser(course, loggedUser);
+                    if (myReview != null) { // review was found
+                        newReviewVBox.setVisible(true);
+                        reviewTitleTextField.setEditable(false);
+                        commentTextArea.setEditable(false);
+                        saveReviewButton.setText("Edit");
+                        saveReviewButton.setOnMouseClicked(clickEvent -> saveReviewButtonHandler());
 
-                    reviewTitleTextField.setText(myReview.getTitle());
-                    commentTextArea.setText(myReview.getContent());
+                        reviewTitleTextField.setText(myReview.getTitle());
+                        commentTextArea.setText(myReview.getContent());
 
-                    Utils.fillStars(myReview.getRating(), ratingHBox);
-                    handleRatingStars(false);
+                        Utils.fillStars(myReview.getRating(), ratingHBox);
+                        handleRatingStars(false);
+                    } else { //too longer documents
+                        saveReviewButton.setVisible(false);
+                        handleRatingStars(false);
+                        reviewTitleTextField.setText("You reviewed this course in the past");
+                        reviewTitleTextField.setDisable(true);
+                        commentTextArea.setText("Don't worry, we take in consideration your opinion :)");
+                        commentTextArea.setDisable(true);
+                        ratingHBox.setVisible(false);
+                    }
+                } else { // not reviewed course
+                    saveReviewButton.setOnMouseClicked(clickEvent2 -> saveReviewButtonHandler());
+                    handleRatingStars(true);
+                    editCourseButton.setVisible(false);
                 }
-                else{ //too longer documents
-                    saveReviewButton.setVisible(false);
-                    handleRatingStars(false);
-                    reviewTitleTextField.setText("You reviewed this course in the past");
-                    reviewTitleTextField.setDisable(true);
-                    commentTextArea.setText("Don't worry, we take in consideration your opinion :)");
-                    commentTextArea.setDisable(true);
-                    ratingHBox.setVisible(false);
+
+                likeCourseButton.setOnMouseClicked(clickEvent -> likeCourseButtonHandler());
+
+                if (neo4jDriver.isCourseLikedByUser(course, loggedUser)) {
+                    likeCourseButton.setText("Dislike");
                 }
-            }else{ // not reviewed course
-                saveReviewButton.setOnMouseClicked(clickEvent2 -> saveReviewButtonHandler());
-                handleRatingStars(true);
-                editCourseButton.setVisible(false);
-            }
-
-            likeCourseButton.setOnMouseClicked(clickEvent -> likeCourseButtonHandler());
-
-            if(neo4jDriver.isCourseLikedByUser(course, loggedUser)){
-                likeCourseButton.setText("Dislike");
             }
         }
 
@@ -135,6 +141,12 @@ public class CoursePageController {
         createReviewsElements(toAdd.getReviews(), reviewsVBox);
     }
 
+    public void deleteCourse(MouseEvent clickEvent) {
+        if (DBOperations.deleteCourse(course)) {
+            Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
+        }
+    }
+
     private void createReviewsElements(List<Review> reviewsList, VBox container){
         BorderPane reviewBorderPane;
         for(Review r: reviewsList){
@@ -151,6 +163,7 @@ public class CoursePageController {
             borderPane = loader.load();
             ReviewSnapshotPageController reviewController = loader.getController();
             reviewController.setReview(review);
+            reviewController.setCourse(course);
         }
         catch (IOException e) {
             e.printStackTrace();
