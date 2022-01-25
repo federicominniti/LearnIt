@@ -16,8 +16,6 @@ public class LoginPageController {
     @FXML private Button loginButton;
     @FXML private Button signUpButton;
 
-    //roba db
-
     public void initialize() {
         loginButton.setOnMouseClicked(clickEvent -> loginHandler(clickEvent));
         signUpButton.setOnMouseClicked(clickEvent -> signUpHandler(clickEvent));
@@ -30,11 +28,11 @@ public class LoginPageController {
             Utils.showErrorAlert("Error: wrong username or password");
         } else {
             Session.getLocalSession().setLoggedUser(loggedUser);
-            Utils.changeScene("/fxml/DiscoveryPage.fxml", clickEvent);
+            Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
         }
     }
 
     public void signUpHandler(MouseEvent clickEvent) {
-        Utils.changeScene("/fxml/RegistrationPage.fxml", clickEvent);
+        Utils.changeScene(Utils.REGISTRATION_PAGE, clickEvent);
     }
 }

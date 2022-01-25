@@ -7,13 +7,9 @@ import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Cursor;
@@ -22,17 +18,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontPosture;
-import javafx.scene.text.FontWeight;
-import org.neo4j.driver.internal.shaded.io.netty.handler.ssl.ClientAuth;
-import org.w3c.dom.events.Event;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class DiscoveryPageController {
@@ -47,30 +34,24 @@ public class DiscoveryPageController {
     @FXML private Label usernameLabel;
     @FXML private ImageView profilePic;
     @FXML private VBox elementsVBox;
+    @FXML private Button createNewCourseButton;
 
     private int[]pageNumber = {0, 0, 0};
     private ToggleGroup searchType;
     private Neo4jDriver neo4jDriver;
     private MongoDBDriver mongoDBDriver;
     private int limit;
-    private ElementsLineController<Course> bestRating;
+    /*private ElementsLineController<Course> bestRating;
     private ElementsLineController<Course> trendingCourse;
     private ElementsLineController<Course> friendsCompletedLiked;
     private ElementsLineController<Course> instructorSuggestions;
-    private ElementsLineController<User> suggestedUsers;
+    private ElementsLineController<User> suggestedUsers;*/
     private int currentI = 0;
     private int currentJ = 0;
     private GridPane gridPane;
 
-    private final String[] languages = {"Arabic", "Chinese", "English", "French", "German", "Hebrew", "Hungarian", "Indonesian",
-            "Italian", "Japanese", "Korean", "Portuguese", "Russian", "Spanish", "Swedish", "Turkish", "Ukrainian", "Albanian",
-            "Azeri", "Bengali", "Bulgarian", "Burmese", "Croatian", "Czech", "Greek", "Hindi", "Estonian", "Filipino",
-            "Indonesia", "Lithuanian", "Malay", "Marathi", "Nederlands", "Norwegian", "Persian", "Polski", "Română", "Serbian",
-            "Swahili", "Tamil", "Telugu", "Urdu", "Vietnamese", "русский", "ไทย", "日本語", "简体中文", "繁體中文", "한국어"};
-
-    private final String[] levels  = {"All Levels", "Beginner", "Expert", "Intermediate"};
     private final static String PROFILE_PAGE = "/fxml/ProfilePage.fxml";
-    //private final static String COURSE_DEFAULT_PIC = "/img/courseDefaultPic.png";
+    private final static String CREATE_NEW_COUSE_PAGE = "/fxml/newCoursePage.fxml";
     //private final static String USER_DEFAULT_PIC = "/img/userDefaultPic.png";
 
 
@@ -88,10 +69,11 @@ public class DiscoveryPageController {
         //GridPane.setMargin(gridPane, new Insets(10, 10, 10, 10));
 
         fillInterfaceElements();
-        usernameLabel.setOnMouseClicked(clickEvent -> Utils.changeScene(PROFILE_PAGE, clickEvent));
-        profilePic.setOnMouseClicked(clickEvent -> Utils.changeScene(PROFILE_PAGE,clickEvent));
+        usernameLabel.setOnMouseClicked(clickEvent -> myProfile(clickEvent));
+        profilePic.setOnMouseClicked(clickEvent -> myProfile(clickEvent));
         initializeSuggestions();
         searchButton.setOnMouseClicked(clickEvent -> searchHandler(clickEvent));
+        createNewCourseButton.setOnMouseClicked(clickEvent -> Utils.changeScene(CREATE_NEW_COUSE_PAGE, clickEvent));
 
         searchType.selectedToggleProperty().addListener(
                 (observable, oldToggle, newToggle) -> {
@@ -110,13 +92,19 @@ public class DiscoveryPageController {
         );
     }
 
+    private void myProfile(MouseEvent clickEvent){
+        ProfilePageController profilePageController =
+                (ProfilePageController) Utils.changeScene(Utils.PROFILE_PAGE, clickEvent);
+        profilePageController.setUserProfile(Session.getLocalSession().getLoggedUser());
+    }
+
     private void fillInterfaceElements(){
         searchType = new ToggleGroup();
         coursesRadio.setToggleGroup(searchType);
         usersRadio.setToggleGroup(searchType);
 
-        languageChoiceBox.setItems(FXCollections.observableArrayList(languages));
-        levelChoiceBox.setItems(FXCollections.observableArrayList(levels));
+        languageChoiceBox.setItems(FXCollections.observableArrayList(Utils.LANGUAGES));
+        levelChoiceBox.setItems(FXCollections.observableArrayList(Utils.LEVELS));
 
         usernameLabel.setText(Session.getLocalSession().getLoggedUser().getUsername());
         profilePic.setImage(new Image(Session.getLocalSession().getLoggedUser().getProfilePic()));
@@ -221,7 +209,7 @@ public class DiscoveryPageController {
             for(; j<4; j++) {
                 System.out.println("i"+i+"j"+j);
                 if(((i-currentI)*4+j) < searchedCourses.size() && searchedCourses.get((i-currentI)*4 + j) != null) {
-                    Pane coursePane = Utils.loadCourseSnapshot(searchedCourses.get(i));
+                    Pane coursePane = Utils.loadCourseSnapshot(searchedCourses.get((i-currentI)*4 + j));
                     GridPane.setHalignment(coursePane, HPos.CENTER);
                     GridPane.setValignment(coursePane, VPos.CENTER);
                     gridPane.add(coursePane, j, i);
@@ -261,7 +249,7 @@ public class DiscoveryPageController {
             for (; j < 4; j++) {
                 System.out.println("i" + i + "j" + j);
                 if (((i - currentI) * 4 + j) < searchedUsers.size() && searchedUsers.get((i - currentI) * 4 + j) != null) {
-                    Pane userPane = Utils.loadUserSnapshot(searchedUsers.get(i));
+                    Pane userPane = Utils.loadUserSnapshot(searchedUsers.get((i-currentI)*4 + j));
                     GridPane.setHalignment(userPane, HPos.CENTER);
                     GridPane.setValignment(userPane, VPos.CENTER);
                     gridPane.add(userPane, j, i);

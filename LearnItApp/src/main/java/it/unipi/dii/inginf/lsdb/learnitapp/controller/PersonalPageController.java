@@ -15,26 +15,16 @@ import java.util.Date;
 
 public class PersonalPageController {
 
-    @FXML
-    private Label usernameLabel;
-    @FXML
-    private Button saveButton;
-    @FXML
-    private Button backToHomeButton;
-    @FXML
-    private TextField completeNameTextField;
-    @FXML
-    private TextField emailTextField;
-    @FXML
-    private PasswordField passwordPasswordField;
-    @FXML
-    private PasswordField confirmPasswordField;
-    @FXML
-    private ChoiceBox genderChoiceBox;
-    @FXML
-    private DatePicker birthDatePicker;
-    @FXML
-    private TextField propicTextField;
+    @FXML private Label usernameLabel;
+    @FXML private Button saveButton;
+    @FXML private Button backToHomeButton;
+    @FXML private TextField completeNameTextField;
+    @FXML private TextField emailTextField;
+    @FXML private PasswordField passwordPasswordField;
+    @FXML private PasswordField confirmPasswordField;
+    @FXML private ChoiceBox genderChoiceBox;
+    @FXML private DatePicker birthDatePicker;
+    @FXML private TextField propicTextField;
 
     private User user;
 

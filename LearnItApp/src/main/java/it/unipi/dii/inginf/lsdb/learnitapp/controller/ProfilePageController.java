@@ -1,20 +1,18 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
-import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.HBox;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import javafx.scene.layout.VBox;
 
-import java.util.List;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 
 public class ProfilePageController {
 
@@ -35,32 +33,21 @@ public class ProfilePageController {
 
     private Neo4jDriver neo4jDriver;
     private User profileUser;
-    private int[]pageNumber = {0, 0, 0, 0, 0};
-    private int limit;
+    //private int[]pageNumber = {0, 0, 0, 0, 0};
+    //private int limit;
 
     public void initialize() {
         neo4jDriver = Neo4jDriver.getInstance();
-        limit = ConfigParams.getLocalConfig().getLimitNumber();
+        //limit = ConfigParams.getLocalConfig().getLimitNumber();
 
-        backToHomeButton.setOnMouseClicked(clickEvent -> backToHomeButtonHandler(clickEvent));
-
-        if(profileUser.getUsername().equals(Session.getLocalSession().getLoggedUser().getUsername())){ // personal profile
-
-            followButton.setText("edit");
-            followButton.setOnMouseClicked(clickEvent -> editButtonHandler(clickEvent));
-        }
-        else{ // another profile
-            followButton.setOnMouseClicked(clickEvent -> followHandler(clickEvent));
-        }
-
-        loadProfileInformation();
-        loadStatistics();
+        backToHomeButton.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
     }
 
     private void loadProfileInformation(){
         completeNameLabel.setText(profileUser.getCompleteName());
         usernameLabel.setText(profileUser.getUsername());
-        birthDateLabel.setText(profileUser.getDateOfBirth().toString());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        birthDateLabel.setText(dateFormat.format(profileUser.getDateOfBirth()));
         genderLabel.setText(profileUser.getGender());
         followerNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(0).toString()); // ??? ricontrollare indice
         followingNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(1).toString()); // ??? ricontrollare indice
@@ -70,16 +57,35 @@ public class ProfilePageController {
             propicImageView.setImage(profilePicture);
         }
 
+        String loggedUser = Session.getLocalSession().getLoggedUser().getUsername();
+        if(neo4jDriver.isUserFollowedByUser(usernameLabel.getText(), loggedUser))
+            followButton.setText("Unfollow");
+
     }
 
     private void loadStatistics(){
         reviewedCoursesLabel.setText(Integer.toString(neo4jDriver.findTotCourses(profileUser)));
-        averageDurationLabel.setText(Double.toString(neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "duration")));
-        averagePriceLabel.setText(Double.toString(neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "price")));
+        DecimalFormat numberFormat = new DecimalFormat("#.00");
+        double avgDuration = neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "duration");
+        double avgPrice = neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "price");
+        averageDurationLabel.setText(numberFormat.format(avgDuration));
+        averagePriceLabel.setText(numberFormat.format(avgPrice));
     }
 
-    public  void setProfileUser(User user){
+    public void setUserProfile(User user){
         profileUser = user;
+
+        if(profileUser.getUsername().equals(Session.getLocalSession().getLoggedUser().getUsername())){ // personal profile
+            followButton.setText("Edit Profile");
+            followButton.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.PROFILE_PAGE, clickEvent));
+        }
+        else{ // another profile
+            followButton.setOnMouseClicked(clickEvent -> followHandler(clickEvent));
+        }
+
+        loadProfileInformation();
+        loadStatistics();
+        loadSocialLists();
     }
 
     public void followHandler(MouseEvent clickEvent){
@@ -87,29 +93,25 @@ public class ProfilePageController {
 
         if(neo4jDriver.isUserFollowedByUser(usernameLabel.getText(), loggedUser)){
             // Unfollow operation
-            neo4jDriver.unfollowUser(Session.getLocalSession().getLoggedUser(), new User(usernameLabel.getText(), completeNameLabel.getText()));
-
-            followButton.setText("follow");
-
+            neo4jDriver.unfollowUser(Session.getLocalSession().getLoggedUser(),
+                    new User(usernameLabel.getText(), completeNameLabel.getText()));
+            followButton.setText("Follow");
             followingNumberLabel.setText(Integer.toString((Integer.parseInt(followingNumberLabel.getText())-1)));
         }
         else{
             // Follow operation
-            neo4jDriver.followUser(Session.getLocalSession().getLoggedUser(), new User(usernameLabel.getText(), completeNameLabel.getText()));
-
-            followButton.setText("unfollow");
-
+            neo4jDriver.followUser(Session.getLocalSession().getLoggedUser(),
+                    new User(usernameLabel.getText(), completeNameLabel.getText()));
+            followButton.setText("Unfollow");
             followingNumberLabel.setText(Integer.toString((Integer.parseInt(followingNumberLabel.getText())+1)));
         }
-
     }
 
-    public void backToHomeButtonHandler(MouseEvent clickEvent){
-        Utils.changeScene("/DiscoveryPage.fxml", clickEvent);
+    public void loadSocialLists(){
+        Utils.addLine(elementsVBox, null, profileUser, Utils.LIKED_COURSES);
+        Utils.addLine(elementsVBox, null, profileUser, Utils.REVIEWED_COURSES);
+        Utils.addLine(elementsVBox, null, profileUser, Utils.OFFERED_COURSES);
+        Utils.addLine(elementsVBox, null, profileUser, Utils.FOLLOWER_USERS);
+        Utils.addLine(elementsVBox, null, profileUser, Utils.FOLLOWING_USERS);
     }
-
-    public void editButtonHandler(MouseEvent clickEvent){
-        Utils.changeScene("/PersonalPage.fxml", clickEvent);
-    }
-
 }

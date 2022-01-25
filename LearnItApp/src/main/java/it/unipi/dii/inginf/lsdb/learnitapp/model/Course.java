@@ -134,6 +134,18 @@ public class Course {
                 modality, new ArrayList<Review>(), num_reviews, sum_ratings, coursePic);
     }
 
+    public Course(String title, String description, User instructor, String language, String level,
+                  double duration, double price, String link, String modality, String coursePic) {
+        this(title, description, instructor, language, new ArrayList<String>(), level, duration, price, link,
+                modality, new ArrayList<Review>(), 0, 0, coursePic);
+    }
+
+    public Course(String title, String description, User instructor, String language, List<String> category, String level,
+                  double duration, double price, String link, String modality, String coursePic) {
+        this(title, description, instructor, language, category, level, duration, price, link,
+                modality, new ArrayList<Review>(), 0, 0, coursePic);
+    }
+
     public void addReview(Review review) {
         this.reviews.add(review);
     }

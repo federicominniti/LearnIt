@@ -23,7 +23,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -52,7 +51,17 @@ public class Utils {
     public final static int USER_SUGGESTIONS = 3;
     public final static int BEST_RATING = -1;
     public final static int TRENDING_COURSE = -2;
+    public final static String[] LANGUAGES = {"Arabic", "Chinese", "English", "French", "German", "Hebrew", "Hungarian", "Indonesian",
+            "Italian", "Japanese", "Korean", "Portuguese", "Russian", "Spanish", "Swedish", "Turkish", "Ukrainian", "Albanian",
+            "Azeri", "Bengali", "Bulgarian", "Burmese", "Croatian", "Czech", "Greek", "Hindi", "Estonian", "Filipino",
+            "Indonesia", "Lithuanian", "Malay", "Marathi", "Nederlands", "Norwegian", "Persian", "Polski", "Română", "Serbian",
+            "Swahili", "Tamil", "Telugu", "Urdu", "Vietnamese", "русский", "ไทย", "日本語", "简体中文", "繁體中文", "한국어"};
+
+    public final static String[] LEVELS  = {"All Levels", "Beginner", "Expert", "Intermediate"};
     public static final String READ_MORE = "/img/readMore.png";
+    public final static String DISCOVERY_PAGE = "/fxml/DiscoveryPage.fxml";
+    public final static String REGISTRATION_PAGE = "/fxml/RegistrationPage.fxml";
+    public final static String PROFILE_PAGE = "/fxml/ProfilePage.fxml";
 
     public static ConfigParams getParams() {
         if (validConfigParams()) {
@@ -113,12 +122,10 @@ public class Utils {
     }
 
     public static Object changeScene (String fileName, Event event) {
-        Scene scene = null;
-        FXMLLoader loader = null;
         try {
-            loader=new FXMLLoader(Utils.class.getResource(fileName));
+            FXMLLoader loader = new FXMLLoader(Utils.class.getResource(fileName));
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            scene = new Scene(loader.load());
+            Scene scene = new Scene(loader.load());
             stage.setScene(scene);
             stage.show();
             return loader.getController();
@@ -190,14 +197,16 @@ public class Utils {
         try {
             FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/fxml/ElementsLine.fxml"));
             pane = (Pane) loader.load();
-            if(type != USER_SUGGESTIONS) {
+            /*if(type != USER_SUGGESTIONS) {
                 ElementsLineController<Course> coursesLine = (ElementsLineController<Course>) loader.getController();
                 coursesLine.setCoursesUsers(course, type);
             }
             else {
                 ElementsLineController<User> coursesLine = (ElementsLineController<User>) loader.getController();
                 coursesLine.setCoursesUsers(user, type);
-            }
+            }*/
+            ElementsLineController coursesLine = (ElementsLineController) loader.getController();
+            coursesLine.setCoursesUsers(course, user, type);
         } catch (IOException e) {
             e.printStackTrace();
         }

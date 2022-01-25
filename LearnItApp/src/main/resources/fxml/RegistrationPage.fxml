@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.DatePicker?>
@@ -9,67 +10,110 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="785.0" prefWidth="360.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.RegistrationPageController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="543.0" prefWidth="724.0" style="-fx-background-color: white;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.RegistrationPageController">
    <children>
-      <Button fx:id="backToLoginButton" layoutX="94.0" layoutY="698.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="67.0" style="-fx-background-color: lightblue lightblue;" text="back" />
-      <Button fx:id="signUpButton" layoutX="200.0" layoutY="698.0" mnemonicParsing="false" style="-fx-background-color: lightgreen;" text="Sign up" />
-      <Label layoutX="45.0" layoutY="540.0" text="username:">
-         <font>
-            <Font size="15.0" />
-         </font></Label>
-      <Label layoutX="45.0" layoutY="587.0" text="password:">
-         <font>
-            <Font size="15.0" />
-         </font></Label>
-      <TextField fx:id="usernameTextField" layoutX="147.0" layoutY="536.0" prefHeight="26.0" prefWidth="165.0" promptText="Lorenzo1" />
-      <ImageView fitHeight="153.0" fitWidth="155.0" layoutX="104.0" layoutY="37.0" preserveRatio="true">
-         <image>
-            <Image url="@../img/learnitLogoApp.png" />
-         </image>
-      </ImageView>
-      <ImageView fitHeight="53.0" fitWidth="200.0" layoutX="81.0" layoutY="216.0">
-         <image>
-            <Image url="@../img/learnitLogo.png" />
-         </image>
-      </ImageView>
-      <PasswordField fx:id="passwordPasswordField" layoutX="147.0" layoutY="583.0" prefHeight="26.0" prefWidth="165.0" promptText="Abcd4321" />
-      <Label layoutX="45.0" layoutY="624.0" text="confirm&#10;password:">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <PasswordField fx:id="confirmPasswordField" layoutX="148.0" layoutY="627.0" prefHeight="26.0" prefWidth="165.0" promptText="Abcd4321" />
-      <Label layoutX="44.0" layoutY="294.0" text="complete&#10;name:">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <TextField fx:id="completeNameTextField" layoutX="145.0" layoutY="293.0" prefHeight="26.0" prefWidth="165.0" promptText="Lorenzo Rossi" />
-      <Label layoutX="45.0" layoutY="494.0" text="email:">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <TextField fx:id="emailTextField" layoutX="147.0" layoutY="490.0" prefHeight="26.0" prefWidth="165.0" promptText="abc@abc.com" />
-      <Label layoutX="43.0" layoutY="395.0" text="gender:">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <DatePicker fx:id="birthDatePicker" layoutX="147.0" layoutY="442.0" prefHeight="24.0" prefWidth="165.0" promptText="01/01/2000" />
-      <Label layoutX="43.0" layoutY="446.0" text="birth date:">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <ChoiceBox fx:id="genderChoiceBox" layoutX="148.0" layoutY="392.0" prefHeight="24.0" prefWidth="165.0" />
-      <Label layoutX="43.0" layoutY="338.0" text="profile&#10;picture:">
-         <font>
-            <Font size="15.0" />
-         </font>
-      </Label>
-      <TextField fx:id="propicTextField" layoutX="147.0" layoutY="342.0" prefHeight="26.0" prefWidth="165.0" promptText="http://www.img.com" />
+      <VBox alignment="TOP_CENTER" prefHeight="543.0" prefWidth="724.0">
+         <children>
+            <ImageView fitHeight="153.0" fitWidth="155.0" preserveRatio="true">
+               <image>
+                  <Image url="@../img/learnitLogoApp.png" />
+               </image>
+            </ImageView>
+            <ImageView fitHeight="53.0" fitWidth="200.0">
+               <image>
+                  <Image url="@../img/learnitLogo.png" />
+               </image>
+            </ImageView>
+            <GridPane hgap="15.0" vgap="15.0">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <Label text="complete name:">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="completeNameTextField" prefHeight="26.0" prefWidth="165.0" promptText="Lorenzo Rossi" GridPane.columnIndex="1" />
+                  <Label text="Profile picture:" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="propicTextField" prefHeight="26.0" prefWidth="165.0" promptText="http://www.img.com" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Label text="Gender:" GridPane.rowIndex="2">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <ChoiceBox fx:id="genderChoiceBox" prefHeight="24.0" prefWidth="165.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <Label text="Birth date:" GridPane.rowIndex="3">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <DatePicker fx:id="birthDatePicker" prefHeight="24.0" prefWidth="165.0" promptText="01/01/2000" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <Label text="Email:" GridPane.columnIndex="2">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <Label text="Username:" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <Label text="Password:" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <Label text="Confirm password:" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                     <font>
+                        <Font size="15.0" />
+                     </font>
+                  </Label>
+                  <TextField fx:id="emailTextField" prefHeight="26.0" prefWidth="165.0" promptText="abc@abc.com" GridPane.columnIndex="3" />
+                  <TextField fx:id="usernameTextField" prefHeight="26.0" prefWidth="165.0" promptText="Lorenzo1" GridPane.columnIndex="3" GridPane.rowIndex="1" />
+                  <PasswordField fx:id="passwordPasswordField" prefHeight="26.0" prefWidth="165.0" promptText="Abcd4321" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+                  <PasswordField fx:id="confirmPasswordField" prefHeight="26.0" prefWidth="165.0" promptText="Abcd4321" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="40.0" top="40.0" />
+               </VBox.margin>
+            </GridPane>
+            <HBox alignment="CENTER" prefHeight="25.0" prefWidth="664.0" spacing="50.0">
+               <children>
+                  <Button fx:id="backToLoginButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="67.0" style="-fx-background-color: lightblue lightblue; -fx-background-radius: 13;" text="Back">
+                     <font>
+                        <Font size="15.0" />
+                     </font></Button>
+                  <Button fx:id="signUpButton" mnemonicParsing="false" style="-fx-background-color: lightgreen; -fx-background-radius: 13;" text="Sign up">
+                     <font>
+                        <Font size="15.0" />
+                     </font></Button>
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="30.0" left="30.0" right="30.0" top="30.0" />
+         </padding>
+      </VBox>
    </children>
 </AnchorPane>

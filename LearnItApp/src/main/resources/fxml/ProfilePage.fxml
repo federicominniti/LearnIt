@@ -15,12 +15,11 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<ScrollPane xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.ProfilePageController">
+<ScrollPane prefHeight="630.0" prefWidth="1102.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.ProfilePageController">
    <content>
-      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="630.0" prefWidth="1100.0" style="-fx-background-color: white;">
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1207.0" prefWidth="1085.0" style="-fx-background-color: white;">
          <children>
-            <ImageView fitHeight="53.0" fitWidth="200.0" layoutX="450.0" layoutY="30.0">
+            <ImageView fitHeight="53.0" fitWidth="200.0" layoutX="476.0" layoutY="30.0">
                <image>
                   <Image url="@../img/learnitLogo.png" />
                </image>
@@ -32,12 +31,12 @@
                <top>
                   <VBox prefHeight="17.0" prefWidth="449.0" BorderPane.alignment="CENTER">
                      <children>
-                        <Label fx:id="completeNameLabel" prefHeight="40.0" prefWidth="930.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="Complete Name" textAlignment="CENTER" textFill="#1880e1">
+                        <Label fx:id="completeNameLabel" alignment="CENTER" contentDisplay="CENTER" prefHeight="40.0" prefWidth="930.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="Complete Name" textAlignment="CENTER" textFill="#1880e1">
                            <font>
                               <Font name="Arial Bold Italic" size="34.0" />
                            </font>
                         </Label>
-                        <Label fx:id="usernameLabel" prefHeight="32.0" prefWidth="877.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="username" textAlignment="CENTER" textFill="#19b2e0">
+                        <Label fx:id="usernameLabel" prefHeight="32.0" prefWidth="952.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="username" textAlignment="CENTER" textFill="#19b2e0">
                            <font>
                               <Font name="Arial Bold Italic" size="28.0" />
                            </font>
@@ -131,6 +130,9 @@
                            </bottom>
                         </BorderPane>
                      </right>
+                     <BorderPane.margin>
+                        <Insets left="50.0" />
+                     </BorderPane.margin>
                   </BorderPane>
                </left>
                <right>
@@ -177,7 +179,7 @@
                   </VBox>
                </right>
             </BorderPane>
-            <VBox fx:id="elementsVBox" layoutX="29.0" layoutY="430.0" prefHeight="201.0" prefWidth="1042.0" style="-fx-background-color: white;" />
+            <VBox fx:id="elementsVBox" layoutX="29.0" layoutY="430.0" prefWidth="1042.0" style="-fx-background-color: white;" />
          </children>
       </AnchorPane>
    </content>
