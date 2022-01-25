@@ -38,8 +38,8 @@ public class UserSnapshotController {
     }
 
     private void showCompleteUserInfo(MouseEvent mouseEvent){
-        /*ProfilePageController profilePageController =
-                (ProfilePageController) Utils.changeScene("/ProfilePage.fxml", mouseEvent);
-        profilePageController.setProfileUser(referredUser);*/
+        ProfilePageController profilePageController =
+                (ProfilePageController) Utils.changeScene("/fxml/ProfilePage.fxml", mouseEvent);
+        profilePageController.setProfileUser(referredUser);
     }
 }

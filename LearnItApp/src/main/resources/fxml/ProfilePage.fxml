@@ -17,7 +17,7 @@
 
 <ScrollPane prefHeight="630.0" prefWidth="1102.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.ProfilePageController">
    <content>
-      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1207.0" prefWidth="1085.0" style="-fx-background-color: white;">
+      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2150.0" prefWidth="1085.0" style="-fx-background-color: white;">
          <children>
             <ImageView fitHeight="53.0" fitWidth="200.0" layoutX="476.0" layoutY="30.0">
                <image>
@@ -179,7 +179,7 @@
                   </VBox>
                </right>
             </BorderPane>
-            <VBox fx:id="elementsVBox" layoutX="29.0" layoutY="430.0" prefWidth="1042.0" style="-fx-background-color: white;" />
+            <VBox fx:id="elementsVBox" layoutX="29.0" layoutY="430.0" prefHeight="2100.0" prefWidth="1042.0" style="-fx-background-color: white;" />
          </children>
       </AnchorPane>
    </content>

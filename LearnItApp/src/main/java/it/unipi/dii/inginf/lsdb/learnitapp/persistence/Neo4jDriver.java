@@ -12,6 +12,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 
@@ -351,23 +353,33 @@ public class Neo4jDriver implements DBDriver {
 
                 User user = null;
                 try {
+                    System.out.println("qui");
                     Record rec = r.next();
-                    String complete_name = rec.get("complete_name").asString();
-                    String email = rec.get("email").asString();
-                    User.Role role = User.Role.fromInteger(rec.get("role").asInt());
-                    Date date_of_birth = null;
-                    String gender = null;
-                    String profile_pic = null;
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                    if (rec.get("date_of_birth") != NULL)
-                        date_of_birth = sdf.parse(rec.get("date_of_birth").asString());
-                    if (rec.get("gender") != NULL)
-                        gender = rec.get("gender").asString();
-                    if (rec.get("picture") != NULL)
-                        profile_pic = rec.get("picture").asString();
+                    System.out.println("qui");
+                    System.out.println(rec.get("role").asInt());
+                    System.out.println(User.Role.ADMINISTRATOR.ordinal());
+                    if (rec.get("role").asInt() == User.Role.ADMINISTRATOR.ordinal()) {
+                        System.out.println("qui");
+                        user = new User(username, User.Role.ADMINISTRATOR);
+                    } else {
+                        String complete_name = rec.get("complete_name").asString();
+                        String email = rec.get("email").asString();
+                        User.Role role = User.Role.fromInteger(rec.get("role").asInt());
+                        Date date_of_birth = null;
+                        String gender = null;
+                        String profile_pic = null;
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                        if (rec.get("date_of_birth") != NULL)
+                            date_of_birth = sdf.parse(rec.get("date_of_birth").asString());
+                        if (rec.get("gender") != NULL)
+                            gender = rec.get("gender").asString();
+                        if (rec.get("picture") != NULL)
+                            profile_pic = rec.get("picture").asString();
 
-                    user = new User(username, password, complete_name, date_of_birth, gender, email, role, profile_pic);
-                } catch (Exception e) {
+                        user = new User(username, password, complete_name, date_of_birth, gender, email, role, profile_pic);
+                    }
+
+                }catch (Exception e) {
                     user = null;
                 }
 
@@ -423,19 +435,33 @@ public class Neo4jDriver implements DBDriver {
             session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (u:User) " +
                                 "WHERE toLower(u.username) CONTAINS toLower($username) " +
-                                "RETURN u.username AS username, u.complete_name AS complete_name, u.profile_picture AS picture " +
+                                "RETURN u.username AS username, u.complete_name AS complete_name, u.profile_picture AS picture, " +
+                                " u.gender as gender, u.date_of_birth as date_of_birth " +
                                 "SKIP $skip LIMIT $limit",
                         parameters("username",searchText, "skip", toSkip, "limit", limit));
 
                 while(result.hasNext()){
                     Record r = result.next();
                     String username = r.get("username").asString();
-                    String complete_name = r.get("lastName").asString();
+                    String complete_name = r.get("complete_name").asString();
                     User user = new User(username, complete_name);
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                    try {
+                        user.setDateOfBirth(sdf.parse(r.get("date_of_birth").asString()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
                     if (r.get("picture") != NULL) {
                         String picture = r.get("picture").asString();
                         user.setProfilePic(picture);
                     }
+
+                    if (r.get("gender") != NULL) {
+                        String gender = r.get("gender").asString();
+                        user.setGender(gender);
+                    }
+
                     users.add(user);
                 }
                 return null;
@@ -520,16 +546,24 @@ public class Neo4jDriver implements DBDriver {
         {
             List<User> resultUsers = session.readTransaction((TransactionWork<List<User>>) tx -> {
                 List<User> users = new ArrayList<>();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
                 Result result = tx.run("MATCH (u:User{username: $username})-[:REVIEW]->(c)<-[:REVIEW]-(suggested)" +
                                 "WHERE u<>suggested RETURN suggested.username AS username, suggested.complete_name AS complete_name, " +
-                                "suggested.profile_picture AS picture " +
+                                "suggested.profile_picture AS picture, suggested.gender as gender, suggested.date_of_birth as birth " +
                                 "SKIP $skip LIMIT $limit",
                         parameters( "username", loggedUser.getUsername(), "skip", skip, "limit", limit));
                 while(result.hasNext()){
                     Record record = result.next();
                     System.out.println(record.get("username").asString());
                     User u = new User(record.get("username").asString(), record.get("complete_name").asString());
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                    try {
+                        u.setDateOfBirth(sdf.parse(record.get("birth").asString()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (record.get("gender") != null)
+                        u.setGender(record.get("gender").asString());
                     u.setProfilePic(record.get("picture").asString());
                     users.add(u);
                 }
@@ -548,7 +582,7 @@ public class Neo4jDriver implements DBDriver {
     public boolean checkUserExists(String username) {
         try (Session session = neo4jDriver.session()) {
             boolean res = session.readTransaction(tx -> {
-                Result r = tx.run("MATCH (u:User {username: $username}) RETURN u", parameters("username", username));
+                Result r = tx.run("MATCH (u:User {username: $username}) RETURN u", parameters("username", username.toLowerCase(Locale.ROOT)));
                 if (r.hasNext())
                     return true;
                 return false;
@@ -607,13 +641,28 @@ public class Neo4jDriver implements DBDriver {
         {
             session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (a:User{username: $username})<-[:FOLLOW]-(b:User) " +
-                                "RETURN b.username as username, b.complete_name as name, b.profile_picture as pic " +
+                                "RETURN b.username as username, b.complete_name as name, b.profile_picture as pic, " +
+                                "b.date_of_birth as date_of_birth, b.gender as gender " +
                                 "SKIP " + toSkip + " LIMIT " + limit,
                         parameters( "username", followedUser.getUsername()));
 
                 while(result.hasNext()){
                     Record record = result.next();
-                    users.add(new User(record.get("username").asString(), record.get("name").asString(), record.get("pic").asString()));
+                    User u = new User(record.get("username").asString(), record.get("name").asString());
+                    if (record.get("pic") != null)
+                        u.setProfilePic(record.get("pic").asString());
+
+                    if (record.get("gender") != null)
+                        u.setGender(record.get("gender").asString());
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                    try {
+                        u.setDateOfBirth(sdf.parse(record.get("date_of_birth").asString()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    users.add(u);
                 }
 
                 return null;
@@ -671,13 +720,28 @@ public class Neo4jDriver implements DBDriver {
         {
             session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (a:User{username: $username})-[:FOLLOW]->(b:User) " +
-                                "RETURN b.username as username, b.complete_name as name, b.profile_picture as pic " +
+                                "RETURN b.username as username, b.complete_name as name, b.profile_picture as pic, " +
+                                "b.date_of_birth as date_of_birth, b.gender as gender " +
                                 "SKIP " + toSkip + " LIMIT " + limit,
                         parameters( "username", followedUser.getUsername()));
 
                 while(result.hasNext()){
                     Record record = result.next();
-                    users.add(new User(record.get("username").asString(), record.get("name").asString(), record.get("pic").asString()));
+                    User u = new User(record.get("username").asString(), record.get("name").asString());
+                    if (record.get("pic") != null)
+                        u.setProfilePic(record.get("pic").asString());
+
+                    if (record.get("gender") != null)
+                        u.setGender(record.get("gender").asString());
+
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+                    try {
+                        u.setDateOfBirth(sdf.parse(record.get("date_of_birth").asString()));
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+                    users.add(u);
                 }
 
                 return null;

@@ -16,6 +16,7 @@ import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import javafx.scene.transform.Affine;
 import org.bson.BsonDocument;
 import org.bson.BsonValue;
 import org.bson.Document;
@@ -42,29 +43,43 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 public class MongoDBDriver implements DBDriver {
     private static MongoDBDriver mongoDBInstance;
 
-    private MongoClient mongoClient;
-    private MongoDatabase database;
-    private MongoCollection<Course> collection;
-    private String mongoDBPrimaryIP;
-    private int mongoDBPrimaryPort;
-    private String mongoDBSecondIP;
-    private int mongoDBSecondPort;
-    private String mongoDBThirdIP;
-    private int mongoDBThirdPort;
+    private static MongoClient mongoClient;
+    private static MongoDatabase database;
+    private static MongoCollection<Course> collection;
+    private static String mongoDBPrimaryIP;
+    private static int mongoDBPrimaryPort;
+    private static String mongoDBSecondIP;
+    private static int mongoDBSecondPort;
+    private static String mongoDBThirdIP;
+    private static int mongoDBThirdPort;
 
-    private String mongoDBusername;
-    private String mongoDBpassword;
-    private String mongoDBName;
-    private CodecRegistry pojoCodecRegistry;
-    private CodecRegistry codecRegistry;
+    private static String mongoDBusername;
+    private static String mongoDBpassword;
+    private static String mongoDBName;
+    private static CodecRegistry pojoCodecRegistry;
+    private static CodecRegistry codecRegistry;
+    private static String uriString;
 
     public static MongoDBDriver getInstance() {
         if (mongoDBInstance == null) {
-            mongoDBInstance = new MongoDBDriver(ConfigParams.getLocalConfig());
+            try {
+                mongoDBInstance = new MongoDBDriver(ConfigParams.getInstance());
+            } catch (Exception e) {
+               uriString = "mongodb://127.0.0.1:27017/";
+               mongoDBName = "db";
+               mongoDBusername = "root";
+               mongoDBpassword = "";
+            }
+
+            mongoDBInstance = new MongoDBDriver();
             mongoDBInstance.initConnection();
         }
 
         return mongoDBInstance;
+    }
+
+    private MongoDBDriver() {
+
     }
 
     private MongoDBDriver(ConfigParams configParams) {
@@ -82,7 +97,7 @@ public class MongoDBDriver implements DBDriver {
     @Override
     public boolean initConnection() {
         try {
-            String uriString = "mongodb://";
+            uriString = "mongodb://";
             if (!mongoDBusername.equals("")) {
                 uriString += mongoDBusername + ":" + mongoDBpassword + "@";
             }
@@ -195,7 +210,7 @@ public class MongoDBDriver implements DBDriver {
     //provata
     public boolean deleteUserCourses(User user) { // aggiungere indice per la find ???
 
-        List<Course> toBeDeleted = collection.find(Filters.eq("instructor", user.getUsername())).into(new ArrayList<>());
+        List<Course> toBeDeleted = collection.find(Filters.eq("instructor", user.getUsername())).projection(Projections.exclude("reviews")).into(new ArrayList<>());
 
         List<String> oids = new ArrayList<>();
 
@@ -204,38 +219,6 @@ public class MongoDBDriver implements DBDriver {
         }
         Bson deleteFilter = Filters.in("_id", oids);
         return collection.deleteMany(deleteFilter).wasAcknowledged();
-    }
-
-
-
-    //provata
-    public Course getCourseFromId(ObjectId oid){
-        try {
-            return  (Course) collection.find(eq("_id", oid)).first();
-        }
-        catch (Exception ex) {
-            return null;
-        }
-    }
-
-
-    /**
-     * Function comment
-     * @param title title of the searched courses
-     * @param toSkip number of courses to skip because they were already loaded
-     * @param quantity number of courses to retrieve
-     * @return a list of courses
-     */
-
-    //provata
-    public List<Course> searchCoursesByTitle (String title, int toSkip, int quantity) {
-        Pattern pattern = Pattern.compile("^.*" + title + ".*$", Pattern.CASE_INSENSITIVE);
-        Bson match = Aggregates.match(Filters.regex("title", pattern));
-        Bson skip = skip(toSkip);
-        Bson limit = limit(quantity);
-        List<Course> results = collection.aggregate(asList(match, skip, limit))
-                .into(new ArrayList<>());
-        return results;
     }
 
     //provata
@@ -307,7 +290,6 @@ public class MongoDBDriver implements DBDriver {
     public boolean deleteUserReviewsRedundancies(User user){
         boolean result = true;
         List<Course> toBeDeleted = collection.find(Filters.elemMatch("reviews", Filters.eq("author.username", user.getUsername()))).into(new ArrayList<>());
-        System.out.println(toBeDeleted.get(1).getTitle());
         for(int i=0; i<toBeDeleted.size(); i++){
 
             List<Review> review = toBeDeleted.get(i).getReviews();
@@ -355,12 +337,12 @@ public class MongoDBDriver implements DBDriver {
         Bson filter = null;
 
         if(priceThreshold != -1){
-            filter = Filters.or(Filters.lte("price", priceThreshold), Filters.eq("price", 0), Filters.eq("price", null));
+            filter = Filters.or(Filters.lte("price", priceThreshold), Filters.eq("price", null));
         }
 
         if(durationThreshold != -1){
             if(filter!=null)
-                filter = Filters.and(filter, Filters.or(Filters.lte("duration", durationThreshold), Filters.eq("duration", 0), Filters.eq("duration", null)));
+                filter = Filters.and(filter, Filters.or(Filters.lte("duration", durationThreshold), Filters.eq("duration", null)));
             else
                 filter = Filters.lte("duration", durationThreshold);
         }
@@ -396,6 +378,7 @@ public class MongoDBDriver implements DBDriver {
         courses = collection.find(filter)
                 .skip(toSkip)
                 .limit(quantity)
+                .projection(Projections.exclude("reviews"))
                 .into(new ArrayList<Course>());
 
         return courses;
@@ -406,7 +389,7 @@ public class MongoDBDriver implements DBDriver {
 
         String json = "[{'$addFields': {" +
                 "'avg': { '$divide': ['$sum_ratings', '$num_reviews']}" +
-                "}}, {'$sort': {'avg': -1}}, {'$limit': "+limit+"}]";
+                "}}, {'$sort': {'avg': -1}}, {'$limit': "+limit+"}, {'$project': {'reviews':0}}]";
 
         List<BsonDocument> pipeline = new BsonArrayCodec().decode(new JsonReader(json), DecoderContext.builder().build())
                 .stream().map(BsonValue::asDocument)
@@ -446,7 +429,7 @@ public class MongoDBDriver implements DBDriver {
     }
 
     public List<Course> findSnapshotsByIds(List<ObjectId> ids) {
-        List<Course> res = collection.find(Filters.in("_id", ids)).into(new ArrayList<>());
+        List<Course> res = collection.find(Filters.in("_id", ids)).projection(Projections.exclude("reviews")).into(new ArrayList<>());
         return res;
     }
 
@@ -479,28 +462,17 @@ db.learnit.aggregate([{"$match": {"title": " Atención prehospitalaria del ictus
         return annualRatings;
     }
 
-    public Course getCourseInfoFromId(ObjectId id) {
-        Bson filter = Filters.eq("_id", id);
-        Bson projection = Projections.fields(Projections.exclude("reviews"));
-        Course c = collection.find(filter).projection(projection).first();
-        return c;
-    }
-
     public Review getCourseReviewByUser(Course course, User user) {
-        Course c = collection.aggregate(Arrays.asList(
-                new Document("$match", new Document("_id", course.getId())),
-                new Document("$project", new Document("_id", 1)
-                        .append("reviews", 1)),
-                new Document("$unwind", "$reviews"),
-                new Document("$match", new Document("reviews.author.username", user.getUsername())),
-                new Document("$group", new Document("_id", "$_id")
-                        .append("reviews", new Document("$push", "$reviews")))
-        )).first();
-
+        Course c = collection.find(Filters.eq("_id", course.getId())).projection(Projections.elemMatch("reviews", Filters.eq("author.username", user.getUsername()))).first();
         if (c == null)
             return null;
         else
             return c.getReviews().get(0);
+    }
+
+    public Course getCourseFromTitle(String title, int skip, int limit) {
+        Course c = collection.find(Filters.eq("title", title)).projection(Projections.slice("reviews", skip, limit)).first();
+        return c;
     }
 
     public List<Review> getCourseReviewsFromId(ObjectId id, int skip, int limit) {
@@ -517,6 +489,13 @@ db.learnit.aggregate([{"$match": {"title": " Atención prehospitalaria del ictus
         )).first();
 
         return c.getReviews();
+    }
+
+    public boolean checkCourseExists(String title) {
+        Course c = collection.find(Filters.eq("title", title)).projection(Projections.include("title")).first();
+        if (c == null)
+            return false;
+        return true;
     }
 
 }

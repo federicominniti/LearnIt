@@ -48,9 +48,14 @@ public class User {
         this.profilePic = picture;
     }
 
+    public User(String username, Role role) {
+        this.username = username;
+        this.role = role;
+    }
+
     public enum Role {
-        ADMINISTRATOR,
-        STANDARD;
+        STANDARD,
+        ADMINISTRATOR;
 
         public static Role fromInteger(int x) {
             switch(x) {

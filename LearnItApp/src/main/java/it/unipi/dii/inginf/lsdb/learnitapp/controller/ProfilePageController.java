@@ -1,6 +1,7 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
@@ -63,21 +64,29 @@ public class ProfilePageController {
 
     }
 
-    private void loadStatistics(){
-        reviewedCoursesLabel.setText(Integer.toString(neo4jDriver.findTotCourses(profileUser)));
+    private void loadStatistics() {
+        int totCourses = neo4jDriver.findTotCourses(profileUser);
+        reviewedCoursesLabel.setText("Reviewed courses: " + Integer.toString(totCourses));
         DecimalFormat numberFormat = new DecimalFormat("#.00");
-        double avgDuration = neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "duration");
-        double avgPrice = neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "price");
-        averageDurationLabel.setText(numberFormat.format(avgDuration));
-        averagePriceLabel.setText(numberFormat.format(avgPrice));
+        if (totCourses > 0) {
+            double avgDuration = neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "duration");
+            double avgPrice = neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "price");
+            averageDurationLabel.setText("Average hours spent learning: " + numberFormat.format(avgDuration));
+            averagePriceLabel.setText("Average price of reviewed courses: " + numberFormat.format(avgPrice));
+        }
+
     }
 
-    public void setUserProfile(User user){
+    public void setProfileUser(User user){
         profileUser = user;
-
-        if(profileUser.getUsername().equals(Session.getLocalSession().getLoggedUser().getUsername())){ // personal profile
+        User loggedUser = Session.getLocalSession().getLoggedUser();
+        if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
+            followButton.setText("Delete user");
+            followButton.setOnMouseClicked(clickEvent -> deleteUserHandler(profileUser, clickEvent));
+        }
+        else if(profileUser.getUsername().equals(loggedUser.getUsername())){ // personal profile
             followButton.setText("Edit Profile");
-            followButton.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.PROFILE_PAGE, clickEvent));
+            followButton.setOnMouseClicked(clickEvent -> Utils.changeScene("/fxml/PersonalPage.fxml", clickEvent));
         }
         else{ // another profile
             followButton.setOnMouseClicked(clickEvent -> followHandler(clickEvent));
@@ -88,6 +97,15 @@ public class ProfilePageController {
         loadSocialLists();
     }
 
+    public void deleteUserHandler(User profileUser, MouseEvent clickEvent) {
+        if (DBOperations.deleteUser(profileUser)) {
+            Utils.showInfoAlert("User deleted successfully");
+            Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
+        }
+        else
+            Utils.showErrorAlert("Something has gone wrong");
+    }
+
     public void followHandler(MouseEvent clickEvent){
         String loggedUser = Session.getLocalSession().getLoggedUser().getUsername();
 
@@ -96,14 +114,14 @@ public class ProfilePageController {
             neo4jDriver.unfollowUser(Session.getLocalSession().getLoggedUser(),
                     new User(usernameLabel.getText(), completeNameLabel.getText()));
             followButton.setText("Follow");
-            followingNumberLabel.setText(Integer.toString((Integer.parseInt(followingNumberLabel.getText())-1)));
+            followerNumberLabel.setText(Integer.toString((Integer.parseInt(followerNumberLabel.getText())-1)));
         }
         else{
             // Follow operation
             neo4jDriver.followUser(Session.getLocalSession().getLoggedUser(),
                     new User(usernameLabel.getText(), completeNameLabel.getText()));
             followButton.setText("Unfollow");
-            followingNumberLabel.setText(Integer.toString((Integer.parseInt(followingNumberLabel.getText())+1)));
+            followerNumberLabel.setText(Integer.toString((Integer.parseInt(followerNumberLabel.getText())+1)));
         }
     }
 

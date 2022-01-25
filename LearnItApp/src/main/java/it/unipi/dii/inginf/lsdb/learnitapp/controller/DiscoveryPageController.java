@@ -70,10 +70,18 @@ public class DiscoveryPageController {
 
         fillInterfaceElements();
         usernameLabel.setOnMouseClicked(clickEvent -> myProfile(clickEvent));
-        profilePic.setOnMouseClicked(clickEvent -> myProfile(clickEvent));
-        initializeSuggestions();
+        if (Session.getLocalSession().getLoggedUser().getRole() == User.Role.STANDARD) {
+            profilePic.setOnMouseClicked(clickEvent -> myProfile(clickEvent));
+            initializeSuggestions();
+        }
         searchButton.setOnMouseClicked(clickEvent -> searchHandler(clickEvent));
-        createNewCourseButton.setOnMouseClicked(clickEvent -> Utils.changeScene(CREATE_NEW_COUSE_PAGE, clickEvent));
+        if (Session.getLocalSession().getLoggedUser().getRole() == User.Role.ADMINISTRATOR) {
+            createNewCourseButton.setText("Create new admin");
+            createNewCourseButton.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.REGISTRATION_PAGE, clickEvent));
+            return;
+        }
+        else
+            createNewCourseButton.setOnMouseClicked(clickEvent -> Utils.changeScene(CREATE_NEW_COUSE_PAGE, clickEvent));
 
         searchType.selectedToggleProperty().addListener(
                 (observable, oldToggle, newToggle) -> {
@@ -95,7 +103,7 @@ public class DiscoveryPageController {
     private void myProfile(MouseEvent clickEvent){
         ProfilePageController profilePageController =
                 (ProfilePageController) Utils.changeScene(Utils.PROFILE_PAGE, clickEvent);
-        profilePageController.setUserProfile(Session.getLocalSession().getLoggedUser());
+        profilePageController.setProfileUser(Session.getLocalSession().getLoggedUser());
     }
 
     private void fillInterfaceElements(){
@@ -107,7 +115,10 @@ public class DiscoveryPageController {
         levelChoiceBox.setItems(FXCollections.observableArrayList(Utils.LEVELS));
 
         usernameLabel.setText(Session.getLocalSession().getLoggedUser().getUsername());
-        profilePic.setImage(new Image(Session.getLocalSession().getLoggedUser().getProfilePic()));
+        if (Session.getLocalSession().getLoggedUser().getRole() == User.Role.ADMINISTRATOR)
+            profilePic.setImage(new Image(String.valueOf(DiscoveryPageController.class.getResource("/img/learnitUserPropic.png"))));
+        else
+            profilePic.setImage(new Image(Session.getLocalSession().getLoggedUser().getProfilePic()));
     }
 
     private void initializeSuggestions(){
