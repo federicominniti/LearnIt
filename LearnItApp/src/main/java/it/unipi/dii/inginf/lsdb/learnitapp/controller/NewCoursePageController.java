@@ -44,31 +44,45 @@ public class NewCoursePageController {
         String language = languageChoiceBox.getValue().toString();
         String coursePic = coursePicTextField.getText();
         String modality = modalityTextField.getText();
-        String []category = categoriesTextArea.getText().split(",");
         String description = descriptionTextArea.getText();
         String level = levelChoiceBox.getValue().toString();
         double duration = Double.parseDouble(hourTextField.getText());
         double price = Double.parseDouble(priceTextField.getText());
         String link = courseLinkTextField.getText();
-        List<String> categoryList = new ArrayList<>(List.of(category));
+        List<String> categoryList = null;
+        if (categoriesTextArea.getText().contains(",")){
+            String[] categories = categoriesTextArea.getText().split(", ", -1);
+            categoryList = new ArrayList<>(List.of(categories));
+        }else
+        if(categoriesTextArea.getText().length() !=0) {
+            categoryList = new ArrayList<>();
+            categoryList.add(categoriesTextArea.getText());
+        }
 
-        if(languageChoiceBox.getValue() == null || title == "" || levelChoiceBox.getValue() == null ||
-            duration == 0){
+
+        if(languageChoiceBox.getValue() == null || title.equals("") || levelChoiceBox.getValue() == null ||
+                duration == 0 || description.equals("")){
 
             Utils.showErrorAlert("Please check that the required fields are inserted!");
             return;
         }
 
+        //null values are not added to the db
+        coursePic = (coursePic.equals("")) ? null : coursePic;
+        modality = (modality.equals("")) ? null : modality;
+        link = (link.equals("")) ? null : link;
+
         Course newCourse;
-        if(categoriesTextArea.getText().equals(""))
+        if(categoriesTextArea.getText().equals("")) {
             newCourse = new Course(title, description, Session.getLocalSession().getLoggedUser(), language, level,
-                 duration, price, link, modality, coursePic);
+                    duration, price, link, modality, coursePic);
+        }
         else
             newCourse = new Course(title, description,  Session.getLocalSession().getLoggedUser(), language, categoryList,
                     level, duration, price, link, modality, coursePic);
 
         if(DBOperations.addCourse(newCourse))
             Utils.showInfoAlert("Course added!");
-        Utils.changeScene("/DiscoveryPage.fxml", clickEvent);
+        Utils.changeScene(Utils.COURSE_PAGE, clickEvent);
     }
 }

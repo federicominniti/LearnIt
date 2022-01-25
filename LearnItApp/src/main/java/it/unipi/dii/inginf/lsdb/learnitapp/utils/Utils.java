@@ -5,6 +5,7 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
 import com.thoughtworks.xstream.security.NullPermission;
 import com.thoughtworks.xstream.security.PrimitiveTypePermission;
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
+import it.unipi.dii.inginf.lsdb.learnitapp.controller.CoursePageController;
 import it.unipi.dii.inginf.lsdb.learnitapp.controller.CourseSnapshotController;
 import it.unipi.dii.inginf.lsdb.learnitapp.controller.ElementsLineController;
 import it.unipi.dii.inginf.lsdb.learnitapp.controller.UserSnapshotController;
@@ -51,6 +52,7 @@ public class Utils {
     public final static int USER_SUGGESTIONS = 3;
     public final static int BEST_RATING = -1;
     public final static int TRENDING_COURSE = -2;
+
     public final static String[] LANGUAGES = {"Arabic", "Chinese", "English", "French", "German", "Hebrew", "Hungarian", "Indonesian",
             "Italian", "Japanese", "Korean", "Portuguese", "Russian", "Spanish", "Swedish", "Turkish", "Ukrainian", "Albanian",
             "Azeri", "Bengali", "Bulgarian", "Burmese", "Croatian", "Czech", "Greek", "Hindi", "Estonian", "Filipino",
@@ -62,6 +64,8 @@ public class Utils {
     public final static String DISCOVERY_PAGE = "/fxml/DiscoveryPage.fxml";
     public final static String REGISTRATION_PAGE = "/fxml/RegistrationPage.fxml";
     public final static String PROFILE_PAGE = "/fxml/ProfilePage.fxml";
+    public final static String COURSE_PAGE = "/fxml/CoursePage.fxml";
+    public final static String REVIEW_SNAPSHOT = "/fxml/ReviewSnapshotPage.fxml";
 
     public static ConfigParams getParams() {
         if (validConfigParams()) {
@@ -231,6 +235,28 @@ public class Utils {
         for(int i = 0; i<users.size(); i++) {
             Pane coursePane = loadUserSnapshot(users.get(i));
             usersHBox.getChildren().add(coursePane);
+        }
+    }
+
+    public static void fillStars(int rating, HBox ratingHBox){
+        for(Node star: ratingHBox.getChildren()){
+            int index = ratingHBox.getChildren().indexOf(star);
+            if(index > rating - 1)
+                break;
+            ImageView starImageView = (ImageView)star;
+            Image starImage = new Image(
+                    String.valueOf(CoursePageController.class.getResource("/img/star-on.png")));
+            starImageView.setImage(starImage);
+            ratingHBox.getChildren().set(index, (Node)starImageView);
+        }
+
+        for(int index=rating; index <5; index++){
+            Node star = ratingHBox.getChildren().get(index);
+            ImageView starImageView = (ImageView)star;
+            Image starImage = new Image(
+                    String.valueOf(CoursePageController.class.getResource("/img/star-off.png")));
+            starImageView.setImage(starImage);
+            ratingHBox.getChildren().set(index, (Node)starImageView);
         }
     }
 }

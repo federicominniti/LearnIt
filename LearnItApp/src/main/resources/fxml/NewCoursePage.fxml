@@ -41,7 +41,7 @@
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="19.0" prefWidth="268.0" text="Language:" textAlignment="CENTER" GridPane.rowIndex="2">
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="19.0" prefWidth="268.0" text="Language*:" textAlignment="CENTER" GridPane.rowIndex="2">
                <font>
                   <Font size="15.0" />
                </font>
@@ -56,7 +56,7 @@
                   <Font size="15.0" />
                </font>
             </Label>
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="19.0" prefWidth="203.0" text="Level:" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="2">
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="19.0" prefWidth="203.0" text="Level*:" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.rowIndex="2">
                <font>
                   <Font size="15.0" />
                </font>
@@ -107,7 +107,7 @@
                   <TextField fx:id="coursePicTextField" layoutX="32.0" layoutY="28.0" prefHeight="26.0" prefWidth="189.0" />
                </children>
             </AnchorPane>
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="141.0" text="Description" textAlignment="CENTER" GridPane.rowIndex="1">
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="141.0" text="Description*:" textAlignment="CENTER" GridPane.rowIndex="1">
                <font>
                   <Font size="15.0" />
                </font>
@@ -137,7 +137,7 @@
                   <Font size="15.0" />
                </font>
             </Label>
-            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="163.0" text="Title:" textAlignment="CENTER">
+            <Label alignment="CENTER" contentDisplay="CENTER" prefHeight="17.0" prefWidth="163.0" text="Title*:" textAlignment="CENTER">
                <font>
                   <Font size="15.0" />
                </font>

@@ -45,7 +45,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <Label text="complete name:">
+                  <Label text="Complete name*:">
                      <font>
                         <Font size="15.0" />
                      </font>
@@ -69,22 +69,22 @@
                      </font>
                   </Label>
                   <DatePicker fx:id="birthDatePicker" prefHeight="24.0" prefWidth="165.0" promptText="01/01/2000" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                  <Label text="Email:" GridPane.columnIndex="2">
+                  <Label text="Email*:" GridPane.columnIndex="2">
                      <font>
                         <Font size="15.0" />
                      </font>
                   </Label>
-                  <Label text="Username:" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                  <Label text="Username*:" GridPane.columnIndex="2" GridPane.rowIndex="1">
                      <font>
                         <Font size="15.0" />
                      </font>
                   </Label>
-                  <Label text="Password:" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                  <Label text="Password*:" GridPane.columnIndex="2" GridPane.rowIndex="2">
                      <font>
                         <Font size="15.0" />
                      </font>
                   </Label>
-                  <Label text="Confirm password:" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                  <Label text="Confirm password*:" GridPane.columnIndex="2" GridPane.rowIndex="3">
                      <font>
                         <Font size="15.0" />
                      </font>
