@@ -14,7 +14,10 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,6 +30,8 @@ public class ReviewSnapshotPageController {
     @FXML private HBox ratingHBox;
     @FXML private Label lastModifiedLabel;
     @FXML private Button deleteButton;
+    @FXML private BorderPane thisBorderPane;
+    private VBox container;
 
     private Course course;
     private Review review;
@@ -40,6 +45,7 @@ public class ReviewSnapshotPageController {
 
     public void deleteReview(MouseEvent clickEvent) {
         DBOperations.deleteReview(review, course);
+        container.getChildren().remove(thisBorderPane);
     }
 
     private void loadReviewInformation(){
@@ -65,8 +71,9 @@ public class ReviewSnapshotPageController {
         lastModifiedLabel.setText(review.getTimestamp().toString());
     }
 
-    public void setReview(Review review){
+    public void setReview(Review review, VBox container){
         this.review = review;
+        this.container = container;
         loadReviewInformation();
     }
 
