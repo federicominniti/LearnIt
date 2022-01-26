@@ -18,7 +18,6 @@ import java.text.SimpleDateFormat;
 public class ProfilePageController {
 
     @FXML private Label completeNameLabel;
-    @FXML private Button backToHomeButton;
     @FXML private Label birthDateLabel;
     @FXML private Label usernameLabel;
     @FXML private Label genderLabel;
@@ -30,6 +29,7 @@ public class ProfilePageController {
     @FXML private Label followingNumberLabel;
     @FXML private Label followerNumberLabel;
     @FXML private VBox elementsVBox;
+    @FXML private Label learnItLabel;
 
 
     private Neo4jDriver neo4jDriver;
@@ -41,7 +41,8 @@ public class ProfilePageController {
         neo4jDriver = Neo4jDriver.getInstance();
         //limit = ConfigParams.getLocalConfig().getLimitNumber();
 
-        backToHomeButton.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
+        learnItLabel.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
+
     }
 
     private void loadProfileInformation(){

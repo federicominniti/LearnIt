@@ -19,7 +19,7 @@
    <content>
       <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2150.0" prefWidth="1085.0" style="-fx-background-color: white;">
          <children>
-            <ImageView fitHeight="53.0" fitWidth="200.0" layoutX="476.0" layoutY="30.0">
+            <ImageView fx:id="learnItLabel" fitHeight="53.0" fitWidth="200.0" layoutX="476.0" layoutY="30.0">
                <image>
                   <Image url="@../img/learnitLogo.png" />
                </image>
@@ -170,11 +170,6 @@
                               <Insets bottom="25.0" top="5.0" />
                            </VBox.margin>
                         </Label>
-                        <Button fx:id="backToHomeButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-background-radius: 13;" text="Back" textFill="WHITE">
-                           <font>
-                              <Font size="15.0" />
-                           </font>
-                        </Button>
                      </children>
                   </VBox>
                </right>

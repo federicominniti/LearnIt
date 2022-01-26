@@ -73,10 +73,10 @@ public class RegistrationPageController {
         boolean ret;
         String birthDate;
 
-        if (completeNameTextField.getText() == null) {
+        if (emailTextField.getText().equals("") || completeNameTextField.getText() == null) {
             Utils.showErrorAlert("Complete name is not an optional field");
             return;
-        } else if (emailTextField.getText() == null) {
+        } else if (emailTextField.getText().equals("") || emailTextField.getText() == null) {
             Utils.showErrorAlert("Email is not an optional field");
             return;
         }
