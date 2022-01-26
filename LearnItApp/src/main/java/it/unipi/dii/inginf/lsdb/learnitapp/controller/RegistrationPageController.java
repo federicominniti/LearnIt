@@ -4,9 +4,10 @@ import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
-import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
 import java.text.SimpleDateFormat;
@@ -14,11 +15,9 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.List;
 
 public class RegistrationPageController {
 
-    @FXML private Button backToLoginButton;
     @FXML private Button signUpButton;
     @FXML private TextField usernameTextField;
     @FXML private PasswordField passwordPasswordField;
@@ -28,31 +27,46 @@ public class RegistrationPageController {
     @FXML private DatePicker birthDatePicker;
     @FXML private ChoiceBox genderChoiceBox;
     @FXML private TextField propicTextField;
+    @FXML private ImageView learnitLogoImageView;
+    @FXML private ImageView learnitImageView;
+    @FXML private Label completeNameLabel;
+    @FXML private Label emailLabel;
+    @FXML private Label profilePictureLabel;
+    @FXML private Label genderLabel;
+    @FXML private Label birthDateLabel;
+
     private User admin;
 
     public void initialize() {
         admin = Session.getLocalSession().getLoggedUser();
+
         if (admin != null) {
             prepareForAdminCreation();
         } else {
             prepareForStandardUserCreation();
         }
-    }
 
-    public void backToLoginButtonHandler(MouseEvent clickEvent) {
-        Utils.changeScene("/fxml/LoginPage.fxml", clickEvent);
     }
 
     private void prepareForAdminCreation() {
-        backToLoginButton.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
+        learnitLogoImageView.setImage(new Image(
+                String.valueOf(RegistrationPageController.class.getResource("/img/createAdmin.png"))));
+        learnitImageView.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
         signUpButton.setOnMouseClicked(this::createAdmin);
 
         signUpButton.setText("Create admin");
+        signUpButton.setStyle("-fx-background-color: lightpink;" +
+                "-fx-background-radius: 13px");
         completeNameTextField.setDisable(true);
         emailTextField.setDisable(true);
         birthDatePicker.setDisable(true);
         genderChoiceBox.setDisable(true);
         propicTextField.setDisable(true);
+        completeNameLabel.setDisable(true);
+        emailLabel.setDisable(true);
+        birthDateLabel.setDisable(true);
+        genderLabel.setDisable(true);
+        profilePictureLabel.setDisable(true);
     }
 
     private void prepareForStandardUserCreation() {
@@ -62,8 +76,11 @@ public class RegistrationPageController {
         birthDatePicker.getEditor().setDisable(true);
         birthDatePicker.getEditor().setOpacity(1);
 
-        backToLoginButton.setOnMouseClicked(this::backToLoginButtonHandler);
-        signUpButton.setOnMouseClicked(this::signUpHandler);
+        learnitLogoImageView.setOnMouseClicked(clickEvent ->
+                Utils.changeScene("/fxml/LoginPage.fxml", clickEvent));
+        learnitImageView.setOnMouseClicked(clickEvent ->
+                Utils.changeScene("/fxml/LoginPage.fxml", clickEvent));
+        signUpButton.setOnMouseClicked(clickEvent -> signUpHandler(clickEvent));
     }
 
     public void createAdmin(MouseEvent clickEvent) {
