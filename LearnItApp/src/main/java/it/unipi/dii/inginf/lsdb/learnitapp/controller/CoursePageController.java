@@ -55,6 +55,7 @@ public class CoursePageController {
     @FXML private TextField courseImageTextField;
     @FXML private HBox buttonsHBox;
     @FXML private VBox profileVBox;
+    @FXML private Label lastModifiedLabel;
     @FXML LineChart<String, Number> annualMeanRatingLineChart;
     private XYChart.Series series;
 
@@ -116,6 +117,7 @@ public class CoursePageController {
 
                         reviewTitleTextField.setText(myReview.getTitle());
                         commentTextArea.setText(myReview.getContent());
+                        lastModifiedLabel.setText("Last-modified: "+myReview.getTimestamp());
                         editCourseButton.setVisible(false);
                         System.out.println("rating loaded: "+myReview.getRating());
                         Utils.fillStars(myReview.getRating(), ratingHBox);
@@ -237,6 +239,7 @@ public class CoursePageController {
                     Utils.showErrorAlert("Error in editing the review");
                 }
             }
+            lastModifiedLabel.setText("Last-modified: "+myReview.getTimestamp());
             reviewTitleTextField.setEditable(false);
             commentTextArea.setEditable(false);
 

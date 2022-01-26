@@ -238,6 +238,7 @@
                            <font>
                               <Font size="15.0" />
                            </font></TextArea>
+                        <Label fx:id="lastModifiedLabel" />
                         <Button fx:id="saveReviewButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-background-radius: 13;" text="Save" textFill="WHITE">
                            <VBox.margin>
                               <Insets bottom="10.0" top="10.0" />

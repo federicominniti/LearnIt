@@ -69,7 +69,7 @@ public class ReviewSnapshotPageController {
         else
             commentTextArea.setText("");
 
-        lastModifiedLabel.setText(review.getTimestamp().toString());
+        lastModifiedLabel.setText("Last-modified: "+review.getTimestamp().toString());
     }
 
     public void setReview(Review review, VBox container){
