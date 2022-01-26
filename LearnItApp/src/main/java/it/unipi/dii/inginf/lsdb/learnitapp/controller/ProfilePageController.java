@@ -1,5 +1,6 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
+import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
@@ -34,23 +35,27 @@ public class ProfilePageController {
 
     private Neo4jDriver neo4jDriver;
     private User profileUser;
-    //private int[]pageNumber = {0, 0, 0, 0, 0};
-    //private int limit;
+    private User loggedUser;
+    private boolean isProfileMine;
+    private int limit;
 
     public void initialize() {
         neo4jDriver = Neo4jDriver.getInstance();
-        //limit = ConfigParams.getLocalConfig().getLimitNumber();
-
+        limit = ConfigParams.getLocalConfig().getLimitNumber();
         learnItLabel.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
-
     }
 
     private void loadProfileInformation(){
         completeNameLabel.setText(profileUser.getCompleteName());
         usernameLabel.setText(profileUser.getUsername());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-        birthDateLabel.setText(dateFormat.format(profileUser.getDateOfBirth()));
-        genderLabel.setText(profileUser.getGender());
+
+        if (profileUser.getDateOfBirth() != null)
+            birthDateLabel.setText(dateFormat.format(profileUser.getDateOfBirth()));
+
+        if (profileUser.getGender() != null)
+            genderLabel.setText(profileUser.getGender());
+
         followerNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(0).toString()); // ??? ricontrollare indice
         followingNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(1).toString()); // ??? ricontrollare indice
 
@@ -59,15 +64,14 @@ public class ProfilePageController {
             propicImageView.setImage(profilePicture);
         }
 
-        String loggedUser = Session.getLocalSession().getLoggedUser().getUsername();
-        if(neo4jDriver.isUserFollowedByUser(usernameLabel.getText(), loggedUser))
+        if(neo4jDriver.isUserFollowedByUser(usernameLabel.getText(), loggedUser.getUsername()))
             followButton.setText("Unfollow");
 
     }
 
     private void loadStatistics() {
         int totCourses = neo4jDriver.findTotCourses(profileUser);
-        reviewedCoursesLabel.setText("Reviewed courses: " + Integer.toString(totCourses));
+        reviewedCoursesLabel.setText("Reviewed courses: " + totCourses);
         DecimalFormat numberFormat = new DecimalFormat("#.00");
         if (totCourses > 0) {
             double avgDuration = neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "duration");
@@ -79,13 +83,15 @@ public class ProfilePageController {
     }
 
     public void setProfileUser(User user){
+        loggedUser = Session.getLocalSession().getLoggedUser();
         profileUser = user;
-        User loggedUser = Session.getLocalSession().getLoggedUser();
+        isProfileMine = loggedUser.getUsername().equals(profileUser.getUsername());
+
         if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
             followButton.setText("Delete user");
             followButton.setOnMouseClicked(clickEvent -> deleteUserHandler(profileUser, clickEvent));
         }
-        else if(profileUser.getUsername().equals(loggedUser.getUsername())){ // personal profile
+        else if(isProfileMine){ // personal profile
             followButton.setText("Edit Profile");
             followButton.setOnMouseClicked(clickEvent -> Utils.changeScene("/fxml/PersonalPage.fxml", clickEvent));
         }

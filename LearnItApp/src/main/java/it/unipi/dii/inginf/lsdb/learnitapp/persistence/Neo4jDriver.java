@@ -373,8 +373,10 @@ public class Neo4jDriver implements DBDriver {
                             date_of_birth = sdf.parse(rec.get("date_of_birth").asString());
                         if (rec.get("gender") != NULL)
                             gender = rec.get("gender").asString();
-                        if (rec.get("picture") != NULL)
+                        if (rec.get("picture") != NULL) {
                             profile_pic = rec.get("picture").asString();
+                            System.out.println(profile_pic);
+                        }
 
                         user = new User(username, password, complete_name, date_of_birth, gender, email, role, profile_pic);
                     }
@@ -449,7 +451,7 @@ public class Neo4jDriver implements DBDriver {
                     try {
                         user.setDateOfBirth(sdf.parse(r.get("date_of_birth").asString()));
                     } catch (ParseException e) {
-                        e.printStackTrace();
+                        user.setDateOfBirth(null);
                     }
 
                     if (r.get("picture") != NULL) {

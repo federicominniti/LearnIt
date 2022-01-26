@@ -17,8 +17,8 @@ public class LoginPageController {
     @FXML private Button signUpButton;
 
     public void initialize() {
-        loginButton.setOnMouseClicked(clickEvent -> loginHandler(clickEvent));
-        signUpButton.setOnMouseClicked(clickEvent -> signUpHandler(clickEvent));
+        loginButton.setOnMouseClicked(this::loginHandler);
+        signUpButton.setOnMouseClicked(this::signUpHandler);
     }
 
     public void loginHandler(MouseEvent clickEvent) {

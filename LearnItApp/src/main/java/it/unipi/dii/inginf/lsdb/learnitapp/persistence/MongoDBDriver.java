@@ -452,7 +452,8 @@ db.learnit.aggregate([{"$match": {"title": " Atención prehospitalaria del ictus
                         .append("sum_ratings", new Document("$sum", "$reviews.rating"))
                         .append("num_reviews", new Document("$sum", 1))),
                 new Document("$set", new Document("year", "$_id.year")),
-                new Document("$unset", "_id")
+                new Document("$unset", "_id"),
+                new Document("$sort", new Document("year", 1))
         )).into(new ArrayList<>());
 
         for (Course c: doc) {
@@ -466,8 +467,12 @@ db.learnit.aggregate([{"$match": {"title": " Atención prehospitalaria del ictus
         Course c = collection.find(Filters.eq("_id", course.getId())).projection(Projections.elemMatch("reviews", Filters.eq("author.username", user.getUsername()))).first();
         if (c == null)
             return null;
-        else
-            return c.getReviews().get(0);
+        else {
+            if (c.getReviews() == null)
+                return null;
+            else
+                return c.getReviews().get(0);
+        }
     }
 
     public Course getCourseFromTitle(String title, int skip, int limit) {

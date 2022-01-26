@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -28,16 +29,13 @@ public class RegistrationPageController {
     @FXML private ChoiceBox genderChoiceBox;
     @FXML private TextField propicTextField;
     private User admin;
+
     public void initialize() {
         admin = Session.getLocalSession().getLoggedUser();
         if (admin != null) {
             prepareForAdminCreation();
         } else {
-            genderChoiceBox.getItems().add("Man");
-            genderChoiceBox.getItems().add("Woman");
-            genderChoiceBox.getItems().add("-");
-            backToLoginButton.setOnMouseClicked(clickEvent -> backToLoginButtonHandler(clickEvent));
-            signUpButton.setOnMouseClicked(clickEvent -> signUpHandler(clickEvent));
+            prepareForStandardUserCreation();
         }
     }
 
@@ -45,15 +43,27 @@ public class RegistrationPageController {
         Utils.changeScene("/fxml/LoginPage.fxml", clickEvent);
     }
 
-    public void prepareForAdminCreation() {
+    private void prepareForAdminCreation() {
         backToLoginButton.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
+        signUpButton.setOnMouseClicked(this::createAdmin);
+
         signUpButton.setText("Create admin");
-        signUpButton.setOnMouseClicked(clickEvent -> createAdmin(clickEvent));
         completeNameTextField.setDisable(true);
         emailTextField.setDisable(true);
         birthDatePicker.setDisable(true);
         genderChoiceBox.setDisable(true);
         propicTextField.setDisable(true);
+    }
+
+    private void prepareForStandardUserCreation() {
+        genderChoiceBox.getItems().add("Male");
+        genderChoiceBox.getItems().add("Female");
+        genderChoiceBox.getItems().add("-");
+        birthDatePicker.getEditor().setDisable(true);
+        birthDatePicker.getEditor().setOpacity(1);
+
+        backToLoginButton.setOnMouseClicked(this::backToLoginButtonHandler);
+        signUpButton.setOnMouseClicked(this::signUpHandler);
     }
 
     public void createAdmin(MouseEvent clickEvent) {
@@ -73,31 +83,14 @@ public class RegistrationPageController {
         boolean ret;
         String birthDate;
 
-        if (emailTextField.getText().equals("") || completeNameTextField.getText() == null) {
-            Utils.showErrorAlert("Complete name is not an optional field");
-            return;
-        } else if (emailTextField.getText().equals("") || emailTextField.getText() == null) {
-            Utils.showErrorAlert("Email is not an optional field");
-            return;
-        }
-        if (validateUsernameAndPassword())
+        if (!validateNonOptionalFields())
             return;
 
-        if (birthDatePicker.getValue() != null) {
-            Date dateBirth = Date.from(birthDatePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
-            LocalDate today = LocalDate.now();
+        birthDate = getValueFromDatePicker();
+        if (birthDate == null)
+            return;
 
-            Period period = Period.between(birthDatePicker.getValue(), today);
-            if (period.getYears() < 18) {
-                Utils.showErrorAlert("Only over 18 people can join LearnIt!");
-                return;
-            }
-            birthDate = dateBirth.toString();
-        } else {
-            birthDate = "";
-        }
-
-        ret = Neo4jDriver.getInstance().registerUser(usernameTextField.getText(), completeNameTextField.getText(), birthDate, (String) genderChoiceBox.getValue(), emailTextField.getText(), passwordPasswordField.getText(), propicTextField.getText(), false);
+        ret = registerUser(birthDate);
 
         if (ret) {
             Utils.showInfoAlert("User registered with success");
@@ -122,5 +115,58 @@ public class RegistrationPageController {
             return true;
         }
         return false;
+    }
+
+    private boolean validateNonOptionalFields() {
+        if (emailTextField.getText().equals("") || completeNameTextField.getText().equals("")) {
+            Utils.showErrorAlert("Please fill all non-optional fields");
+            return false;
+        }
+
+        return !validateUsernameAndPassword();
+    }
+
+    private String getValueFromDatePicker() {
+        String birthDate = "";
+        if (birthDatePicker.getValue() != null) {
+            Date dateBirth = Date.from(birthDatePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+            LocalDate today = LocalDate.now();
+
+            Period period = Period.between(birthDatePicker.getValue(), today);
+            if (period.getYears() < 18) {
+                Utils.showErrorAlert("Only over 18 people can join LearnIt!");
+                return null;
+            }
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+            birthDate = sdf.format(dateBirth);
+        }
+
+        return birthDate;
+    }
+
+    private boolean registerUser(String birthDate) {
+        String username = usernameTextField.getText();
+        String password = passwordPasswordField.getText();
+        String complete_name = completeNameTextField.getText();
+
+        if (birthDate.equals(""))
+            birthDate = null;
+
+        String propic = null;
+        if (!propicTextField.getText().equals(""))
+            propic = propicTextField.getText();
+
+        String gender = null;
+        if (genderChoiceBox.getValue() != null)
+            gender = genderChoiceBox.getValue().toString();
+        return Neo4jDriver.getInstance().registerUser(username,
+                complete_name,
+                birthDate,
+                gender,
+                emailTextField.getText(),
+                password,
+                propic,
+                false);
+
     }
 }
