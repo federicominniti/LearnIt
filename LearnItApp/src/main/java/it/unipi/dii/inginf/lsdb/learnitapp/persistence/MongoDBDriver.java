@@ -65,10 +65,10 @@ public class MongoDBDriver implements DBDriver {
             try {
                 mongoDBInstance = new MongoDBDriver(ConfigParams.getInstance());
             } catch (Exception e) {
-               uriString = "mongodb://127.0.0.1:27017/";
-               mongoDBName = "db";
-               mongoDBusername = "root";
-               mongoDBpassword = "";
+                uriString = "mongodb://127.0.0.1:27017/";
+                mongoDBName = "db";
+                mongoDBusername = "root";
+                mongoDBpassword = "";
             }
 
             mongoDBInstance = new MongoDBDriver();
@@ -387,7 +387,7 @@ public class MongoDBDriver implements DBDriver {
     //provata
     public List<Course> findBestRatings(int limit){ // trasformare come trindingCourses se funziona ???
 
-        String json = "[{'$addFields': {" +
+        String json = "[{'$match': {num_reviews: {'$gt': 0}}},{'$addFields': {" +
                 "'avg': { '$divide': ['$sum_ratings', '$num_reviews']}" +
                 "}}, {'$sort': {'avg': -1}}, {'$limit': "+limit+"}, {'$project': {'reviews':0}}]";
 

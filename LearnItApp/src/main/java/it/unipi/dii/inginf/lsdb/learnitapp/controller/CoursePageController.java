@@ -21,6 +21,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,6 +52,7 @@ public class CoursePageController {
     @FXML private Button saveReviewButton;
     @FXML private VBox allContentVBox;
     @FXML private TextField courseLinkTextField;
+    @FXML private TextField courseImageTextField;
 
     private Course course;
     private Review myReview;
@@ -71,7 +74,7 @@ public class CoursePageController {
     }
 
     public void setCourse(Course course){
-        this.course = mongoDBDriver.getCourseFromTitle(course.getTitle(), 0 , 1);
+        this.course = mongoDBDriver.getCourseByTitle(course.getTitle());
 
         moreReviewsImageView.setOnMouseClicked(clickEvent -> loadMore());
 
@@ -84,10 +87,10 @@ public class CoursePageController {
             saveReviewButton.setVisible(false);
         } else {
             if (course.getInstructor().getUsername().equals(loggedUser.getUsername())) { // own course
-                //editCourseButton.setOnMouseClicked(clickEvent -> editCourseButtonHandler());
+                editCourseButton.setOnMouseClicked(clickEvent -> editCourseButtonHandler());
                 likeCourseButton.setVisible(false);
                 newReviewVBox.setVisible(false);
-                editCourseButton.setText("Apply changes");
+                editCourseButton.setText("Edit course");
             } else { // course not owned
                 if (neo4jDriver.isCourseReviewedByUser(course, loggedUser)) { // logged user has already written a review of the course
                     myReview = mongoDBDriver.getCourseReviewByUser(course, loggedUser);
@@ -100,6 +103,7 @@ public class CoursePageController {
 
                         reviewTitleTextField.setText(myReview.getTitle());
                         commentTextArea.setText(myReview.getContent());
+                        editCourseButton.setVisible(false);
 
                         Utils.fillStars(myReview.getRating(), ratingHBox);
                         handleRatingStars(false);
@@ -126,7 +130,7 @@ public class CoursePageController {
             }
         }
 
-        loadCourseInformation();
+        loadCourseInformation(loggedUser.getUsername().equals(course.getInstructor().getUsername()));
         //loadReviews();
 
 
@@ -137,8 +141,16 @@ public class CoursePageController {
         int skip = pageNumber*limit;
         pageNumber++;
 
-        Course toAdd = mongoDBDriver.getCourseFromTitle(course.getTitle(), skip, limit);
-        createReviewsElements(toAdd.getReviews(), reviewsVBox);
+        int toIndex = skip + limit;
+        if (toIndex >= course.getReviews().size()) {
+            toIndex = course.getReviews().size();
+        }
+
+        if (skip >= toIndex)
+            return;
+
+        List<Review> toAdd = course.getReviews().subList(skip, toIndex);
+        createReviewsElements(toAdd, reviewsVBox);
     }
 
     public void deleteCourse(MouseEvent clickEvent) {
@@ -162,7 +174,7 @@ public class CoursePageController {
             FXMLLoader loader = new FXMLLoader(Utils.class.getResource(Utils.REVIEW_SNAPSHOT));
             borderPane = loader.load();
             ReviewSnapshotPageController reviewController = loader.getController();
-            reviewController.setReview(review);
+            reviewController.setReview(review, reviewsVBox);
             reviewController.setCourse(course);
         }
         catch (IOException e) {
@@ -261,22 +273,29 @@ public class CoursePageController {
         }
     }
 
-    private void loadCourseInformation(){
+    private void loadCourseInformation(boolean isCourseMine){
         titleLabel.setText(course.getTitle());
+        instructorLabel.setText(course.getInstructor().getUsername());
         descriptionTextArea.setText(course.getDescription());
+        descriptionTextArea.setEditable(isCourseMine);
 
         if(course.getCoursePic() != null){
             Image coursePicture = new Image(course.getCoursePic());
             courseImageImageView.setImage(coursePicture);
+            courseImageTextField.setText(course.getCoursePic());
         }
+        courseImageTextField.setPromptText("Unknown");
+        courseImageTextField.setEditable(isCourseMine);
 
         languageChoiceBox.setItems(FXCollections.observableArrayList(Utils.LANGUAGES));
         languageChoiceBox.setValue(course.getLanguage());
         levelChoiceBox.setItems(FXCollections.observableArrayList(Utils.LEVELS));
         levelChoiceBox.setValue(course.getLevel());
+        languageChoiceBox.setDisable(!isCourseMine);
+        levelChoiceBox.setDisable(!isCourseMine);
 
         String categories = "";
-        if(!course.getCategory().isEmpty()){
+        if(course.getCategory() != null){
             List<String> listOfCategories = course.getCategory();
             //StringBuilder categories = new StringBuilder();
             for(String c : listOfCategories){
@@ -286,11 +305,21 @@ public class CoursePageController {
             }
         }
         categoryTextField.setText(categories);
+        categoryTextField.setPromptText("Unknown");
+        categoryTextField.setEditable(isCourseMine);
         instructorLabel.setText(course.getInstructor().getUsername());
         modalityTextField.setText(course.getModality());
+        modalityTextField.setPromptText("Unknown");
+        modalityTextField.setEditable(isCourseMine);
         durationTextField.setText(Double.toString(course.getDuration()));
+        durationTextField.setEditable(isCourseMine);
+        durationTextField.setPromptText("Unknown");
         priceTextField.setText(Double.toString(course.getPrice()));
+        priceTextField.setEditable(isCourseMine);
+        priceTextField.setPromptText("Unknown");
         courseLinkTextField.setText(course.getLink());
+        courseLinkTextField.setPromptText("Unknown");
+        courseLinkTextField.setEditable(isCourseMine);
     }
 
     public void editCourseButtonHandler(){
@@ -306,7 +335,7 @@ public class CoursePageController {
         }
 
         String language = languageChoiceBox.getValue().toString();
-        String coursePic = course.getCoursePic();
+        String coursePic = courseImageTextField.getText();
         String modality = modalityTextField.getText();
         String description = descriptionTextArea.getText();
         String level = levelChoiceBox.getValue().toString();
@@ -323,6 +352,7 @@ public class CoursePageController {
             newCourse = new Course(course.getTitle(), description, course.getInstructor(), language, categoryList,
                     level, duration, price, link, modality, coursePic);
 
+        newCourse.setId(course.getId());
         course = newCourse;
         if(DBOperations.updateCourse(newCourse))
             Utils.showInfoAlert("Course's information updated with success!");
