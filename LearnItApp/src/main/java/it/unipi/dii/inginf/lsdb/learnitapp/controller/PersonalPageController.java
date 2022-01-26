@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -19,7 +20,6 @@ public class PersonalPageController {
 
     @FXML private Label usernameLabel;
     @FXML private Button saveButton;
-    @FXML private Button backToHomeButton;
     @FXML private TextField completeNameTextField;
     @FXML private TextField emailTextField;
     @FXML private PasswordField passwordPasswordField;
@@ -28,36 +28,34 @@ public class PersonalPageController {
     @FXML private DatePicker birthDatePicker;
     @FXML private TextField propicTextField;
     @FXML private ImageView profileImageView;
+    @FXML private ImageView learnitImageView;
 
-    private User user;
+    private User loggedUser;
 
     public void initialize() {
-        user = Session.getLocalSession().getLoggedUser();
+        loggedUser = Session.getLocalSession().getLoggedUser();
+        learnitImageView.setOnMouseClicked(this::backToHomeButtonHandler);
+        saveButton.setOnMouseClicked(this::saveButtonHandler);
 
-        backToHomeButton.setOnMouseClicked(clickEvent -> backToHomeButtonHandler(clickEvent));
-        saveButton.setOnMouseClicked(clickEvent -> saveButtonHandler(clickEvent));
+        usernameLabel.setText(loggedUser.getUsername());
+        completeNameTextField.setText(loggedUser.getCompleteName());
+        emailTextField.setText(loggedUser.getEmail());
 
-        usernameLabel.setText(user.getUsername());
-        completeNameTextField.setText(user.getCompleteName());
-        emailTextField.setText(user.getEmail());
+        genderChoiceBox.getItems().add("Male");
+        genderChoiceBox.getItems().add("Female");
+        genderChoiceBox.getItems().add("-");
+        if (loggedUser.getGender() != null)
+            genderChoiceBox.setValue(loggedUser.getGender());
 
-        genderChoiceBox.setValue(user.getGender());
-        if(user.getGender()==null){
-            genderChoiceBox.getItems().add("F");
-            genderChoiceBox.getItems().add("M");
+        if (loggedUser.getProfilePic() != null) {
+            propicTextField.setText(loggedUser.getProfilePic());
+            profileImageView.setImage(new Image(loggedUser.getProfilePic()));
         }
-        else if(user.getGender().equals("F")){
-            genderChoiceBox.getItems().add("M");
-        }
-        else
-            genderChoiceBox.getItems().add("F");
 
-        propicTextField.setText(user.getProfilePic());
-        if(user.getProfilePic() != null)
-            profileImageView.setImage(new Image(
-                    String.valueOf(PersonalPageController.class.getResource(user.getProfilePic()))));
-        passwordPasswordField.setText(user.getPassword());
-        confirmPasswordField.setText(user.getPassword());
+        if (loggedUser.getDateOfBirth() != null)
+            birthDatePicker.setValue(loggedUser.getDateOfBirth().toInstant()
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDate());
     }
 
     public void backToHomeButtonHandler(MouseEvent clickEvent) {
@@ -67,50 +65,91 @@ public class PersonalPageController {
     }
 
     public void saveButtonHandler(MouseEvent clickEvent) {
+        boolean ret;
+        Date birthDate;
 
-        boolean flag;
-        Date dateBirth;
-
-        if (!passwordPasswordField.getText().equals(confirmPasswordField.getText())) {
-            Utils.showErrorAlert("The passwords do not match!");
-            return;
-        } else if (!Utils.isPasswordSecure(passwordPasswordField.getText())) {
-            Utils.showErrorAlert("Not secure password, try another password");
-            return;
-        } else if (completeNameTextField.getText() == null) {
-            Utils.showErrorAlert("Complete name is not an optional field");
-            return;
-        } else if (emailTextField.getText() == null) {
-            Utils.showErrorAlert("Email is not an optional field");
-            return;
+        if (!passwordPasswordField.getText().equals("")) {
+            if (validatePassword())
+                return;
         }
 
+        birthDate = getValueFromDatePicker();
+        if (birthDate == null)
+            return;
+
+        ret = editProfileInfo(birthDate);
+
+        if (ret) {
+            Utils.showInfoAlert("Success");
+        } else {
+            Utils.showInfoAlert("Something has gone wrong");
+        }
+    }
+
+    private boolean validatePassword() {
+        if (!passwordPasswordField.getText().equals(confirmPasswordField.getText())) {
+            Utils.showErrorAlert("The passwords do not match!");
+            return true;
+        } else if (!Utils.isPasswordSecure(passwordPasswordField.getText())) {
+            Utils.showErrorAlert("Not secure password, try another password");
+            return true;
+        }
+
+        return false;
+    }
+
+    private Date getValueFromDatePicker() {
+        Date birthDate = null;
         if (birthDatePicker.getValue() != null) {
-            dateBirth = Date.from(birthDatePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+            birthDate = Date.from(birthDatePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
             LocalDate today = LocalDate.now();
 
             Period period = Period.between(birthDatePicker.getValue(), today);
             if (period.getYears() < 18) {
-                Utils.showErrorAlert("You should have at least 18 years to be registered to LearnIt!");
-                return;
+                Utils.showErrorAlert("Only over 18 people can join LearnIt!");
+                return null;
             }
-            user.setDateOfBirth(dateBirth);
-        } else
-            user.setDateOfBirth(null);
-
-        user.setCompleteName(completeNameTextField.getText());
-        user.setEmail(emailTextField.getText());
-        user.setGender((String) genderChoiceBox.getValue());
-        user.setProfilePic(propicTextField.getText());
-        user.setPassword(passwordPasswordField.getText());
-
-        flag = Neo4jDriver.getInstance().editProfileInfo(user);
-
-        if(flag){
-            Utils.showInfoAlert("Changes applied!");
-            Utils.changeScene("/fxml/ProfilePage.fxml", clickEvent);
         }
-        else
-            Utils.showErrorAlert("Error, changes not applied");
+
+        return birthDate;
+    }
+
+    private boolean editProfileInfo(Date birthDate) {
+        String password = passwordPasswordField.getText();
+        if (password.equals(""))
+            password = loggedUser.getPassword();
+
+        String complete_name = completeNameTextField.getText();
+        if (complete_name.equals(""))
+            complete_name = loggedUser.getCompleteName();
+
+        String propic = null;
+        if (!propicTextField.getText().equals(""))
+            propic = propicTextField.getText();
+
+        String gender = null;
+        if (genderChoiceBox.getValue() != null)
+            gender = genderChoiceBox.getValue().toString();
+
+        String email = emailTextField.getText();
+        if (email.equals(""))
+            email = loggedUser.getEmail();
+
+        User editedUser = new User();
+        editedUser.setUsername(loggedUser.getUsername());
+        editedUser.setPassword(password);
+        editedUser.setGender(gender);
+        editedUser.setEmail(email);
+        editedUser.setDateOfBirth(birthDate);
+        editedUser.setRole(User.Role.STANDARD);
+        editedUser.setCompleteName(complete_name);
+        editedUser.setProfilePic(propic);
+
+        if (Neo4jDriver.getInstance().editProfileInfo(editedUser)) {
+            Session.getLocalSession().setLoggedUser(editedUser);
+            return true;
+        }
+
+        return false;
     }
 }
