@@ -6,6 +6,8 @@ import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
 import java.time.LocalDate;
@@ -25,6 +27,7 @@ public class PersonalPageController {
     @FXML private ChoiceBox genderChoiceBox;
     @FXML private DatePicker birthDatePicker;
     @FXML private TextField propicTextField;
+    @FXML private ImageView profileImageView;
 
     private User user;
 
@@ -50,6 +53,9 @@ public class PersonalPageController {
             genderChoiceBox.getItems().add("F");
 
         propicTextField.setText(user.getProfilePic());
+        if(user.getProfilePic() != null)
+            profileImageView.setImage(new Image(
+                    String.valueOf(PersonalPageController.class.getResource(user.getProfilePic()))));
         passwordPasswordField.setText(user.getPassword());
         confirmPasswordField.setText(user.getPassword());
     }
