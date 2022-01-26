@@ -29,7 +29,7 @@ public class ProfilePageController {
     @FXML private Label followingNumberLabel;
     @FXML private Label followerNumberLabel;
     @FXML private VBox elementsVBox;
-    @FXML private Label learnItLabel;
+    @FXML private ImageView learnItLabel;
 
 
     private Neo4jDriver neo4jDriver;

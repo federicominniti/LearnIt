@@ -30,7 +30,8 @@ public class LearnIt extends Application {
         primaryStage.setScene(scene);
         primaryStage.setTitle("LearnIt!");
         primaryStage.show();
-        primaryStage.setResizable(false);
+        primaryStage.setResizable(true);
+        primaryStage.sizeToScene();
         ConfigParams.getInstance();
 
         MongoDBDriver m = MongoDBDriver.getInstance();
