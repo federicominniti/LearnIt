@@ -29,6 +29,9 @@ public class NewCoursePageController {
     @FXML private Button createButton;
     @FXML private TextField courseLinkTextField;
 
+    private final int MIN_DESCRIPTION_LEN = 20;
+    private final int MIN_TITLE_LEN = 10;
+
     public void initialize() {
         languageChoiceBox.setItems(FXCollections.observableArrayList(Utils.LANGUAGES));
         levelChoiceBox.setItems(FXCollections.observableArrayList(Utils.LEVELS));
@@ -40,14 +43,33 @@ public class NewCoursePageController {
     }
 
     private void createButtonHandler(MouseEvent clickEvent){
+        if (!validateNonOptionalFields())
+            return;
+
         String title = titleTextField.getText();
         String language = languageChoiceBox.getValue().toString();
         String coursePic = coursePicTextField.getText();
         String modality = modalityTextField.getText();
         String description = descriptionTextArea.getText();
         String level = levelChoiceBox.getValue().toString();
-        double duration = Double.parseDouble(hourTextField.getText());
-        double price = Double.parseDouble(priceTextField.getText());
+        double price;
+        double duration;
+        try {
+            price = Double.parseDouble(priceTextField.getText());
+            if (price < 0)
+                price = -1;
+        } catch (NumberFormatException nf) {
+            price = -1;
+        }
+
+        try {
+            duration = Double.parseDouble(hourTextField.getText());
+            if (duration < 0)
+                duration = -1;
+        } catch (NumberFormatException nf) {
+            duration = -1;
+        }
+
         String link = courseLinkTextField.getText();
         List<String> categoryList = null;
         if (categoriesTextArea.getText().contains(",")){
@@ -59,30 +81,41 @@ public class NewCoursePageController {
             categoryList.add(categoriesTextArea.getText());
         }
 
-
-        if(languageChoiceBox.getValue() == null || title.equals("") || levelChoiceBox.getValue() == null ||
-                duration == 0 || description.equals("")){
-
-            Utils.showErrorAlert("Please check that the required fields are inserted!");
-            return;
-        }
-
         //null values are not added to the db
         coursePic = (coursePic.equals("")) ? null : coursePic;
         modality = (modality.equals("")) ? null : modality;
         link = (link.equals("")) ? null : link;
 
-        Course newCourse;
-        if(categoriesTextArea.getText().equals("")) {
-            newCourse = new Course(title, description, Session.getLocalSession().getLoggedUser(), language, level,
-                    duration, price, link, modality, coursePic);
-        }
-        else
-            newCourse = new Course(title, description,  Session.getLocalSession().getLoggedUser(), language, categoryList,
-                    level, duration, price, link, modality, coursePic);
+        Course newCourse = new Course();
+        newCourse.setTitle(title);
+        newCourse.setDescription(description);
+        newCourse.setInstructor(Session.getLocalSession().getLoggedUser());
+        newCourse.setLanguage(language);
+        newCourse.setLevel(level);
+        if (duration != -1)
+            newCourse.setDuration(duration);
+        if (price != -1)
+            newCourse.setPrice(price);
+        newCourse.setCoursePic(coursePic);
+        newCourse.setModality(modality);
+        newCourse.setLink(link);
+        if (!categoriesTextArea.getText().equals(""))
+            newCourse.setCategory(categoryList);
 
         if(DBOperations.addCourse(newCourse))
             Utils.showInfoAlert("Course added!");
         Utils.changeScene(Utils.COURSE_PAGE, clickEvent);
+    }
+
+    public boolean validateNonOptionalFields() {
+        if (languageChoiceBox.getValue() == null ||
+                levelChoiceBox.getValue() == null ||
+                descriptionTextArea.getText().length() < MIN_DESCRIPTION_LEN ||
+                titleTextField.getText().length() < MIN_TITLE_LEN) {
+            Utils.showErrorAlert("Please fill all non-optional fields");
+            return false;
+        }
+
+        return true;
     }
 }

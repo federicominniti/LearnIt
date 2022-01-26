@@ -155,6 +155,9 @@ public class CoursePageController {
         int skip = pageNumber*limit;
         pageNumber++;
 
+        if (course.getReviews() == null)
+            return;
+
         int toIndex = skip + limit;
         if (toIndex >= course.getReviews().size()) {
             toIndex = course.getReviews().size();
