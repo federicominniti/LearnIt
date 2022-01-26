@@ -70,6 +70,8 @@ public class DiscoveryPageController {
 
         if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
             createNewCourseButton.setText("Create new admin");
+            createNewCourseButton.setStyle("-fx-background-color: lightpink;" +
+                    "-fx-background-radius: 13px");
             createNewCourseButton.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.REGISTRATION_PAGE, clickEvent));
             return;
         }

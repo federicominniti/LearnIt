@@ -13,6 +13,8 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -24,9 +26,7 @@ import javafx.scene.layout.VBox;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class CoursePageController {
 
@@ -53,6 +53,11 @@ public class CoursePageController {
     @FXML private VBox allContentVBox;
     @FXML private TextField courseLinkTextField;
     @FXML private TextField courseImageTextField;
+    @FXML private HBox buttonsHBox;
+    @FXML private VBox profileVBox;
+    @FXML LineChart<String, Number> annualMeanRatingLineChart;
+    private XYChart.Series series;
+
 
     private Course course;
     private Review myReview;
@@ -65,6 +70,10 @@ public class CoursePageController {
         limit = ConfigParams.getLocalConfig().getLimitNumber();
         neo4jDriver = Neo4jDriver.getInstance();
         mongoDBDriver = MongoDBDriver.getInstance();
+
+        series = new XYChart.Series();
+        series.setName("Mean rating");
+        annualMeanRatingLineChart.getData().add(series);
 
         logoImageView.setOnMouseClicked(clickEvent -> backToHome(clickEvent));
     }
@@ -80,11 +89,15 @@ public class CoursePageController {
 
         User loggedUser = Session.getLocalSession().getLoggedUser();
         if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
-            likeCourseButton.setText("Delete course");
-            likeCourseButton.setOnMouseClicked(clickEvent -> deleteCourse(clickEvent));
-            newReviewVBox.setVisible(false);
-            editCourseButton.setVisible(false);
-            saveReviewButton.setVisible(false);
+            ImageView trash = new ImageView(new Image(
+                    String.valueOf(CoursePageController.class.getResource("/img/trash-bin.png"))));
+            trash.setPreserveRatio(true);
+            trash.setFitWidth(40);
+            trash.setFitHeight(40);
+            profileVBox.getChildren().remove(buttonsHBox);
+            profileVBox.getChildren().add(trash);
+            trash.setOnMouseClicked(clickEvent -> deleteCourse(clickEvent));
+            allContentVBox.getChildren().remove(newReviewVBox);
         } else {
             if (course.getInstructor().getUsername().equals(loggedUser.getUsername())) { // own course
                 editCourseButton.setOnMouseClicked(clickEvent -> editCourseButtonHandler());
@@ -133,8 +146,7 @@ public class CoursePageController {
         }
 
         loadCourseInformation(loggedUser.getUsername().equals(course.getInstructor().getUsername()));
-        //loadReviews();
-
+        loadAnnualMeanRatingLineChart();
 
         loadMore();
     }
@@ -306,12 +318,12 @@ public class CoursePageController {
         if(neo4jDriver.isCourseLikedByUser(course, loggedUser)){
             //dislike
             neo4jDriver.dislikeCourse(loggedUser, course);
-            likeCourseButton.setText("like");
+            likeCourseButton.setText("Like");
         }
         else{
             //like
             neo4jDriver.likeCourse(loggedUser, course);
-            likeCourseButton.setText("dislike");
+            likeCourseButton.setText("Dislike");
         }
     }
 
@@ -376,14 +388,45 @@ public class CoursePageController {
             categoryList.add(categoriesString);
         }
 
-        String language = languageChoiceBox.getValue().toString();
         String coursePic = courseImageTextField.getText();
         String modality = modalityTextField.getText();
         String description = descriptionTextArea.getText();
-        String level = levelChoiceBox.getValue().toString();
-        double duration = Double.parseDouble(durationTextField.getText());
-        double price = Double.parseDouble(priceTextField.getText());
         String link = courseLinkTextField.getText();
+
+        if (languageChoiceBox.getValue() == null) {
+            Utils.showErrorAlert("Please choose a language");
+            return;
+        }
+        String language = languageChoiceBox.getValue().toString();
+
+        if(levelChoiceBox.getValue() == null) {
+            Utils.showErrorAlert("Please choose a level value");
+            return;
+        }
+        String level = levelChoiceBox.getValue().toString();
+
+        double duration;
+        try{
+            duration = Double.parseDouble(durationTextField.getText());
+        }catch (NumberFormatException ex) {
+            Utils.showErrorAlert("Duration must be numeric!");
+            durationTextField.setText("");
+            return;
+        }
+
+        double price;
+        try{
+            price = Double.parseDouble(priceTextField.getText());
+        }catch (NumberFormatException ex) {
+            Utils.showErrorAlert("Duration must be numeric!");
+            durationTextField.setText("");
+            return;
+        }
+
+        //null values are not added to the db
+        coursePic = (coursePic.equals("")) ? null : coursePic;
+        modality = (modality.equals("")) ? null : modality;
+        link = (link.equals("")) ? null : link;
 
         Course newCourse;
         if(categoryTextField.getText().equals("")) {
@@ -400,6 +443,23 @@ public class CoursePageController {
             Utils.showInfoAlert("Course's information updated with success!");
         else
             Utils.showErrorAlert("Error in updating course's information.");
+    }
+
+    public void loadAnnualMeanRatingLineChart () {
+        HashMap<String, Double> courseAnnualMeanRating = mongoDBDriver.getCourseAnnualRatings(course);
+        List<Integer> years = new ArrayList<>();
+        List<Double> means = new ArrayList<>();
+        for (String year : courseAnnualMeanRating.keySet()) {
+            years.add(Integer.valueOf(year));
+        }
+        years.sort(Comparator.naturalOrder());
+
+        series.getData().clear();
+        for (int year: years){
+            series.getData().add(new XYChart.Data(
+                    String.valueOf(year), courseAnnualMeanRating.get(String.valueOf(year))));
+        }
+
     }
 
 }

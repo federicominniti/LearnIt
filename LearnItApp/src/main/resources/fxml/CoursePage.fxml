@@ -39,10 +39,10 @@
                               <Font name="Arial Bold Italic" size="34.0" />
                            </font>
                            <VBox.margin>
-                              <Insets bottom="15.0" />
+                              <Insets bottom="5.0" />
                            </VBox.margin>
                         </Label>
-                        <TextArea fx:id="descriptionTextArea" editable="false" prefHeight="84.0" prefWidth="439.0" text="A description of the course.&#10;">
+                        <TextArea fx:id="descriptionTextArea" editable="false" prefHeight="84.0" prefWidth="439.0" text="A description of the course.&#10;" wrapText="true">
                            <font>
                               <Font size="15.0" />
                            </font>
@@ -179,12 +179,12 @@
                         </VBox>
                      </right>
                   </BorderPane>
-                  <LineChart fx:id="annualMeanRatingLineChart" prefHeight="259.0" prefWidth="895.0" title="Annual mean rating">
+                  <LineChart fx:id="annualMeanRatingLineChart" animated="false" legendSide="RIGHT" prefHeight="259.0" prefWidth="895.0" title="Annual mean rating">
                     <xAxis>
-                      <CategoryAxis side="BOTTOM" />
+                      <CategoryAxis prefHeight="25.0" prefWidth="848.0" />
                     </xAxis>
                     <yAxis>
-                      <NumberAxis side="LEFT" />
+                      <NumberAxis side="LEFT" upperBound="5.0" />
                     </yAxis>
                      <VBox.margin>
                         <Insets top="20.0" />
@@ -255,9 +255,9 @@
                      <top>
                         <BorderPane prefHeight="30.0" prefWidth="895.0" BorderPane.alignment="CENTER">
                            <center>
-                              <Label prefHeight="24.0" prefWidth="898.0" style="-fx-font-weight: bold;" text="Reviews" textFill="#1880e1" BorderPane.alignment="CENTER">
+                              <Label prefHeight="24.0" prefWidth="898.0" text="Reviews" textFill="#1880e1" BorderPane.alignment="CENTER">
                                  <font>
-                                    <Font size="15.0" />
+                                    <Font name="System Bold" size="15.0" />
                                  </font></Label>
                            </center>
                            <right>

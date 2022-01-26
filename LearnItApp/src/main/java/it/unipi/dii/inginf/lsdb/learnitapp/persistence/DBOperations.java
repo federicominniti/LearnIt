@@ -10,7 +10,7 @@ public class DBOperations {
     private static MongoDBDriver mongoDBDriver = MongoDBDriver.getInstance();
 
     public static boolean updateCourse(Course course){
-        Course oldCourse = mongoDBDriver.getCourseFromTitle(course.getTitle(), 0, 0);
+        Course oldCourse = mongoDBDriver.getCourseByTitle(course.getTitle());
         if (mongoDBDriver.updateCourse(course)) {
             if (!neo4jDriver.updateCourse(course)) {
                 mongoDBDriver.updateCourse(oldCourse);

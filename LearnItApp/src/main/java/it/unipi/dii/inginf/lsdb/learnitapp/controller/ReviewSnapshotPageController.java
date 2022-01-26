@@ -29,8 +29,9 @@ public class ReviewSnapshotPageController {
     @FXML private TextArea commentTextArea;
     @FXML private HBox ratingHBox;
     @FXML private Label lastModifiedLabel;
-    @FXML private Button deleteButton;
     @FXML private BorderPane thisBorderPane;
+    @FXML private ImageView deleteImageView;
+
     private VBox container;
 
     private Course course;
@@ -38,8 +39,8 @@ public class ReviewSnapshotPageController {
 
     public void initialize() {
         if (Session.getLocalSession().getLoggedUser().getRole() == User.Role.ADMINISTRATOR) {
-            deleteButton.setVisible(true);
-            deleteButton.setOnMouseClicked(clickEvent -> deleteReview(clickEvent));
+            deleteImageView.setVisible(true);
+            deleteImageView.setOnMouseClicked(clickEvent -> deleteReview(clickEvent));
         }
     }
 
