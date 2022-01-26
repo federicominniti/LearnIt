@@ -266,7 +266,10 @@ public class MongoDBDriver implements DBDriver {
         List<Review> reviewsList = course.getReviews();
         int count = 0;
         for (Review r: reviewsList) {
-            if(r.getAuthor().equals(review.getAuthor())){
+            //System.out.println("scorro review \n title: "+ review.getTitle() + "\n content: "+ review.getContent() +"\n rating: "+ review.getRating()+"\n timestamp: "+review.getTimestamp().toString());
+
+            if(r.getAuthor().getUsername().equals(review.getAuthor().getUsername())){
+                //System.out.println("stesso author, count: "+count);
                 course.setSum_ratings(review.getRating()-r.getRating()+course.getSum_ratings());
                 reviewsList.set(count, review);
 

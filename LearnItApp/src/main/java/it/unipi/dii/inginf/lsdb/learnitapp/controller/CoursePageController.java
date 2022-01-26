@@ -73,8 +73,8 @@ public class CoursePageController {
         Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
     }
 
-    public void setCourse(Course course){
-        this.course = mongoDBDriver.getCourseByTitle(course.getTitle());
+    public void setCourse(Course snapCourse){
+        this.course = mongoDBDriver.getCourseByTitle(snapCourse.getTitle());
 
         moreReviewsImageView.setOnMouseClicked(clickEvent -> loadMore());
 
@@ -104,7 +104,7 @@ public class CoursePageController {
                         reviewTitleTextField.setText(myReview.getTitle());
                         commentTextArea.setText(myReview.getContent());
                         editCourseButton.setVisible(false);
-
+                        System.out.println("rating loaded: "+myReview.getRating());
                         Utils.fillStars(myReview.getRating(), ratingHBox);
                         handleRatingStars(false);
                     } else { //too longer documents
@@ -117,7 +117,9 @@ public class CoursePageController {
                         ratingHBox.setVisible(false);
                     }
                 } else { // not reviewed course
+                    saveReviewButton.setText("Save");
                     saveReviewButton.setOnMouseClicked(clickEvent2 -> saveReviewButtonHandler());
+                    commentTextArea.setEditable(true);
                     handleRatingStars(true);
                     editCourseButton.setVisible(false);
                 }
@@ -185,48 +187,71 @@ public class CoursePageController {
 
     public void saveReviewButtonHandler(){
         if(saveReviewButton.getText().equals("Save")) { // save operation
-            int rating = 1;
+            int rating = getRatingFromStars();
+            System.out.println("rating received: "+rating);
             User loggedUser = Session.getLocalSession().getLoggedUser();
+            User author = new User(loggedUser.getUsername(), loggedUser.getCompleteName());
             Date currentTimestamp = new Date();
 
-            myReview = new Review(reviewTitleTextField.getText(), commentTextArea.getText(), rating,
-                    currentTimestamp, loggedUser);
+            if(myReview==null) { // add review
+                myReview = new Review(reviewTitleTextField.getText(), commentTextArea.getText(), rating, currentTimestamp, author);
+                course.addReview(myReview);
+                //System.out.println("add review \n title: "+ myReview.getTitle() + "\n content: "+ myReview.getContent() +"\n rating: "+ myReview.getRating()+"\n timestamp: "+myReview.getTimestamp().toString());
 
-            if (DBOperations.addReview(myReview, course)) {
-                Utils.showInfoAlert("Added new review with success!");
-                reviewTitleTextField.setEditable(false);
-                commentTextArea.setEditable(false);
+                if (DBOperations.addReview(myReview, course)) {
+                    Utils.showInfoAlert("Added new review with success!");
 
-                handleRatingStars(false);
-
-                saveReviewButton.setText("Edit");
-            } else {
-                Utils.showErrorAlert("Error in adding the review");
+                } else {
+                    Utils.showErrorAlert("Error in adding the review");
+                }
             }
+            else{ // edit review
+
+                System.out.println("here, i'm editing a review");
+                myReview.setContent(commentTextArea.getText());
+                myReview.setTitle(reviewTitleTextField.getText());
+                myReview.setRating(rating);
+                myReview.setTimestamp(currentTimestamp);
+
+                //System.out.println("edit review \n title: "+ myReview.getTitle() + "\n content: "+ myReview.getContent() +"\n rating: "+ myReview.getRating()+"\n timestamp: "+myReview.getTimestamp().toString());
+
+                if(mongoDBDriver.editReview(course, myReview)){
+                    Utils.showInfoAlert("Review edited with success!");
+                }
+                else{
+                    Utils.showErrorAlert("Error in editing the review");
+                }
+            }
+            reviewTitleTextField.setEditable(false);
+            commentTextArea.setEditable(false);
+
+            handleRatingStars(false);
+
+            saveReviewButton.setText("Edit");
+
         }
-        else{ // edited the review, system should apply changes
-            myReview.setContent(commentTextArea.getText());
-            myReview.setTitle(reviewTitleTextField.getText());
-            myReview.setRating(getRatingFromStars());
-            myReview.setTimestamp(new Date());
+        else{ // click on edit button -> edit the review should be permitted
+            reviewTitleTextField.setEditable(true);
+            commentTextArea.setEditable(true);
 
-            if(mongoDBDriver.editReview(course, myReview)){
-                Utils.showInfoAlert("Review edited with success!");
-            }
-            else{
-                Utils.showErrorAlert("Error in editing the review");
-            }
+            handleRatingStars(true);
+
+            saveReviewButton.setText("Save");
         }
     }
 
     private int getRatingFromStars(){
         int rating = 0;
+        Image starOn = new Image(String.valueOf(CoursePageController.class.getResource("/img/star-on.png")));
+
         for(Node star: ratingHBox.getChildren()){
             ImageView starImageView = (ImageView)star;
-            if(starImageView.getImage().getUrl().equals(
-                    CoursePageController.class.getResource("/img/star-on.png")))
+            if(starImageView.getImage().getUrl().equals(starOn.getUrl()))
                 rating++;
+
         }
+
+        System.out.println("rating saved: "+rating);
         return rating;
     }
 
@@ -236,7 +261,7 @@ public class CoursePageController {
         if(type){ // activate
             for(Node star: ratingHBox.getChildren()) {
                 int index = ratingHBox.getChildren().indexOf(star);
-                star.setOnMouseClicked(mouseEvent -> Utils.fillStars(index+1, ratingHBox));
+                star.setOnMouseClicked(mouseEvent -> starOnMouseClickedHandler(index));
                 star.setOnMouseEntered(mouseEvent -> starOnMouseOverHandler(star));
                 star.setOnMouseExited(mouseEvent -> starOnMouseExitedHandler());
             }
@@ -244,7 +269,7 @@ public class CoursePageController {
         else{ // disabled
             for(Node star: ratingHBox.getChildren()) {
                 star.setOnMouseEntered(mouseEvent -> {});
-                star.setOnMouseEntered(mouseEvent -> {});
+                star.setOnMouseExited(mouseEvent -> {});
                 star.setOnMouseClicked(mouseEvent -> {});
             }
         }
@@ -257,6 +282,23 @@ public class CoursePageController {
 
     private void starOnMouseExitedHandler(){
         Utils.fillStars(1, ratingHBox);
+    }
+
+    private void starOnMouseClickedHandler(int index){
+        Utils.fillStars(index + 1, ratingHBox);
+        System.out.println("click on star "+index);
+        for(Node star: ratingHBox.getChildren()) {
+            int s = ratingHBox.getChildren().indexOf(star);
+            if(s<=index){
+                star.setOnMouseExited(mouseEvent -> {});
+                star.setOnMouseEntered(mouseEvent -> {});
+            }
+            else{
+                star.setOnMouseExited(mouseEvent -> Utils.fillStars(index+1, ratingHBox));
+                star.setOnMouseEntered(mouseEvent -> starOnMouseOverHandler(star));
+            }
+
+        }
     }
 
     public void likeCourseButtonHandler(){

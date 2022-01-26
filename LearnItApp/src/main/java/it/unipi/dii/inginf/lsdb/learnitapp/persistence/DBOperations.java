@@ -40,7 +40,7 @@ public class DBOperations {
     }
 
     public static boolean addReview(Review newReview, Course course){
-        if (mongoDBDriver.addReview(course, newReview)) {
+        if (mongoDBDriver.addReviewRedundancies(course, newReview)) {
             if (!neo4jDriver.addReview(course, newReview.getAuthor())) {
                 mongoDBDriver.deleteReview(course, newReview);
                 Utils.showErrorAlert("Something has gone wrong");
