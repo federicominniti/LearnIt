@@ -40,7 +40,7 @@ public class RegistrationPageController {
 
     public void initialize() {
         admin = Session.getLocalSession().getLoggedUser();
-
+        //System.out.println("user: "+admin.getUsername());
         if (admin != null) {
             prepareForAdminCreation();
         } else {

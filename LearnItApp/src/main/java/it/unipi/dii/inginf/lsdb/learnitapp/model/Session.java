@@ -2,12 +2,14 @@ package it.unipi.dii.inginf.lsdb.learnitapp.model;
 
 public class Session {
     private static Session localSession = null; // Singleton
-    private static User loggedUser;
+    private User loggedUser;
 
     public static Session getLocalSession()
     {
-        if(localSession == null)
+        if(localSession == null) {
+            System.out.println("qui");
             localSession = new Session();
+        }
         return localSession;
     }
 
@@ -19,5 +21,9 @@ public class Session {
 
     public User getLoggedUser() {
         return loggedUser;
+    }
+
+    public static void destroySession(){
+        localSession =null;
     }
 }

@@ -10,6 +10,7 @@ import it.unipi.dii.inginf.lsdb.learnitapp.controller.CourseSnapshotController;
 import it.unipi.dii.inginf.lsdb.learnitapp.controller.ElementsLineController;
 import it.unipi.dii.inginf.lsdb.learnitapp.controller.UserSnapshotController;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
@@ -269,7 +270,11 @@ public class Utils {
     }
 
     public static void  logout(MouseEvent clickEvent){
-
+        //System.out.println("Destroy session: "+ Session.getLocalSession().toString());
+        Session.destroySession();
+        //System.out.println("Destroy session: "+ Session.getLocalSession().getLoggedUser().getUsername());
+        //System.out.println("Destroy session: "+ Session.getLocalSession().toString());
         changeScene(LOGIN_PAGE, clickEvent);
+
     }
 }
