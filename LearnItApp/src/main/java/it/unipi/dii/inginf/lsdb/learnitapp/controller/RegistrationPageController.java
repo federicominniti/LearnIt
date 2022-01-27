@@ -77,9 +77,9 @@ public class RegistrationPageController {
         birthDatePicker.getEditor().setOpacity(1);
 
         learnitLogoImageView.setOnMouseClicked(clickEvent ->
-                Utils.changeScene("/fxml/LoginPage.fxml", clickEvent));
+                Utils.changeScene(Utils.LOGIN_PAGE, clickEvent));
         learnitImageView.setOnMouseClicked(clickEvent ->
-                Utils.changeScene("/fxml/LoginPage.fxml", clickEvent));
+                Utils.changeScene(Utils.LOGIN_PAGE, clickEvent));
         signUpButton.setOnMouseClicked(clickEvent -> signUpHandler(clickEvent));
     }
 
@@ -111,7 +111,7 @@ public class RegistrationPageController {
 
         if (ret) {
             Utils.showInfoAlert("User registered with success");
-            Utils.changeScene("/fxml/LoginPage.fxml", clickEvent);
+            Utils.changeScene(Utils.LOGIN_PAGE, clickEvent);
         } else {
             Utils.showInfoAlert("Error, registration failed");
         }

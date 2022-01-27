@@ -23,7 +23,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.*;
@@ -55,8 +54,8 @@ public class CoursePageController {
     @FXML private TextField courseImageTextField;
     @FXML private HBox buttonsHBox;
     @FXML private VBox profileVBox;
-    @FXML private Label lastModifiedLabel;
     @FXML LineChart<String, Number> annualMeanRatingLineChart;
+    @FXML private Label lastModifiedLabel;
     private XYChart.Series series;
 
 
@@ -91,7 +90,7 @@ public class CoursePageController {
         User loggedUser = Session.getLocalSession().getLoggedUser();
         if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
             ImageView trash = new ImageView(new Image(
-                    String.valueOf(CoursePageController.class.getResource("/img/trash-bin.png"))));
+                    String.valueOf(CoursePageController.class.getResource(Utils.TRASH_BIN))));
             trash.setPreserveRatio(true);
             trash.setFitWidth(40);
             trash.setFitHeight(40);
@@ -156,9 +155,6 @@ public class CoursePageController {
     private void loadMore(){
         int skip = pageNumber*limit;
         pageNumber++;
-
-        if (course.getReviews() == null)
-            return;
 
         int toIndex = skip + limit;
         if (toIndex >= course.getReviews().size()) {
@@ -260,7 +256,7 @@ public class CoursePageController {
 
     private int getRatingFromStars(){
         int rating = 0;
-        Image starOn = new Image(String.valueOf(CoursePageController.class.getResource("/img/star-on.png")));
+        Image starOn = new Image(String.valueOf(CoursePageController.class.getResource(Utils.STRAR_ON)));
 
         for(Node star: ratingHBox.getChildren()){
             ImageView starImageView = (ImageView)star;

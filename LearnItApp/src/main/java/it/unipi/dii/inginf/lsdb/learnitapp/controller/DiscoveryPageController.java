@@ -1,12 +1,12 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
+import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
@@ -20,6 +20,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+
 import java.util.List;
 
 public class DiscoveryPageController {
@@ -112,12 +113,12 @@ public class DiscoveryPageController {
         usernameLabel.setText(loggedUser.getUsername());
 
         if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
-            profilePic.setImage(new Image(String.valueOf(DiscoveryPageController.class.getResource("/img/learnitUserPropic.png"))));
+            profilePic.setImage(new Image(String.valueOf(DiscoveryPageController.class.getResource(Utils.USER_DEFAULT))));
             return;
         }
 
         if (loggedUser.getProfilePic() == null)
-            profilePic.setImage(new Image(String.valueOf(DiscoveryPageController.class.getResource("/img/learnitUserPropic.png"))));
+            profilePic.setImage(new Image(String.valueOf(DiscoveryPageController.class.getResource(Utils.USER_DEFAULT))));
         else
             profilePic.setImage(new Image(loggedUser.getProfilePic()));
     }

@@ -24,6 +24,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,7 +61,12 @@ public class Utils {
             "Swahili", "Tamil", "Telugu", "Urdu", "Vietnamese", "русский", "ไทย", "日本語", "简体中文", "繁體中文", "한국어"};
 
     public final static String[] LEVELS  = {"All Levels", "Beginner", "Expert", "Intermediate"};
+
     public static final String READ_MORE = "/img/readMore.png";
+    public static final String STRAR_ON = "/img/star-on.png";
+    public static final String TRASH_BIN = "/img/trash-bin.png";
+    public static final String USER_DEFAULT = "/img/userDefault.png";
+    public static final String LOGIN_PAGE = "/fxml/LoginPage.fxml";
     public final static String DISCOVERY_PAGE = "/fxml/DiscoveryPage.fxml";
     public final static String REGISTRATION_PAGE = "/fxml/RegistrationPage.fxml";
     public final static String PROFILE_PAGE = "/fxml/ProfilePage.fxml";
@@ -157,7 +163,8 @@ public class Utils {
         alert.setContentText(text);
         alert.setHeaderText("Confirm Message");
         alert.setTitle("Information");
-        ImageView imageView = new ImageView(new Image(String.valueOf(Utils.class.getResource("/img/success.png"))));
+        ImageView imageView = new ImageView(
+                new Image(String.valueOf(Utils.class.getResource("/img/success.png"))));
         imageView.setFitHeight(60);
         imageView.setFitWidth(60);
         imageView.setPreserveRatio(true);
@@ -245,7 +252,7 @@ public class Utils {
                 break;
             ImageView starImageView = (ImageView)star;
             Image starImage = new Image(
-                    String.valueOf(CoursePageController.class.getResource("/img/star-on.png")));
+                    String.valueOf(CoursePageController.class.getResource(Utils.STRAR_ON)));
             starImageView.setImage(starImage);
             ratingHBox.getChildren().set(index, (Node)starImageView);
         }

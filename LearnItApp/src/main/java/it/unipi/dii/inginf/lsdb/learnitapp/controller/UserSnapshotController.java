@@ -39,7 +39,7 @@ public class UserSnapshotController {
 
     private void showCompleteUserInfo(MouseEvent mouseEvent){
         ProfilePageController profilePageController =
-                (ProfilePageController) Utils.changeScene("/fxml/ProfilePage.fxml", mouseEvent);
+                (ProfilePageController) Utils.changeScene(Utils.PROFILE_PAGE, mouseEvent);
         profilePageController.setProfileUser(referredUser);
     }
 }

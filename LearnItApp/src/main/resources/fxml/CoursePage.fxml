@@ -54,27 +54,27 @@
                   </VBox>
                   <BorderPane prefHeight="200.0" prefWidth="200.0">
                      <left>
-                        <VBox fx:id="profileVBox" alignment="CENTER" prefHeight="180.0" prefWidth="497.0" style="-fx-alignment: center;" BorderPane.alignment="CENTER">
+                        <VBox fx:id="profileVBox" alignment="CENTER" prefHeight="180.0" prefWidth="497.0" BorderPane.alignment="CENTER">
                            <BorderPane.margin>
                               <Insets bottom="10.0" top="10.0" />
                            </BorderPane.margin>
                            <children>
                               <ImageView fx:id="courseImageImageView" fitHeight="89.0" fitWidth="97.0" preserveRatio="true">
                                  <image>
-                                    <Image url="@../img/learnitUserPropic.png" />
+                                    <Image url="@../img/userDefault.png" />
                                  </image>
                                  <VBox.margin>
                                     <Insets bottom="25.0" />
                                  </VBox.margin>
                               </ImageView>
-                              <HBox fx:id="buttonsHBox" prefHeight="24.0" prefWidth="211.0" style="-fx-alignment: center; -fx-spacing: 30px;">
+                              <HBox fx:id="buttonsHBox" alignment="CENTER" prefHeight="24.0" prefWidth="211.0" spacing="50.0">
                                  <children>
-                                    <Button fx:id="likeCourseButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-background-radius: 13;" text="Like" textFill="WHITE">
+                                    <Button fx:id="likeCourseButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-background-radius: 13;" text="Like" textFill="WHITE">
                                        <font>
                                           <Font size="15.0" />
                                        </font>
                                     </Button>
-                                    <Button fx:id="editCourseButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-background-radius: 13;" text="Edit course" textFill="WHITE">
+                                    <Button fx:id="editCourseButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-background-radius: 13;" text="Edit course" textAlignment="CENTER" textFill="WHITE">
                                        <font>
                                           <Font size="15.0" />
                                        </font>
@@ -83,6 +83,9 @@
                                        </HBox.margin>
                                     </Button>
                                  </children>
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
                               </HBox>
                            </children>
                         </VBox>
@@ -90,9 +93,9 @@
                      <right>
                         <VBox prefHeight="200.0" prefWidth="372.0" BorderPane.alignment="CENTER">
                            <children>
-                              <Label prefHeight="24.0" prefWidth="981.0" style="-fx-font-weight: bold;" text="Course's information" textFill="#1880e1">
+                              <Label prefHeight="24.0" prefWidth="981.0" text="Course's information" textFill="#1880e1">
                                  <font>
-                                    <Font size="15.0" />
+                                    <Font name="System Bold" size="15.0" />
                                  </font>
                                  <VBox.margin>
                                     <Insets bottom="10.0" />

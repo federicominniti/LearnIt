@@ -1,29 +1,23 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.app;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
+import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.bson.types.ObjectId;
 
 import java.io.IOException;
-import java.util.List;
 
 public class LearnIt extends Application {
-
-    private final static String LOGIN_PAGE = "/fxml/LoginPage.fxml";
 
     @Override
     public void start(Stage primaryStage) throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setLocation(LearnIt.class.getResource(LOGIN_PAGE));
+        loader.setLocation(LearnIt.class.getResource(Utils.LOGIN_PAGE));
         Parent root = loader.load();
 
         Scene scene = new Scene(root);

@@ -33,7 +33,7 @@ public class CourseSnapshotController {
 
     private void showCompleteCourseInfo(MouseEvent mouseEvent){
         CoursePageController coursePageController =
-                (CoursePageController) Utils.changeScene("/fxml/CoursePage.fxml", mouseEvent);
+                (CoursePageController) Utils.changeScene(Utils.COURSE_PAGE, mouseEvent);
         coursePageController.setCourse(referredCourse);
     }
 }

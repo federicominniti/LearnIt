@@ -1,11 +1,11 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
-import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
+import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -31,7 +31,9 @@ public class ProfilePageController {
     @FXML private Label followerNumberLabel;
     @FXML private VBox elementsVBox;
     @FXML private ImageView learnItLabel;
+    @FXML private VBox userInfoVBox;
 
+    private static final String PERSONAL_PAGE = "/fxml/PersonalPage.fxml";
 
     private Neo4jDriver neo4jDriver;
     private User profileUser;
@@ -88,12 +90,19 @@ public class ProfilePageController {
         isProfileMine = loggedUser.getUsername().equals(profileUser.getUsername());
 
         if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
-            followButton.setText("Delete user");
-            followButton.setOnMouseClicked(clickEvent -> deleteUserHandler(profileUser, clickEvent));
+            userInfoVBox.getChildren().remove(followButton);
+            //followButton.setText("Delete user");
+            ImageView trashBin = new ImageView(new Image(
+                    String.valueOf(ProfilePageController.class.getResource(Utils.TRASH_BIN))));
+            trashBin.setPreserveRatio(true);
+            trashBin.setFitWidth(40);
+            trashBin.setFitHeight(40);
+            trashBin.setOnMouseClicked(clickEvent -> deleteUserHandler(profileUser, clickEvent));
+            userInfoVBox.getChildren().add(trashBin);
         }
         else if(isProfileMine){ // personal profile
             followButton.setText("Edit Profile");
-            followButton.setOnMouseClicked(clickEvent -> Utils.changeScene("/fxml/PersonalPage.fxml", clickEvent));
+            followButton.setOnMouseClicked(clickEvent -> Utils.changeScene(PERSONAL_PAGE, clickEvent));
         }
         else{ // another profile
             followButton.setOnMouseClicked(clickEvent -> followHandler(clickEvent));

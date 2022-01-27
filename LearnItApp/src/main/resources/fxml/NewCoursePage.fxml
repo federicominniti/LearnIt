@@ -21,7 +21,7 @@
             <Image url="@../img/learnitLogo.png" />
          </image>
       </ImageView>
-      <Label fx:id="titleLabel" layoutX="344.0" layoutY="102.0" prefHeight="41.0" prefWidth="424.0" style="-fx-font-weight: bold; -fx-alignment: center;" text="Insert new course" textAlignment="CENTER" textFill="#1880e1">
+      <Label fx:id="titleLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="344.0" layoutY="102.0" prefHeight="41.0" prefWidth="424.0" text="Insert new course" textAlignment="CENTER" textFill="#1880e1">
          <font>
             <Font name="Arial Bold Italic" size="34.0" />
          </font>
