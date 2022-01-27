@@ -7,20 +7,15 @@ import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
-import javafx.scene.control.Button;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 public class ReviewSnapshotPageController {
     @FXML private Label courseTitleLabel;
@@ -41,6 +36,7 @@ public class ReviewSnapshotPageController {
         if (Session.getLocalSession().getLoggedUser().getRole() == User.Role.ADMINISTRATOR) {
             deleteImageView.setVisible(true);
             deleteImageView.setOnMouseClicked(clickEvent -> deleteReview(clickEvent));
+            deleteImageView.setCursor(Cursor.HAND);
         }
     }
 

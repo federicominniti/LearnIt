@@ -1,16 +1,16 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -34,8 +34,10 @@ public class PersonalPageController {
 
     public void initialize() {
         loggedUser = Session.getLocalSession().getLoggedUser();
-        learnitImageView.setOnMouseClicked(this::backToHomeButtonHandler);
-        saveButton.setOnMouseClicked(this::saveButtonHandler);
+        learnitImageView.setOnMouseClicked(clickEvent -> backToHomeButtonHandler(clickEvent));
+        learnitImageView.setCursor(Cursor.HAND);
+        saveButton.setOnMouseClicked(clickEvent -> saveButtonHandler(clickEvent));
+        saveButton.setCursor(Cursor.HAND);
 
         usernameLabel.setText(loggedUser.getUsername());
         completeNameTextField.setText(loggedUser.getCompleteName());

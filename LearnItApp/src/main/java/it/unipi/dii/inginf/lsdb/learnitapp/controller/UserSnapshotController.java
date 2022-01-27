@@ -4,6 +4,7 @@ import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -21,6 +22,7 @@ public class UserSnapshotController {
 
     public void initialize(){
         userSnapshot.setOnMouseClicked(mouseEvent -> showCompleteUserInfo(mouseEvent));
+        userSnapshot.setCursor(Cursor.HAND);
     }
 
     public void setSnapshotUser(User user) {

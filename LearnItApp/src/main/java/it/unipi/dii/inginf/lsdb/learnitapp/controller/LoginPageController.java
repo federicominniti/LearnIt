@@ -5,6 +5,7 @@ import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -17,8 +18,10 @@ public class LoginPageController {
     @FXML private Button signUpButton;
 
     public void initialize() {
-        loginButton.setOnMouseClicked(this::loginHandler);
-        signUpButton.setOnMouseClicked(this::signUpHandler);
+        loginButton.setOnMouseClicked(clickEvent -> loginHandler(clickEvent));
+        loginButton.setCursor(Cursor.HAND);
+        signUpButton.setOnMouseClicked(clickEvent -> signUpHandler(clickEvent));
+        signUpButton.setCursor(Cursor.HAND);
     }
 
     public void loginHandler(MouseEvent clickEvent) {

@@ -6,7 +6,11 @@ import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.Cursor;
+import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
@@ -37,9 +41,12 @@ public class NewCoursePageController {
         levelChoiceBox.setItems(FXCollections.observableArrayList(Utils.LEVELS));
 
         backButton.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
+        backButton.setCursor(Cursor.HAND);
         createButton.setOnMouseClicked(clickEvent -> createButtonHandler(clickEvent));
+        createButton.setCursor(Cursor.HAND);
 
         textLogoImageView.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
+        textLogoImageView.setCursor(Cursor.HAND);
     }
 
     private void createButtonHandler(MouseEvent clickEvent){

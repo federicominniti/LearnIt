@@ -5,6 +5,7 @@ import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -52,7 +53,9 @@ public class RegistrationPageController {
         learnitLogoImageView.setImage(new Image(
                 String.valueOf(RegistrationPageController.class.getResource("/img/createAdmin.png"))));
         learnitImageView.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
-        signUpButton.setOnMouseClicked(this::createAdmin);
+        learnitLogoImageView.setCursor(Cursor.HAND);
+        signUpButton.setOnMouseClicked(clickEvent -> createAdmin(clickEvent));
+        signUpButton.setCursor(Cursor.HAND);
 
         signUpButton.setText("Create admin");
         signUpButton.setStyle("-fx-background-color: lightpink;" +
@@ -78,9 +81,12 @@ public class RegistrationPageController {
 
         learnitLogoImageView.setOnMouseClicked(clickEvent ->
                 Utils.changeScene(Utils.LOGIN_PAGE, clickEvent));
+        learnitLogoImageView.setCursor(Cursor.HAND);
         learnitImageView.setOnMouseClicked(clickEvent ->
                 Utils.changeScene(Utils.LOGIN_PAGE, clickEvent));
+        learnitImageView.setCursor(Cursor.HAND);
         signUpButton.setOnMouseClicked(clickEvent -> signUpHandler(clickEvent));
+        signUpButton.setCursor(Cursor.HAND);
     }
 
     public void createAdmin(MouseEvent clickEvent) {

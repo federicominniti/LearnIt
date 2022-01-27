@@ -8,11 +8,11 @@ import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 
 import java.util.List;
@@ -83,6 +83,7 @@ public class ElementsLineController{
             buttonImage.setFitWidth(40);
             buttonImage.setFitWidth(40);
             buttonImage.setOnMouseClicked(clickEvent -> loadMore());
+            buttonImage.setCursor(Cursor.HAND);
         }
     }
 

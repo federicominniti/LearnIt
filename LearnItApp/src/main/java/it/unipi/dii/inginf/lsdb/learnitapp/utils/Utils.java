@@ -63,7 +63,7 @@ public class Utils {
     public final static String[] LEVELS  = {"All Levels", "Beginner", "Expert", "Intermediate"};
 
     public static final String READ_MORE = "/img/readMore.png";
-    public static final String STRAR_ON = "/img/star-on.png";
+    public static final String STAR_ON = "/img/star-on.png";
     public static final String TRASH_BIN = "/img/trash-bin.png";
     public static final String USER_DEFAULT = "/img/userDefault.png";
     public static final String LOGIN_PAGE = "/fxml/LoginPage.fxml";
@@ -252,7 +252,7 @@ public class Utils {
                 break;
             ImageView starImageView = (ImageView)star;
             Image starImage = new Image(
-                    String.valueOf(CoursePageController.class.getResource(Utils.STRAR_ON)));
+                    String.valueOf(CoursePageController.class.getResource(Utils.STAR_ON)));
             starImageView.setImage(starImage);
             ratingHBox.getChildren().set(index, (Node)starImageView);
         }

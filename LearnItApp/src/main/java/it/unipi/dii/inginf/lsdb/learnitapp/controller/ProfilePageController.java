@@ -7,7 +7,9 @@ import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.Cursor;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -45,6 +47,7 @@ public class ProfilePageController {
         neo4jDriver = Neo4jDriver.getInstance();
         limit = ConfigParams.getLocalConfig().getLimitNumber();
         learnItLabel.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
+        learnItLabel.setCursor(Cursor.HAND);
     }
 
     private void loadProfileInformation(){
@@ -98,14 +101,17 @@ public class ProfilePageController {
             trashBin.setFitWidth(40);
             trashBin.setFitHeight(40);
             trashBin.setOnMouseClicked(clickEvent -> deleteUserHandler(profileUser, clickEvent));
+            trashBin.setCursor(Cursor.HAND);
             userInfoVBox.getChildren().add(trashBin);
         }
         else if(isProfileMine){ // personal profile
             followButton.setText("Edit Profile");
             followButton.setOnMouseClicked(clickEvent -> Utils.changeScene(PERSONAL_PAGE, clickEvent));
+            followButton.setCursor(Cursor.HAND);
         }
         else{ // another profile
             followButton.setOnMouseClicked(clickEvent -> followHandler(clickEvent));
+            followButton.setCursor(Cursor.HAND);
         }
 
         loadProfileInformation();

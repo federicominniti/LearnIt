@@ -61,14 +61,18 @@ public class DiscoveryPageController {
 
         fillInterfaceElements();
 
-        usernameLabel.setOnMouseClicked(this::myProfile);
+        usernameLabel.setOnMouseClicked(clickEvent -> myProfile(clickEvent));
+        usernameLabel.setCursor(Cursor.HAND);
         if (loggedUser.getRole() == User.Role.STANDARD) {
-            profilePic.setOnMouseClicked(this::myProfile);
+            profilePic.setOnMouseClicked(clickEvent -> myProfile(clickEvent));
+            profilePic.setCursor(Cursor.HAND);
             initializeSuggestions();
         }
 
-        searchButton.setOnMouseClicked(this::searchHandler);
+        searchButton.setOnMouseClicked(clickEvent -> searchHandler(clickEvent));
+        searchButton.setCursor(Cursor.HAND);
 
+        createNewCourseButton.setCursor(Cursor.HAND);
         if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
             createNewCourseButton.setText("Create new admin");
             createNewCourseButton.setStyle("-fx-background-color: lightpink;" +
@@ -233,6 +237,7 @@ public class DiscoveryPageController {
                     currentJ = (j);
                     more.setOnMouseClicked(newClickEvent -> addMoreResearchedCourses(title, level, language,
                             duration, price));
+                    more.setCursor(Cursor.HAND);
                     GridPane.setHalignment(more, HPos.CENTER);
                     GridPane.setValignment(more, VPos.CENTER);
                     gridPane.add(more, j, i);

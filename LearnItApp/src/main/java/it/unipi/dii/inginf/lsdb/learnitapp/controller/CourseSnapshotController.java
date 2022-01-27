@@ -3,6 +3,7 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -18,6 +19,7 @@ public class CourseSnapshotController {
     private Course referredCourse;
 
     public void initialize(){
+        courseSnapshot.setCursor(Cursor.HAND);
         courseSnapshot.setOnMouseClicked(mouseEvent -> showCompleteCourseInfo(mouseEvent));
     }
 

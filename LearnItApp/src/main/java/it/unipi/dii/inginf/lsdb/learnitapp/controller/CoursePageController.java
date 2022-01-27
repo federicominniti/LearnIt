@@ -12,11 +12,11 @@ import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -76,6 +76,7 @@ public class CoursePageController {
         annualMeanRatingLineChart.getData().add(series);
 
         logoImageView.setOnMouseClicked(clickEvent -> backToHome(clickEvent));
+        logoImageView.setCursor(Cursor.HAND);
     }
 
     public void backToHome(MouseEvent clickEvent){
@@ -86,6 +87,7 @@ public class CoursePageController {
         this.course = mongoDBDriver.getCourseByTitle(snapCourse.getTitle());
 
         moreReviewsImageView.setOnMouseClicked(clickEvent -> loadMore());
+        moreReviewsImageView.setCursor(Cursor.HAND);
 
         User loggedUser = Session.getLocalSession().getLoggedUser();
         if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
@@ -97,10 +99,12 @@ public class CoursePageController {
             profileVBox.getChildren().remove(buttonsHBox);
             profileVBox.getChildren().add(trash);
             trash.setOnMouseClicked(clickEvent -> deleteCourse(clickEvent));
+            trash.setCursor(Cursor.HAND);
             allContentVBox.getChildren().remove(newReviewVBox);
         } else {
             if (course.getInstructor().getUsername().equals(loggedUser.getUsername())) { // own course
                 editCourseButton.setOnMouseClicked(clickEvent -> editCourseButtonHandler());
+                editCourseButton.setCursor(Cursor.HAND);
                 likeCourseButton.setVisible(false);
                 newReviewVBox.setVisible(false);
                 editCourseButton.setText("Edit course");
@@ -113,6 +117,7 @@ public class CoursePageController {
                         commentTextArea.setEditable(false);
                         saveReviewButton.setText("Edit");
                         saveReviewButton.setOnMouseClicked(clickEvent -> saveReviewButtonHandler());
+                        saveReviewButton.setCursor(Cursor.HAND);
 
                         reviewTitleTextField.setText(myReview.getTitle());
                         commentTextArea.setText(myReview.getContent());
@@ -133,12 +138,14 @@ public class CoursePageController {
                 } else { // not reviewed course
                     saveReviewButton.setText("Save");
                     saveReviewButton.setOnMouseClicked(clickEvent2 -> saveReviewButtonHandler());
+                    saveReviewButton.setCursor(Cursor.HAND);
                     commentTextArea.setEditable(true);
                     handleRatingStars(true);
                     editCourseButton.setVisible(false);
                 }
 
                 likeCourseButton.setOnMouseClicked(clickEvent -> likeCourseButtonHandler());
+                likeCourseButton.setCursor(Cursor.HAND);
 
                 if (neo4jDriver.isCourseLikedByUser(course, loggedUser)) {
                     likeCourseButton.setText("Dislike");
@@ -256,7 +263,7 @@ public class CoursePageController {
 
     private int getRatingFromStars(){
         int rating = 0;
-        Image starOn = new Image(String.valueOf(CoursePageController.class.getResource(Utils.STRAR_ON)));
+        Image starOn = new Image(String.valueOf(CoursePageController.class.getResource(Utils.STAR_ON)));
 
         for(Node star: ratingHBox.getChildren()){
             ImageView starImageView = (ImageView)star;
@@ -278,6 +285,7 @@ public class CoursePageController {
                 star.setOnMouseClicked(mouseEvent -> starOnMouseClickedHandler(index));
                 star.setOnMouseEntered(mouseEvent -> starOnMouseOverHandler(star));
                 star.setOnMouseExited(mouseEvent -> starOnMouseExitedHandler());
+                star.setCursor(Cursor.HAND);
             }
         }
         else{ // disabled
