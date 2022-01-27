@@ -232,7 +232,6 @@ public class CoursePageController {
 
             if(myReview==null) { // add review
                 myReview = new Review(reviewTitleTextField.getText(), commentTextArea.getText(), rating, currentTimestamp, author);
-                course.addReview(myReview);
                 //System.out.println("add review \n title: "+ myReview.getTitle() + "\n content: "+ myReview.getContent() +"\n rating: "+ myReview.getRating()+"\n timestamp: "+myReview.getTimestamp().toString());
 
                 if (DBOperations.addReview(myReview, course)) {
