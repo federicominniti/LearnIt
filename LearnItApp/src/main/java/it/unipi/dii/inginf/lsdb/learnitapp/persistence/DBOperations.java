@@ -46,7 +46,7 @@ public class DBOperations {
                 Utils.showErrorAlert("Something has gone wrong");
                 return false;
             } else {
-                Utils.showInfoAlert("Review added successfully");
+                //Utils.showInfoAlert("Review added successfully");
                 return true;
             }
         }

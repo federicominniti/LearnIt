@@ -38,6 +38,8 @@ public class ReviewSnapshotPageController {
             deleteImageView.setOnMouseClicked(clickEvent -> deleteReview(clickEvent));
             deleteImageView.setCursor(Cursor.HAND);
         }
+        else
+            deleteImageView.setVisible(false);
     }
 
     public void deleteReview(MouseEvent clickEvent) {
@@ -54,6 +56,8 @@ public class ReviewSnapshotPageController {
         Utils.fillStars(review.getRating(), ratingHBox);
 
         usernameLabel.setText(review.getAuthor().getUsername());
+        usernameLabel.setOnMouseClicked(clickEvent -> visitAuthorProfile(clickEvent));
+        profilePicImageView.setOnMouseClicked(clickEvent -> visitAuthorProfile(clickEvent));
 
         if(review.getAuthor().getProfilePic() != null){
             Image profilePicture = new Image(review.getAuthor().getProfilePic());
@@ -76,5 +80,11 @@ public class ReviewSnapshotPageController {
 
     public void setCourse(Course course) {
         this.course = course;
+    }
+
+    public void visitAuthorProfile(MouseEvent mouseEvent){
+        User author = review.getAuthor();
+        ProfilePageController profilePageController = (ProfilePageController) Utils.changeScene(Utils.PROFILE_PAGE, mouseEvent);
+        profilePageController.setProfileUser(author);
     }
 }

@@ -19,7 +19,7 @@
             <Image url="@../img/learnitLogoApp.png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="74.0" fitWidth="165.0" layoutX="145.0" layoutY="49.0" preserveRatio="true">
+      <ImageView fx:id="learnItImageView" fitHeight="74.0" fitWidth="165.0" layoutX="145.0" layoutY="49.0" preserveRatio="true">
          <image>
             <Image url="@../img/learnitLogo.png" />
          </image>
@@ -39,7 +39,7 @@
             <Font size="15.0" />
          </font>
       </RadioButton>
-      <Button fx:id="searchButton" layoutX="783.0" layoutY="38.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="69.0" style="-fx-background-radius: 13; -fx-background-color: lightblue;" text="Search!" textFill="#006aff">
+      <Button fx:id="searchButton" layoutX="783.0" layoutY="38.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="88.0" style="-fx-background-radius: 13; -fx-background-color: lightblue;" text="Search!" textFill="#006aff">
          <font>
             <Font size="15.0" />
          </font>
@@ -68,7 +68,12 @@
             <VBox fx:id="elementsVBox" prefHeight="471.0" prefWidth="1042.0" style="-fx-background-color: white;" />
          </content>
       </ScrollPane>
-      <Button fx:id="createNewCourseButton" layoutX="930.0" layoutY="89.0" mnemonicParsing="false" style="-fx-background-radius: 13; -fx-background-color: lightgreen;" text="Create New Course">
+      <Button fx:id="createNewCourseButton" layoutX="766.0" layoutY="86.0" mnemonicParsing="false" style="-fx-background-radius: 13; -fx-background-color: lightgreen;" text="Create Course">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Button>
+      <Button fx:id="logoutButton" layoutX="991.0" layoutY="81.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="88.0" style="-fx-background-radius: 13; -fx-background-color: lightblue;" text="Logout" textFill="#006aff">
          <font>
             <Font size="15.0" />
          </font>

@@ -56,6 +56,7 @@ public class CoursePageController {
     @FXML private VBox profileVBox;
     @FXML LineChart<String, Number> annualMeanRatingLineChart;
     @FXML private Label lastModifiedLabel;
+    @FXML private ImageView deleteImageView;
     private XYChart.Series series;
 
 
@@ -77,6 +78,7 @@ public class CoursePageController {
 
         logoImageView.setOnMouseClicked(clickEvent -> backToHome(clickEvent));
         logoImageView.setCursor(Cursor.HAND);
+        deleteImageView.setCursor(Cursor.HAND);
     }
 
     public void backToHome(MouseEvent clickEvent){
@@ -119,6 +121,7 @@ public class CoursePageController {
                         saveReviewButton.setOnMouseClicked(clickEvent -> saveReviewButtonHandler());
                         saveReviewButton.setCursor(Cursor.HAND);
 
+                        deleteImageView.setOnMouseClicked(clickEvent -> deleteButtonHandler());
                         reviewTitleTextField.setText(myReview.getTitle());
                         commentTextArea.setText(myReview.getContent());
                         lastModifiedLabel.setText("Last-modified: "+myReview.getTimestamp());
@@ -142,6 +145,7 @@ public class CoursePageController {
                     commentTextArea.setEditable(true);
                     handleRatingStars(true);
                     editCourseButton.setVisible(false);
+                    deleteImageView.setVisible(false);
                 }
 
                 likeCourseButton.setOnMouseClicked(clickEvent -> likeCourseButtonHandler());
@@ -159,11 +163,26 @@ public class CoursePageController {
         loadMore();
     }
 
+    public void deleteButtonHandler(){
+        DBOperations.deleteReview(myReview, course);
+        saveReviewButton.setText("save");
+        myReview = null;
+        reviewTitleTextField.setEditable(true);
+        commentTextArea.setEditable(true);
+        reviewTitleTextField.setText("");
+        commentTextArea.setText("");
+        Utils.fillStars(1, ratingHBox);
+        handleRatingStars(true);
+        deleteImageView.setVisible(false);
+    }
+
     private void loadMore(){
         int skip = pageNumber*limit;
         pageNumber++;
 
         int toIndex = skip + limit;
+        if(course.getReviews()==null)
+           return; // ricontrollare ???
         if (toIndex >= course.getReviews().size()) {
             toIndex = course.getReviews().size();
         }
@@ -224,6 +243,7 @@ public class CoursePageController {
                 } else {
                     Utils.showErrorAlert("Error in adding the review");
                 }
+                deleteImageView.setVisible(true);
             }
             else{ // edit review
 

@@ -36,6 +36,8 @@ public class DiscoveryPageController {
     @FXML private ImageView profilePic;
     @FXML private VBox elementsVBox;
     @FXML private Button createNewCourseButton;
+    @FXML private ImageView learnItImageView;
+    @FXML private Button logoutButton;
 
     private ToggleGroup searchType;
     private Neo4jDriver neo4jDriver;
@@ -47,7 +49,7 @@ public class DiscoveryPageController {
 
     private User loggedUser = Session.getLocalSession().getLoggedUser();
 
-    private final static String CREATE_NEW_COUSE_PAGE = "/fxml/newCoursePage.fxml";
+    private final static String CREATE_NEW_COURSE_PAGE = "/fxml/NewCoursePage.fxml";
 
     public void initialize() {
         neo4jDriver = Neo4jDriver.getInstance();
@@ -61,6 +63,8 @@ public class DiscoveryPageController {
 
         fillInterfaceElements();
 
+        logoutButton.setOnMouseClicked(clickEvent -> Utils.logout(clickEvent));
+        learnItImageView.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
         usernameLabel.setOnMouseClicked(clickEvent -> myProfile(clickEvent));
         usernameLabel.setCursor(Cursor.HAND);
         if (loggedUser.getRole() == User.Role.STANDARD) {
@@ -81,7 +85,7 @@ public class DiscoveryPageController {
             return;
         }
 
-        createNewCourseButton.setOnMouseClicked(clickEvent -> Utils.changeScene(CREATE_NEW_COUSE_PAGE, clickEvent));
+        createNewCourseButton.setOnMouseClicked(clickEvent -> Utils.changeScene(CREATE_NEW_COURSE_PAGE, clickEvent));
 
         searchType.selectedToggleProperty().addListener(
                 (observable, oldToggle, newToggle) -> {

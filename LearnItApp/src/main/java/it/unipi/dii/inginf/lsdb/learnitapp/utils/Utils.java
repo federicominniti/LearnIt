@@ -18,6 +18,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -265,5 +266,10 @@ public class Utils {
             starImageView.setImage(starImage);
             ratingHBox.getChildren().set(index, (Node)starImageView);
         }
+    }
+
+    public static void  logout(MouseEvent clickEvent){
+
+        changeScene(LOGIN_PAGE, clickEvent);
     }
 }
