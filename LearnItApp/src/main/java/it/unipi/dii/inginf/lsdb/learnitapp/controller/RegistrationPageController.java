@@ -93,9 +93,15 @@ public class RegistrationPageController {
         if (validateUsernameAndPassword())
             return;
 
+        if (usernameTextField.getText().length() < 5) {
+            Utils.showErrorAlert("Username too short, try another username");
+            return;
+        }
+
         boolean ret = Neo4jDriver.getInstance().registerUser(usernameTextField.getText(), "", "", "", "", passwordPasswordField.getText(), "", true);
         if (ret) {
             Utils.showInfoAlert("Admin registered with success");
+            Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
         } else {
             Utils.showInfoAlert("Error, registration failed");
         }

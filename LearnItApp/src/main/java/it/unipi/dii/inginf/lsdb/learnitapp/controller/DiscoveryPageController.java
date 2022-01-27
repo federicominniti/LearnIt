@@ -223,7 +223,7 @@ public class DiscoveryPageController {
             else
                 j = 0;
             for(; j<4; j++) {
-                System.out.println("i"+i+"j"+j);
+                //System.out.println("i"+i+"j"+j);
                 if(((i-currentI)*4+j) < searchedCourses.size() && searchedCourses.get((i-currentI)*4 + j) != null) {
                     Pane coursePane = Utils.loadCourseSnapshot(searchedCourses.get((i-currentI)*4 + j));
                     GridPane.setHalignment(coursePane, HPos.CENTER);
@@ -245,7 +245,7 @@ public class DiscoveryPageController {
                     GridPane.setHalignment(more, HPos.CENTER);
                     GridPane.setValignment(more, VPos.CENTER);
                     gridPane.add(more, j, i);
-                    System.out.println("-------i"+currentJ+"j"+currentJ);
+                    //System.out.println("-------i"+currentJ+"j"+currentJ);
                     return;
                 }
             }

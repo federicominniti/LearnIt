@@ -325,7 +325,7 @@ public class MongoDBDriver implements DBDriver {
     public boolean deleteUserReviews(User user){
 
         if(deleteUserReviewsRedundancies(user)){
-            System.out.println("qui");
+            //System.out.println("qui");
             Bson pullFilter = Updates.pull("reviews", Filters.eq("author.username", user.getUsername()));
             return collection.updateMany(new Document(), pullFilter).wasAcknowledged();
         }

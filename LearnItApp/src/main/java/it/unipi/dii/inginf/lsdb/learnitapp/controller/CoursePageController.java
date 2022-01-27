@@ -126,7 +126,6 @@ public class CoursePageController {
                         commentTextArea.setText(myReview.getContent());
                         lastModifiedLabel.setText("Last-modified: "+myReview.getTimestamp());
                         editCourseButton.setVisible(false);
-                        System.out.println("rating loaded: "+myReview.getRating());
                         Utils.fillStars(myReview.getRating(), ratingHBox);
                         handleRatingStars(false);
                     } else { //too longer documents
@@ -227,7 +226,6 @@ public class CoursePageController {
     public void saveReviewButtonHandler(){
         if(saveReviewButton.getText().equals("Save")) { // save operation
             int rating = getRatingFromStars();
-            System.out.println("rating received: "+rating);
             User loggedUser = Session.getLocalSession().getLoggedUser();
             User author = new User(loggedUser.getUsername(), loggedUser.getCompleteName());
             Date currentTimestamp = new Date();
@@ -247,7 +245,6 @@ public class CoursePageController {
             }
             else{ // edit review
 
-                System.out.println("here, i'm editing a review");
                 myReview.setContent(commentTextArea.getText());
                 myReview.setTitle(reviewTitleTextField.getText());
                 myReview.setRating(rating);
@@ -291,8 +288,6 @@ public class CoursePageController {
                 rating++;
 
         }
-
-        System.out.println("rating saved: "+rating);
         return rating;
     }
 
@@ -328,7 +323,6 @@ public class CoursePageController {
 
     private void starOnMouseClickedHandler(int index){
         Utils.fillStars(index + 1, ratingHBox);
-        System.out.println("click on star "+index);
         for(Node star: ratingHBox.getChildren()) {
             int s = ratingHBox.getChildren().indexOf(star);
             if(s<=index){

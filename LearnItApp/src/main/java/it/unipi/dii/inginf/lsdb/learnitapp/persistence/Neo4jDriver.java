@@ -353,13 +353,10 @@ public class Neo4jDriver implements DBDriver {
 
                 User user = null;
                 try {
-                    System.out.println("qui");
                     Record rec = r.next();
-                    System.out.println("qui");
                     System.out.println(rec.get("role").asInt());
                     System.out.println(User.Role.ADMINISTRATOR.ordinal());
                     if (rec.get("role").asInt() == User.Role.ADMINISTRATOR.ordinal()) {
-                        System.out.println("qui");
                         user = new User(username, User.Role.ADMINISTRATOR);
                     } else {
                         String complete_name = rec.get("complete_name").asString();
@@ -375,7 +372,7 @@ public class Neo4jDriver implements DBDriver {
                             gender = rec.get("gender").asString();
                         if (rec.get("picture") != NULL) {
                             profile_pic = rec.get("picture").asString();
-                            System.out.println(profile_pic);
+                            //System.out.println(profile_pic);
                         }
 
                         user = new User(username, password, complete_name, date_of_birth, gender, email, role, profile_pic);
@@ -555,7 +552,7 @@ public class Neo4jDriver implements DBDriver {
                         parameters( "username", loggedUser.getUsername(), "skip", skip, "limit", limit));
                 while(result.hasNext()){
                     Record record = result.next();
-                    System.out.println(record.get("username").asString());
+                    //System.out.println(record.get("username").asString());
                     User u = new User(record.get("username").asString(), record.get("complete_name").asString());
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
                     try {
