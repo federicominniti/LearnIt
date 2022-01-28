@@ -30,7 +30,7 @@ public class Course2 {
     @BsonProperty(value = "modality")
     private String modality;
     @BsonProperty(value = "reviews")
-    private List<Review> reviews;
+    private List<Review2> reviews;
     @BsonProperty(value="num_reviews")
     private int num_reviews;
     @BsonProperty(value="sum_ratings")
@@ -132,11 +132,11 @@ public class Course2 {
         this.modality = modality;
     }
 
-    public List<Review> getReviews() {
+    public List<Review2> getReviews() {
         return reviews;
     }
 
-    public void setReviews(List<Review> reviews) {
+    public void setReviews(List<Review2> reviews) {
         this.reviews = reviews;
     }
 
