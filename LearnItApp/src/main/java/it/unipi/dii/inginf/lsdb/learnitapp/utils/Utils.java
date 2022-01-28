@@ -270,10 +270,7 @@ public class Utils {
     }
 
     public static void  logout(MouseEvent clickEvent){
-        //System.out.println("Destroy session: "+ Session.getLocalSession().toString());
         Session.destroySession();
-        //System.out.println("Destroy session: "+ Session.getLocalSession().getLoggedUser().getUsername());
-        //System.out.println("Destroy session: "+ Session.getLocalSession().toString());
         changeScene(LOGIN_PAGE, clickEvent);
 
     }

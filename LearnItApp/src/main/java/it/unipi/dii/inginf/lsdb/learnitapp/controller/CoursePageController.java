@@ -105,11 +105,20 @@ public class CoursePageController {
             allContentVBox.getChildren().remove(newReviewVBox);
         } else {
             if (course.getInstructor().getUsername().equals(loggedUser.getUsername())) { // own course
+                ImageView trash = new ImageView(new Image(
+                        String.valueOf(CoursePageController.class.getResource(Utils.TRASH_BIN))));
+                trash.setPreserveRatio(true);
+                trash.setFitWidth(40);
+                trash.setFitHeight(40);
                 editCourseButton.setOnMouseClicked(clickEvent -> editCourseButtonHandler());
                 editCourseButton.setCursor(Cursor.HAND);
                 likeCourseButton.setVisible(false);
                 newReviewVBox.setVisible(false);
                 editCourseButton.setText("Edit course");
+
+                profileVBox.getChildren().add(trash);
+                trash.setOnMouseClicked(clickEvent -> deleteCourse(clickEvent));
+                trash.setCursor(Cursor.HAND);
             } else { // course not owned
                 if (neo4jDriver.isCourseReviewedByUser(course, loggedUser)) { // logged user has already written a review of the course
                     myReview = mongoDBDriver.getCourseReviewByUser(course, loggedUser);
