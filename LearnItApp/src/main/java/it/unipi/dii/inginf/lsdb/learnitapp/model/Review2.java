@@ -4,7 +4,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import java.util.Date;
 
-public class Review {
+public class Review2 {
     @BsonProperty(value = "title")
     private String title;
     @BsonProperty(value = "content")
@@ -13,10 +13,19 @@ public class Review {
     private int rating;
     @BsonProperty(value = "edited_timestamp")
     private Date timestamp;
-    @BsonProperty(value = "author")
-    private User author;
 
-    public Review() {
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    @BsonProperty(value = "username")
+    private String username;
+
+    public Review2() {
 
     }
 
@@ -50,13 +59,5 @@ public class Review {
 
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
-    }
-
-    public User getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
     }
 }
