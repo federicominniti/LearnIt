@@ -24,7 +24,7 @@
                   <Image url="@../img/learnitLogo.png" />
                </image>
             </ImageView>
-            <BorderPane layoutX="81.0" layoutY="104.0" style="-fx-background-color: f1f8f6;">
+            <BorderPane fx:id="profileContentBorderPane" layoutX="81.0" layoutY="104.0" style="-fx-background-color: f1f8f6;">
                <center>
                   <HBox />
                </center>
@@ -48,7 +48,7 @@
                   </VBox>
                </top>
                <left>
-                  <BorderPane prefHeight="235.0" prefWidth="322.0" BorderPane.alignment="CENTER">
+                  <BorderPane fx:id="userBorderPane" prefHeight="235.0" prefWidth="322.0" BorderPane.alignment="CENTER">
                      <left>
                         <VBox alignment="CENTER" BorderPane.alignment="CENTER">
                            <children>
@@ -130,7 +130,7 @@
                   </BorderPane>
                </left>
                <right>
-                  <VBox alignment="CENTER" prefHeight="89.0" prefWidth="449.0" BorderPane.alignment="CENTER">
+                  <VBox fx:id="statisticsVBox" alignment="CENTER" prefHeight="89.0" prefWidth="449.0" BorderPane.alignment="CENTER">
                      <children>
                         <Label alignment="CENTER" prefHeight="24.0" prefWidth="477.0" text="Statistics about completed courses" textFill="#1880e1">
                            <font>

@@ -124,7 +124,7 @@ public class CoursePageController {
                         deleteImageView.setOnMouseClicked(clickEvent -> deleteButtonHandler());
                         reviewTitleTextField.setText(myReview.getTitle());
                         commentTextArea.setText(myReview.getContent());
-                        lastModifiedLabel.setText("Last-modified: "+myReview.getTimestamp());
+                        lastModifiedLabel.setText("Last-modified: "+ myReview.getTimestamp());
                         editCourseButton.setVisible(false);
                         Utils.fillStars(myReview.getRating(), ratingHBox);
                         handleRatingStars(false);
@@ -136,6 +136,9 @@ public class CoursePageController {
                         commentTextArea.setText("Don't worry, we take in consideration your opinion :)");
                         commentTextArea.setDisable(true);
                         ratingHBox.setVisible(false);
+
+                        deleteImageView.setVisible(false);
+                        newReviewVBox.getChildren().remove(deleteImageView);
                     }
                 } else { // not reviewed course
                     saveReviewButton.setText("Save");
@@ -164,12 +167,13 @@ public class CoursePageController {
 
     public void deleteButtonHandler(){
         DBOperations.deleteReview(myReview, course);
-        saveReviewButton.setText("save");
+        saveReviewButton.setText("Save");
         myReview = null;
         reviewTitleTextField.setEditable(true);
         commentTextArea.setEditable(true);
         reviewTitleTextField.setText("");
         commentTextArea.setText("");
+        System.out.println("BELLAAAAA");
         Utils.fillStars(1, ratingHBox);
         handleRatingStars(true);
         deleteImageView.setVisible(false);
@@ -180,7 +184,7 @@ public class CoursePageController {
         pageNumber++;
 
         int toIndex = skip + limit;
-        if(course.getReviews()==null)
+        if(course.getReviews() == null)
            return; // ricontrollare ???
         if (toIndex >= course.getReviews().size()) {
             toIndex = course.getReviews().size();
@@ -190,7 +194,20 @@ public class CoursePageController {
             return;
 
         List<Review> toAdd = course.getReviews().subList(skip, toIndex);
-        createReviewsElements(toAdd, reviewsVBox);
+        if(myReview != null) {
+            int i;
+            boolean found = false;
+            for (i = 0; i < toAdd.size(); i++) {
+                if (toAdd.get(i).getAuthor().getUsername().equals(Session.getLocalSession().getLoggedUser().getUsername())) {
+                    found = true;
+                    break;
+                }
+            }
+            if(found)
+                toAdd.remove(i);
+        }
+        if(toAdd.size() != 0)
+            createReviewsElements(toAdd, reviewsVBox);
     }
 
     public void deleteCourse(MouseEvent clickEvent) {
@@ -230,8 +247,11 @@ public class CoursePageController {
             User author = new User(loggedUser.getUsername(), loggedUser.getCompleteName());
             Date currentTimestamp = new Date();
 
+            String comment = commentTextArea.getText().equals("") ? null : commentTextArea.getText();
+            String title = reviewTitleTextField.getText().equals("") ? null : reviewTitleTextField.getText();
+
             if(myReview==null) { // add review
-                myReview = new Review(reviewTitleTextField.getText(), commentTextArea.getText(), rating, currentTimestamp, author);
+                myReview = new Review(title, comment, rating, currentTimestamp, author);
                 //System.out.println("add review \n title: "+ myReview.getTitle() + "\n content: "+ myReview.getContent() +"\n rating: "+ myReview.getRating()+"\n timestamp: "+myReview.getTimestamp().toString());
 
                 if (DBOperations.addReview(myReview, course)) {
@@ -244,8 +264,8 @@ public class CoursePageController {
             }
             else{ // edit review
 
-                myReview.setContent(commentTextArea.getText());
-                myReview.setTitle(reviewTitleTextField.getText());
+                myReview.setContent(comment);
+                myReview.setTitle(title);
                 myReview.setRating(rating);
                 myReview.setTimestamp(currentTimestamp);
 
@@ -258,10 +278,10 @@ public class CoursePageController {
                     Utils.showErrorAlert("Error in editing the review");
                 }
             }
-            lastModifiedLabel.setText("Last-modified: "+myReview.getTimestamp());
+            lastModifiedLabel.setText("Last-modified: " + myReview.getTimestamp());
             reviewTitleTextField.setEditable(false);
             commentTextArea.setEditable(false);
-
+            deleteImageView.setOnMouseClicked(clickEvent -> deleteButtonHandler());
             handleRatingStars(false);
 
             saveReviewButton.setText("Edit");

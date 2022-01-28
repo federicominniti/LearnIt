@@ -9,7 +9,6 @@ import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -21,7 +20,7 @@ public class ReviewSnapshotPageController {
     @FXML private Label courseTitleLabel;
     @FXML private ImageView profilePicImageView;
     @FXML private Label usernameLabel;
-    @FXML private TextArea commentTextArea;
+    @FXML private Label reviewContentLabel;
     @FXML private HBox ratingHBox;
     @FXML private Label lastModifiedLabel;
     @FXML private BorderPane thisBorderPane;
@@ -65,9 +64,9 @@ public class ReviewSnapshotPageController {
         }
 
         if(review.getContent() != null)
-            commentTextArea.setText(review.getContent());
+            reviewContentLabel.setText(review.getContent());
         else
-            commentTextArea.setText("");
+            reviewContentLabel.setText("");
 
         lastModifiedLabel.setText("Last-modified: "+review.getTimestamp().toString());
     }

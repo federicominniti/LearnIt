@@ -7,14 +7,20 @@ import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.Cursor;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
+import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
@@ -34,6 +40,9 @@ public class ProfilePageController {
     @FXML private VBox elementsVBox;
     @FXML private ImageView learnItLabel;
     @FXML private VBox userInfoVBox;
+    @FXML private BorderPane profileContentBorderPane;
+    @FXML private BorderPane userBorderPane;
+    @FXML private VBox statisticsVBox;
 
     private static final String PERSONAL_PAGE = "/fxml/PersonalPage.fxml";
 
@@ -93,16 +102,62 @@ public class ProfilePageController {
         isProfileMine = loggedUser.getUsername().equals(profileUser.getUsername());
 
         if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
-            userInfoVBox.getChildren().remove(followButton);
+            profileContentBorderPane.getChildren().remove(statisticsVBox);
+            profileContentBorderPane.getChildren().remove(userBorderPane);
+            profileContentBorderPane.setPrefWidth(923);
+            profileContentBorderPane.setPrefHeight(326);
+
+            ImageView adminImage = new ImageView(
+                    String.valueOf(PersonalPageController.class.getResource("/img/createAdmin.png")));
+            adminImage.setPreserveRatio(true);
+            adminImage.setFitHeight(100);
+            adminImage.setFitHeight(100);
+            profileContentBorderPane.setLeft(adminImage);
+            BorderPane.setAlignment(adminImage, Pos.CENTER);
+
+            VBox passwordVBox = new VBox();
+            passwordVBox.setAlignment(Pos.CENTER);
+            passwordVBox.setSpacing(20);
+
+            GridPane modifyPasswordGridPane = new GridPane();
+            modifyPasswordGridPane.setAlignment(Pos.CENTER);
+            modifyPasswordGridPane.setHgap(15);
+            modifyPasswordGridPane.setVgap(15);
+            passwordVBox.getChildren().add(modifyPasswordGridPane);
+
+            Label oldPasswordLabel = new Label("Old password:");
+            PasswordField oldPasswordField = new PasswordField();
+            Label newPasswordLabel = new Label("New password:");
+            TextField newPasswordTextField = new TextField();
+            Label repeatPasswordLabel = new Label("Repeat password:");
+            TextField repeatPasswordTextField = new TextField();
+
+            modifyPasswordGridPane.add(oldPasswordLabel, 0, 0);
+            modifyPasswordGridPane.add(oldPasswordField, 1, 0);
+            modifyPasswordGridPane.add(newPasswordLabel, 0, 1);
+            modifyPasswordGridPane.add(newPasswordTextField, 1, 1);
+            modifyPasswordGridPane.add(repeatPasswordLabel, 0, 2);
+            modifyPasswordGridPane.add(repeatPasswordTextField, 1, 2);
+
+            Button modifyButton = new Button("Modify");
+            modifyButton.setStyle("-fx-background-color: lightpink;" +
+                    "-fx-background-radius: 13px");
+
+            modifyButton.setOnMouseClicked(clickEvent -> modifyAdminPasswordHandler(oldPasswordField,
+                    newPasswordTextField, repeatPasswordTextField));
+            passwordVBox.getChildren().add(modifyButton);
+            profileContentBorderPane.setRight(passwordVBox);
+            BorderPane.setAlignment(passwordVBox, Pos.CENTER);
+            //userInfoVBox.getChildren().remove(followButton);
             //followButton.setText("Delete user");
-            ImageView trashBin = new ImageView(new Image(
-                    String.valueOf(ProfilePageController.class.getResource(Utils.TRASH_BIN))));
-            trashBin.setPreserveRatio(true);
-            trashBin.setFitWidth(40);
-            trashBin.setFitHeight(40);
-            trashBin.setOnMouseClicked(clickEvent -> deleteUserHandler(profileUser, clickEvent));
-            trashBin.setCursor(Cursor.HAND);
-            userInfoVBox.getChildren().add(trashBin);
+            //ImageView trashBin = new ImageView(new Image(
+            //        String.valueOf(ProfilePageController.class.getResource(Utils.TRASH_BIN))));
+            //trashBin.setPreserveRatio(true);
+            //trashBin.setFitWidth(40);
+            //trashBin.setFitHeight(40);
+            //trashBin.setOnMouseClicked(clickEvent -> deleteUserHandler(profileUser, clickEvent));
+            //trashBin.setCursor(Cursor.HAND);
+            //userInfoVBox.getChildren().add(trashBin);
         }
         else if(isProfileMine){ // personal profile
             followButton.setText("Edit Profile");
@@ -117,6 +172,25 @@ public class ProfilePageController {
         loadProfileInformation();
         loadStatistics();
         loadSocialLists();
+    }
+
+    public void modifyAdminPasswordHandler(PasswordField oldPasswordField, TextField newPasswordTextField,
+                                           TextField repeatPasswordTextField){
+
+        String oldPassword = oldPasswordField.getText();
+        String newPassword = newPasswordTextField.getText();
+        String repeatPassword = repeatPasswordTextField.getText();
+
+        //if(! QUERY MONGO PER VERIFICA OLD PASSWORD CORRETTA)
+            //Utils.showErrorAlert("Old password is wrong!!");
+
+        if(newPassword.equals(repeatPassword))
+            //QUERY DI MODIFICA PASSWORD UTENTE
+            Utils.showInfoAlert("Password modified!");
+
+        oldPasswordField.setText("");
+        newPasswordTextField.setText("");
+        repeatPasswordTextField.setText("");
     }
 
     public void deleteUserHandler(User profileUser, MouseEvent clickEvent) {

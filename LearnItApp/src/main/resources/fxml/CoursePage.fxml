@@ -238,13 +238,6 @@
                            </left>
                         </BorderPane>
                         <BorderPane prefHeight="200.0" prefWidth="200.0">
-                           <center>
-                              <TextArea fx:id="commentTextArea" editable="false" prefHeight="69.0" prefWidth="454.0" promptText="Review main content" BorderPane.alignment="CENTER">
-                                 <font>
-                                    <Font size="15.0" />
-                                 </font>
-                              </TextArea>
-                           </center>
                            <right>
                               <ImageView fx:id="deleteImageView" fitHeight="31.0" fitWidth="33.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER">
                                  <image>
@@ -252,6 +245,13 @@
                                  </image>
                               </ImageView>
                            </right>
+                           <left>
+                              <TextArea fx:id="commentTextArea" editable="false" prefHeight="46.0" prefWidth="852.0" promptText="Review main content" BorderPane.alignment="CENTER">
+                                 <font>
+                                    <Font size="15.0" />
+                                 </font>
+                              </TextArea>
+                           </left>
                         </BorderPane>
                         <Label fx:id="lastModifiedLabel" />
                         <Button fx:id="saveReviewButton" mnemonicParsing="false" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #1880e1; -fx-background-radius: 13;" text="Save" textFill="WHITE">
