@@ -3,6 +3,7 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -109,20 +110,35 @@ public class NewCoursePageController {
         if (!categoriesTextArea.getText().equals(""))
             newCourse.setCategory(categoryList);
 
-        if(DBOperations.addCourse(newCourse))
-            Utils.showInfoAlert("Course added!");
-        Utils.changeScene(Utils.COURSE_PAGE, clickEvent);
+        if(DBOperations.addCourse(newCourse)){
+            Utils.showInfoAlert("Course added successfully!");
+            CoursePageController coursePageController = (CoursePageController) Utils.changeScene(Utils.COURSE_PAGE, clickEvent);
+            coursePageController.setCourse(newCourse);
+        }
+        else
+            Utils.showErrorAlert("Error in adding course");
+
     }
 
     public boolean validateNonOptionalFields() {
-        if (languageChoiceBox.getValue() == null ||
-                levelChoiceBox.getValue() == null ||
-                descriptionTextArea.getText().length() < MIN_DESCRIPTION_LEN ||
-                titleTextField.getText().length() < MIN_TITLE_LEN) {
-            Utils.showErrorAlert("Please fill all non-optional fields");
+        if(descriptionTextArea.getText().length() < MIN_DESCRIPTION_LEN){
+            Utils.showErrorAlert("Too short description");
             return false;
         }
 
+        if(titleTextField.getText().length() < MIN_TITLE_LEN){
+            Utils.showErrorAlert("Too short course title");
+            return false;
+        }
+
+        if(languageChoiceBox.getValue() == null){
+            Utils.showErrorAlert("Please insert a language");
+            return false;
+        }
+        if (levelChoiceBox.getValue() == null) {
+            Utils.showErrorAlert("Please insert a course level");
+            return false;
+        }
         return true;
     }
 }

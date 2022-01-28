@@ -72,10 +72,10 @@ public class DBOperations {
         if (mongoDBDriver.addCourse(course)) {
             if (!neo4jDriver.addCourse(course)) {
                 mongoDBDriver.deleteCourse(course);
-                Utils.showErrorAlert("Something has gone wrong");
+                //Utils.showErrorAlert("Something has gone wrong");
                 return false;
             } else {
-                Utils.showInfoAlert("Course added successfully");
+               // Utils.showInfoAlert("Course added successfully");
                 return true;
             }
         }
