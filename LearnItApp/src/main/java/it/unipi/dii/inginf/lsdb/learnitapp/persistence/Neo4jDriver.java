@@ -274,9 +274,9 @@ public class Neo4jDriver implements DBDriver {
         try (Session session = neo4jDriver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH (c:Course {title: $title}) " +
-                                "SET c = {title: $title, duration: $newduration, price: $newprice}",
+                                "SET c = {title: $title, duration: $newduration, price: $newprice, course_pic: $pic}",
                         parameters("title", course.getTitle(), "newduration", course.getDuration(),
-                                "newprice", course.getPrice()));
+                                "newprice", course.getPrice(), "pic", course.getCoursePic()));
                 return null;
             });
 

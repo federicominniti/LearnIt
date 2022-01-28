@@ -82,9 +82,9 @@ public class PersonalPageController {
         ret = editProfileInfo(birthDate);
 
         if (ret) {
-            Utils.showInfoAlert("Success");
+            Utils.showInfoAlert("Your personal information was updated with success!");
         } else {
-            Utils.showInfoAlert("Something has gone wrong");
+            Utils.showInfoAlert("Something has gone wrong in updating your personal information");
         }
     }
 

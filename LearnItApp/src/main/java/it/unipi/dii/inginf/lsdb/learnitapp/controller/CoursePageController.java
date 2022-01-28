@@ -166,17 +166,17 @@ public class CoursePageController {
     }
 
     public void deleteButtonHandler(){
-        DBOperations.deleteReview(myReview, course);
-        saveReviewButton.setText("Save");
-        myReview = null;
-        reviewTitleTextField.setEditable(true);
-        commentTextArea.setEditable(true);
-        reviewTitleTextField.setText("");
-        commentTextArea.setText("");
-        System.out.println("BELLAAAAA");
-        Utils.fillStars(1, ratingHBox);
-        handleRatingStars(true);
-        deleteImageView.setVisible(false);
+        if(DBOperations.deleteReview(myReview, course)){
+            saveReviewButton.setText("Save");
+            myReview = null;
+            reviewTitleTextField.setEditable(true);
+            commentTextArea.setEditable(true);
+            reviewTitleTextField.setText("");
+            commentTextArea.setText("");
+            Utils.fillStars(1, ratingHBox);
+            handleRatingStars(true);
+            deleteImageView.setVisible(false);
+        }
     }
 
     private void loadMore(){
@@ -420,6 +420,7 @@ public class CoursePageController {
     }
 
     public void editCourseButtonHandler(){
+        System.out.println("sono qui");
         String categoriesString = categoryTextField.getText();
         List<String> categoryList = null;
         if (categoriesString.contains(",")){
@@ -467,9 +468,9 @@ public class CoursePageController {
         }
 
         //null values are not added to the db
-        coursePic = (coursePic.equals("")) ? null : coursePic;
-        modality = (modality.equals("")) ? null : modality;
-        link = (link.equals("")) ? null : link;
+        coursePic = (coursePic == null || coursePic.equals("")) ? null : coursePic;
+        modality = (modality == null || modality.equals("")) ? null : modality;
+        link = (link == null || link.equals("")) ? null : link;
 
         Course newCourse;
         if(categoryTextField.getText().equals("")) {
@@ -482,6 +483,7 @@ public class CoursePageController {
 
         newCourse.setId(course.getId());
         course = newCourse;
+
         if(DBOperations.updateCourse(newCourse))
             Utils.showInfoAlert("Course's information updated with success!");
         else

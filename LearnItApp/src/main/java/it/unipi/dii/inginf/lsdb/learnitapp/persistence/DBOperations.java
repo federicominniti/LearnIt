@@ -14,10 +14,10 @@ public class DBOperations {
         if (mongoDBDriver.updateCourse(course)) {
             if (!neo4jDriver.updateCourse(course)) {
                 mongoDBDriver.updateCourse(oldCourse);
-                Utils.showErrorAlert("Something has gone wrong");
+                //Utils.showErrorAlert("Something has gone wrong");
                 return false;
             } else {
-                Utils.showInfoAlert("Course updated successfully");
+                //Utils.showInfoAlert("Course updated successfully");
                 return true;
             }
         }
@@ -43,7 +43,7 @@ public class DBOperations {
         if (mongoDBDriver.addReviewRedundancies(course, newReview)) {
             if (!neo4jDriver.addReview(course, newReview.getAuthor())) {
                 mongoDBDriver.deleteReview(course, newReview);
-                Utils.showErrorAlert("Something has gone wrong");
+                Utils.showErrorAlert("Something has gone wrong in adding your review");
                 return false;
             } else {
                 //Utils.showInfoAlert("Review added successfully");
@@ -57,10 +57,10 @@ public class DBOperations {
         if (mongoDBDriver.deleteReview(course, review)) {
             if (!neo4jDriver.deleteReview(course, review.getAuthor())) {
                 mongoDBDriver.addReview(course, review);
-                Utils.showErrorAlert("Something has gone wrong");
+                Utils.showErrorAlert("Something has gone wrong in deleting your review");
                 return false;
             } else {
-                Utils.showInfoAlert("Review deleted");
+                Utils.showInfoAlert("Review deleted correctly");
                 return true;
             }
         }

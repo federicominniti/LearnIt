@@ -25,8 +25,10 @@ public class CourseSnapshotController {
 
     public void setSnapshotCourse(Course course) {
         titleLabel.setText(course.getTitle());
-        if(course.getCoursePic() != null)
+        if(course.getCoursePic() != null){
             coursePicImage = new ImageView(new Image(course.getCoursePic()));
+        }
+
         durationLabel.setText("Duration: " + course.getDuration() + " hour");
         priceLabel.setText("Price: " + course.getPrice() + " €");
 
