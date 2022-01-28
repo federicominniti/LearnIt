@@ -17,7 +17,7 @@
 
 <ScrollPane prefHeight="630.0" prefWidth="1102.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.ProfilePageController">
    <content>
-      <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2150.0" prefWidth="1085.0" style="-fx-background-color: white;">
+      <AnchorPane fx:id="pageAnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="630.0" minWidth="-Infinity" prefWidth="1085.0" style="-fx-background-color: white;">
          <children>
             <ImageView fx:id="learnItLabel" fitHeight="53.0" fitWidth="200.0" layoutX="443.0" layoutY="31.0">
                <image>

@@ -16,11 +16,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.text.Font;
 
-import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
@@ -43,6 +41,7 @@ public class ProfilePageController {
     @FXML private BorderPane profileContentBorderPane;
     @FXML private BorderPane userBorderPane;
     @FXML private VBox statisticsVBox;
+    @FXML private AnchorPane pageAnchorPane;
 
     private static final String PERSONAL_PAGE = "/fxml/PersonalPage.fxml";
 
@@ -102,46 +101,70 @@ public class ProfilePageController {
         isProfileMine = loggedUser.getUsername().equals(profileUser.getUsername());
 
         if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
+            pageAnchorPane.getChildren().remove(elementsVBox);
+
+            profileContentBorderPane.setPrefHeight(440);
             profileContentBorderPane.getChildren().remove(statisticsVBox);
             profileContentBorderPane.getChildren().remove(userBorderPane);
             profileContentBorderPane.setPrefWidth(923);
-            profileContentBorderPane.setPrefHeight(326);
+            profileContentBorderPane.setPrefHeight(440);
 
             ImageView adminImage = new ImageView(
                     String.valueOf(PersonalPageController.class.getResource("/img/createAdmin.png")));
             adminImage.setPreserveRatio(true);
-            adminImage.setFitHeight(100);
-            adminImage.setFitHeight(100);
-            profileContentBorderPane.setLeft(adminImage);
-            BorderPane.setAlignment(adminImage, Pos.CENTER);
+            adminImage.setFitHeight(170);
+            adminImage.setFitHeight(170);
+            VBox leftColumn = new VBox();
+            leftColumn.setPrefWidth(470);
+            leftColumn.setPrefHeight(320);
+            leftColumn.getChildren().add(adminImage);
+            leftColumn.setAlignment(Pos.CENTER);
+            profileContentBorderPane.setLeft(leftColumn);
+            //BorderPane.setAlignment(adminImage, Pos.CENTER);
 
             VBox passwordVBox = new VBox();
             passwordVBox.setAlignment(Pos.CENTER);
             passwordVBox.setSpacing(20);
-
-            GridPane modifyPasswordGridPane = new GridPane();
-            modifyPasswordGridPane.setAlignment(Pos.CENTER);
-            modifyPasswordGridPane.setHgap(15);
-            modifyPasswordGridPane.setVgap(15);
-            passwordVBox.getChildren().add(modifyPasswordGridPane);
+            passwordVBox.setPrefWidth(450);
+            passwordVBox.setPrefHeight(320);
 
             Label oldPasswordLabel = new Label("Old password:");
+            oldPasswordLabel.setFont(new Font(15));
             PasswordField oldPasswordField = new PasswordField();
-            Label newPasswordLabel = new Label("New password:");
-            TextField newPasswordTextField = new TextField();
-            Label repeatPasswordLabel = new Label("Repeat password:");
-            TextField repeatPasswordTextField = new TextField();
+            HBox row1 = new HBox();
+            row1.setAlignment(Pos.CENTER);
+            row1.getChildren().add(oldPasswordLabel);
+            row1.getChildren().add(oldPasswordField);
+            row1.setSpacing(25);
+            row1.setPrefHeight(25);
+            passwordVBox.getChildren().add(row1);
 
-            modifyPasswordGridPane.add(oldPasswordLabel, 0, 0);
-            modifyPasswordGridPane.add(oldPasswordField, 1, 0);
-            modifyPasswordGridPane.add(newPasswordLabel, 0, 1);
-            modifyPasswordGridPane.add(newPasswordTextField, 1, 1);
-            modifyPasswordGridPane.add(repeatPasswordLabel, 0, 2);
-            modifyPasswordGridPane.add(repeatPasswordTextField, 1, 2);
+            Label newPasswordLabel = new Label("New password:");
+            newPasswordLabel.setFont(new Font(15));
+            TextField newPasswordTextField = new TextField();
+            HBox row2 = new HBox();
+            row2.setAlignment(Pos.CENTER);
+            row2.getChildren().add(newPasswordLabel);
+            row2.getChildren().add(newPasswordTextField);
+            row2.setSpacing(25);
+            row2.setPrefHeight(25);
+            passwordVBox.getChildren().add(row2);
+
+            Label repeatPasswordLabel = new Label("Repeat password:");
+            repeatPasswordLabel.setFont(new Font(15));
+            TextField repeatPasswordTextField = new TextField();
+            HBox row3 = new HBox();
+            row3.setAlignment(Pos.CENTER);
+            row3.getChildren().add(repeatPasswordLabel);
+            row3.getChildren().add(repeatPasswordTextField);
+            row3.setSpacing(25);
+            row3.setPrefHeight(25);
+            passwordVBox.getChildren().add(row3);
 
             Button modifyButton = new Button("Modify");
             modifyButton.setStyle("-fx-background-color: lightpink;" +
-                    "-fx-background-radius: 13px");
+                    "-fx-background-radius: 13px;" /*+ "-fx-font-size:15"*/);
+            modifyButton.setFont(new Font(15));
 
             modifyButton.setOnMouseClicked(clickEvent -> modifyAdminPasswordHandler(oldPasswordField,
                     newPasswordTextField, repeatPasswordTextField));

@@ -67,9 +67,10 @@ public class DiscoveryPageController {
         learnItImageView.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
         usernameLabel.setOnMouseClicked(clickEvent -> myProfile(clickEvent));
         usernameLabel.setCursor(Cursor.HAND);
+
+        profilePic.setOnMouseClicked(clickEvent -> myProfile(clickEvent));
+        profilePic.setCursor(Cursor.HAND);
         if (loggedUser.getRole() == User.Role.STANDARD) {
-            profilePic.setOnMouseClicked(clickEvent -> myProfile(clickEvent));
-            profilePic.setCursor(Cursor.HAND);
             initializeSuggestions();
         }
 
@@ -80,7 +81,7 @@ public class DiscoveryPageController {
         if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
             createNewCourseButton.setText("Create new admin");
             createNewCourseButton.setStyle("-fx-background-color: lightpink;" +
-                    "-fx-background-radius: 13px");
+                    "-fx-background-radius: 13px;" + "-fx-text-fill: red");
             createNewCourseButton.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.REGISTRATION_PAGE, clickEvent));
             return;
         }
@@ -121,7 +122,7 @@ public class DiscoveryPageController {
         usernameLabel.setText(loggedUser.getUsername());
 
         if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
-            profilePic.setImage(new Image(String.valueOf(DiscoveryPageController.class.getResource(Utils.USER_DEFAULT))));
+            profilePic.setImage(new Image(String.valueOf(DiscoveryPageController.class.getResource("/img/createAdmin.png"))));
             return;
         }
 

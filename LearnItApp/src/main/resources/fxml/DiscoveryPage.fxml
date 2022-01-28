@@ -68,7 +68,7 @@
             <VBox fx:id="elementsVBox" prefHeight="471.0" prefWidth="1042.0" style="-fx-background-color: white;" />
          </content>
       </ScrollPane>
-      <Button fx:id="createNewCourseButton" layoutX="783.0" layoutY="84.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="111.0" style="-fx-background-radius: 13; -fx-background-color: lightgreen;" text="Create Course" textFill="#1f8d00">
+      <Button fx:id="createNewCourseButton" layoutX="783.0" layoutY="81.0" mnemonicParsing="false" prefHeight="33.0" prefWidth="136.0" style="-fx-background-radius: 13; -fx-background-color: lightgreen;" text="Create Course" textFill="#1f8d00">
          <font>
             <Font size="15.0" />
          </font>
