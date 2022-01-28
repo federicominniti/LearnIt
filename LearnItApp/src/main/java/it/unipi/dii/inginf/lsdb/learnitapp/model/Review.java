@@ -20,6 +20,14 @@ public class Review {
 
     }
 
+    public Review(String title, String content, int rating, Date timestamp, User author) {
+        this.title = title;
+        this.content = content;
+        this.rating = rating;
+        this.timestamp = timestamp;
+        this.author = author;
+    }
+
     public String getTitle() {
         return title;
     }
