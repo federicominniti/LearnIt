@@ -1,18 +1,21 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.persistence;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.ConnectionString;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClientSettings;
+import com.mongodb.*;
+import com.mongodb.bulk.BulkWriteUpsert;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.model.Projections;
+import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.model.Updates;
+import com.mongodb.internal.operation.BulkWriteBatch;
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
+import it.unipi.dii.inginf.lsdb.learnitapp.log.LearnItLogger;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.*;
+import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.bson.BsonDocument;
 import org.bson.BsonValue;
 import org.bson.Document;
@@ -39,8 +42,8 @@ public class MongoDBDriver implements DBDriver {
 
     private static MongoClient mongoClient;
     private static MongoDatabase database;
-    private static MongoCollection<Course> coursesCollection;
-    private static MongoCollection<User> usersCollection;
+    private static MongoCollection<Course2> coursesCollection;
+    private static MongoCollection<User2> usersCollection;
     private static String mongoDBPrimaryIP;
     private static int mongoDBPrimaryPort;
     private static String mongoDBSecondIP;
@@ -54,6 +57,7 @@ public class MongoDBDriver implements DBDriver {
     private static CodecRegistry pojoCodecRegistry;
     private static CodecRegistry codecRegistry;
     private static String uriString;
+    private static Logger mongoLogger;
 
     public static MongoDBDriver getInstance() {
         if (mongoDBInstance == null) {
@@ -68,6 +72,7 @@ public class MongoDBDriver implements DBDriver {
 
             mongoDBInstance = new MongoDBDriver();
             mongoDBInstance.initConnection();
+            mongoLogger = LearnItLogger.getMongoLogger();
         }
 
         return mongoDBInstance;
@@ -139,8 +144,8 @@ public class MongoDBDriver implements DBDriver {
             mongoClient.close();
     }
 
-    //provata
-    public boolean addCourse(Course newCourse) {
+    //provata - ok
+    public boolean addCourse(Course2 newCourse) {
         try {
             coursesCollection.insertOne(newCourse);
         } catch (Exception e) {
@@ -153,7 +158,7 @@ public class MongoDBDriver implements DBDriver {
     }
 
     //provata
-    public Course getCourseByTitle(String title) {
+    public Course2 getCourseByTitle(String title) {
         try {
             Course2 c = coursesCollection.find(Filters.eq("title", title)).first();
             return c;
@@ -162,18 +167,15 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
-    //provata - OK
-    public boolean updateCourse(Course2 editedCourse) {
+    //fare update su snapshot inserendo newprice e newduration se necessario
+    //fare update anche su recensioni
+    public boolean updateCourse(Course2 editedCourse, Course2 oldCourse) {
         try {
             Document d = new Document("title", editedCourse.getTitle())
                     .append("instructor", editedCourse.getInstructor())
                     .append("description", editedCourse.getDescription())
                     .append("language", editedCourse.getLanguage())
-                    .append("level", editedCourse.getLevel())
-                    .append("duration", editedCourse.getDuration())
-                    .append("price", editedCourse.getPrice())
-                    .append("sum_ratings", editedCourse.getSum_ratings())
-                    .append("num_reviews", editedCourse.getNum_reviews());
+                    .append("level", editedCourse.getLevel());
 
             if (editedCourse.getCategory() != null)
                 d.append("category", editedCourse.getCategory());
@@ -184,43 +186,98 @@ public class MongoDBDriver implements DBDriver {
             if (editedCourse.getLink() != null)
                 d.append("link", editedCourse.getLink());
 
+            if (editedCourse.getCoursePic() != null && !editedCourse.getCoursePic().equals("") )
+                d.append("course_pic", editedCourse.getCoursePic());
+
+            if (editedCourse.getDuration() != 0)
+                d.append("duration", editedCourse.getDuration());
+
+            if (editedCourse.getPrice() != 0)
+                d.append("price", editedCourse.getPrice());
+
+            if (editedCourse.getNum_reviews() != 0)
+                d.append("num_reviews", editedCourse.getNum_reviews());
+
+            if (editedCourse.getSum_ratings() != 0)
+                d.append("sum_ratings", editedCourse.getSum_ratings());
+
+            if (editedCourse.getReviews() != null)
+                d.append("sum_ratings")
+
             Bson updateOperation = new Document("$set", d);
 
             coursesCollection.updateOne(new Document("_id", editedCourse.getId()), updateOperation);
+
+            /*
+            db.learnitprova.updateMany(
+  { reviews: {$exists: true}},
+  { $set: { "reviews.$[elem].author.username" : "hello" } },
+  {  arrayFilters: [ { "elem.author.username": "william" } ],
+  multi: true
+ })
+
+             */
+
+            //nuova
+            /*
+            Bson filter = Filters.exists("reviewed", true);
+            Bson set = Updates.set("reviews.[$elem].author.username", "pino");
+            UpdateOptions options = new UpdateOptions().arrayFilters(Collections.singletonList(Filters.eq("elem.author.username", "michael")));
+            coursesCollection.updateMany(filter, set, options);
+
+             */
             return true;
         } catch (Exception e) {
             System.err.println("Error: cannot edit course");
-            e.printStackTrace();
             return false;
         }
     }
 
-    //provata - OK
+    //non cancellare snapshot
     public boolean deleteCourse(Course2 toBeDeleted) {
         try {
-            coursesCollection.deleteOne(new Document("_id", toBeDeleted.getId()));
-            return true;
-        } catch (Exception e) {
+            Bson match = Filters.eq("_id", toBeDeleted.getId());
+            coursesCollection.deleteOne(match);
+        } catch (MongoException e) {
             System.err.println("Error: cannot delete course");
             return false;
         }
+
+        String errmsg;
+        try {
+            Bson update = Updates.pull("reviewed", Filters.eq("title", toBeDeleted.getTitle()));
+            Bson empty = Filters.empty();
+            usersCollection.updateMany(empty, update);
+            return true;
+        } catch (MongoException e) {
+            System.err.println("Could not delete course in users collection");
+            errmsg = e.getMessage();
+        }
+
+        try {
+            coursesCollection.insertOne(toBeDeleted);
+        } catch (MongoException e) {
+            mongoLogger.error(errmsg);
+            return false;
+        }
     }
 
-    //provata - OK
+    //non cancellare snapshot su collection utenti
     public boolean deleteUserCourses(User2 user) { // aggiungere indice per la find ???
 
         List<Course2> toBeDeleted = coursesCollection.find(Filters.eq("instructor", user.getUsername())).projection(Projections.exclude("reviews")).into(new ArrayList<>());
 
-        List<String> oids = new ArrayList<>();
+        List<String> titles = new ArrayList<>();
 
         for (int i = 0; i < toBeDeleted.size(); i++) {
-            oids.add(toBeDeleted.get(i).getId().toString());
+            titles.add(toBeDeleted.get(i).getTitle());
         }
-        Bson deleteFilter = Filters.in("_id", oids);
+        Bson deleteFilter = Filters.in("title", titles);
+
         return coursesCollection.deleteMany(deleteFilter).wasAcknowledged();
     }
 
-    //provata - OK
+    //ripensare e aggiungere snapshot su user collection
     private boolean addReviewToCourse(Course2 course, Review2 review) {
         try {
             List<Review2> reviewsList = course.getReviews();
@@ -234,7 +291,7 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
-    //provata
+    //accorpare a quella sopra
     public boolean addReviewRedundancies(Course2 course, Review2 review) {
         try {
             boolean result = addReview(course, review);
@@ -253,14 +310,13 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
-    //provata
     public boolean updateReviews(ObjectId id, List<Review2> reviews) {
         Bson update = new Document("reviews", reviews);
         Bson updateOperation = new Document("$set", update);
         return coursesCollection.updateOne(new Document("_id", id), updateOperation).wasAcknowledged();
     }
 
-    //provata
+    //fare solo updatecourse aggiornata con aggiornamento ridondanze
     public boolean editReview(Course2 course, Review2 review){
         List<Review2> reviewsList = course.getReviews();
         int count = 0;
@@ -279,7 +335,8 @@ public class MongoDBDriver implements DBDriver {
         return updateCourse(course) && updateReviews(course.getId(), reviewsList);
     }
 
-    //provata
+    //fare solo updatecourse aggiornata e rimuovere snapshot con rollback
+    //non aggiornare ridondanze
     public boolean deleteReview(Course2 course, Review2 review){
         List<Review2> reviewsList  = course.getReviews();
         reviewsList.remove(review);
@@ -288,47 +345,13 @@ public class MongoDBDriver implements DBDriver {
         return updateCourse(course) && updateReviews(course.getId(), reviewsList);
     }
 
-    //provata
-    public boolean deleteUserReviewsRedundancies(User2 user){
-        boolean result = true;
-        List<Course2> toBeDeleted = coursesCollection.find(Filters.elemMatch("reviews", Filters.eq("author.username", user.getUsername()))).into(new ArrayList<>());
-        for(int i=0; i<toBeDeleted.size(); i++){
-
-            List<Review2> review = toBeDeleted.get(i).getReviews();
-
-            for(int j=0; j<review.size(); j++){
-                if(review.get(j).getAuthor().getUsername().equals(user.getUsername())){
-                    Course2 c = toBeDeleted.get(i);
-                    Review2 r = review.get(j);
-
-                    if (c.getSum_ratings()-r.getRating() < 0)
-                        c.setSum_ratings(0);
-                    else
-                        c.setSum_ratings(c.getSum_ratings()-r.getRating());
-
-                    if (c.getNum_reviews() == 0)
-                        c.setNum_reviews(0);
-                    else
-                        c.setNum_reviews(c.getNum_reviews()-1);
-
-                    result = result && updateCourse(c);
-                    break;
-                }
-            }
-        }
-
-        return result;
-    }
-
-    //provata
+    //rivedere ma va bene
     public boolean deleteUserReviews(User2 user){
 
-        if(deleteUserReviewsRedundancies(user)){
             //System.out.println("qui");
             Bson pullFilter = Updates.pull("reviews", Filters.eq("author.username", user.getUsername()));
             return coursesCollection.updateMany(new Document(), pullFilter).wasAcknowledged();
-        }
-        return false;
+
     }
 
     //provata
@@ -386,17 +409,22 @@ public class MongoDBDriver implements DBDriver {
         return courses;
     }
 
-    //provata
+    //provata - OK
     public List<Course2> findBestRatings(int limit){ // trasformare come trindingCourses se funziona ???
 
-        String json = "[{'$match': {num_reviews: {'$gt': 0}}},{'$addFields': {" +
-                "'avg': { '$divide': ['$sum_ratings', '$num_reviews']}" +
-                "}}, {'$sort': {'avg': -1}}, {'$limit': "+limit+"}, {'$project': {'reviews':0}}]";
+        List<Document> aggregation = Arrays.asList(new Document("$match",
+                        new Document("num_reviews",
+                        new Document("$gt", 0L))),
+                        new Document("$addFields",
+                        new Document("avg",
+                        new Document("$divide", Arrays.asList("$sum_ratings", "$num_reviews")))),
+                        new Document("$sort",
+                        new Document("avg", -1L)),
+                        new Document("$limit", 10L),
+                        new Document("$project",
+                        new Document("reviews", 0L)));
 
-        List<BsonDocument> pipeline = new BsonArrayCodec().decode(new JsonReader(json), DecoderContext.builder().build())
-                .stream().map(BsonValue::asDocument)
-                .collect(Collectors.toList());
-        List<Course2> c = coursesCollection.aggregate(pipeline).into(new ArrayList<>());
+        List<Course2> c = coursesCollection.aggregate(aggregation).into(new ArrayList<>());
 
         return c;
     }
@@ -477,32 +505,17 @@ db.learnit.aggregate([{"$match": {"title": " Atención prehospitalaria del ictus
         }
     }
 
-    public Course2 getCourseFromTitle(String title, int skip, int limit) {
-        Course2 c = coursesCollection.find(Filters.eq("title", title)).projection(Projections.slice("reviews", skip, limit)).first();
-        return c;
-    }
-
-    public List<Review2> getCourseReviewsFromId(ObjectId id, int skip, int limit) {
-        Course2 c = coursesCollection.aggregate(Arrays.asList(
-                new Document("$match", new Document("_id", id)),
-                new Document("$project", new Document("_id", 1)
-                        .append("reviews", 1)),
-                new Document("$unwind", "$reviews"),
-                new Document("$skip", skip),
-                new Document("$limit", limit),
-                new Document("$group", new Document("_id", "$_id")
-                        .append("reviews", new Document("$push", "$reviews")))
-
-        )).first();
-
-        return c.getReviews();
-    }
-
     public boolean checkCourseExists(String title) {
         Course2 c = coursesCollection.find(Filters.eq("title", title)).projection(Projections.include("title")).first();
         if (c == null)
             return false;
         return true;
     }
+
+    //aggiungere
+    /*
+    mostActiveUsers
+    bestUsers
+     */
 
 }

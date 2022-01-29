@@ -13,6 +13,12 @@ public class Review2 {
     private int rating;
     @BsonProperty(value = "edited_timestamp")
     private Date timestamp;
+    @BsonProperty(value = "username")
+    private String username;
+
+    public Review2() {
+
+    }
 
     public String getUsername() {
         return username;
@@ -20,13 +26,6 @@ public class Review2 {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    @BsonProperty(value = "username")
-    private String username;
-
-    public Review2() {
-
     }
 
     public String getTitle() {

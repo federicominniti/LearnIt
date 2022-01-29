@@ -37,7 +37,9 @@ public class Course2 {
     private int sum_ratings;
     @BsonProperty(value="course_pic")
     private String coursePic;
-
+    @BsonProperty(value="new_price")
+    private int newPrice;
+    @BsonProperty(value="")
     @BsonProperty(value="year")
     private int year;
 
