@@ -1,36 +1,24 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.persistence;
 
 import com.mongodb.*;
-import com.mongodb.bulk.BulkWriteUpsert;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Projections;
-import com.mongodb.client.model.UpdateOptions;
-import com.mongodb.client.model.Updates;
-import com.mongodb.internal.operation.BulkWriteBatch;
+import com.mongodb.client.model.*;
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.log.LearnItLogger;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.*;
 import org.apache.log4j.Logger;
-import org.apache.log4j.Priority;
-import org.bson.BsonDocument;
-import org.bson.BsonValue;
 import org.bson.Document;
-import org.bson.codecs.BsonArrayCodec;
-import org.bson.codecs.DecoderContext;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
-import org.bson.json.JsonReader;
 import org.bson.types.ObjectId;
 
 import java.util.*;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.mongodb.client.model.Aggregates.limit;
 import static com.mongodb.client.model.Aggregates.skip;
@@ -167,70 +155,129 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
-    //fare update su snapshot inserendo newprice e newduration se necessario
-    //fare update anche su recensioni
-    public boolean updateCourse(Course2 editedCourse, Course2 oldCourse) {
-        try {
-            Document d = new Document("title", editedCourse.getTitle())
-                    .append("instructor", editedCourse.getInstructor())
-                    .append("description", editedCourse.getDescription())
-                    .append("language", editedCourse.getLanguage())
-                    .append("level", editedCourse.getLevel());
+    public boolean updateCourse(Course2 editedCourse, Course2 oldCourse) throws MongoException {
+        if (oldCourse == null) {
+            //this is the case when you want to update the course reviews only
+            Bson filter = Filters.eq("_id", editedCourse.getId());
+            Bson update_reviews = Updates.set("reviews", editedCourse.getReviews());
 
-            if (editedCourse.getCategory() != null)
-                d.append("category", editedCourse.getCategory());
 
-            if (editedCourse.getModality() != null)
-                d.append("modality", editedCourse.getModality());
+            //updating redundancies
+            Bson update_sum = null;
+            if (editedCourse.getSum_ratings() > 0)
+                update_sum = Updates.set("sum_ratings", editedCourse.getSum_ratings());
+            Bson update_num = null;
+            if (editedCourse.getNum_reviews() > 0)
+                update_num = Updates.set(("num_reviews"), editedCourse.getNum_reviews());
 
-            if (editedCourse.getLink() != null)
-                d.append("link", editedCourse.getLink());
+            try {
+                coursesCollection.updateOne(filter, Updates.combine(update_reviews, update_sum, update_num));
+                return true;
+            } catch(MongoException e) {
+                return false;
+            }
+        } else {
 
-            if (editedCourse.getCoursePic() != null && !editedCourse.getCoursePic().equals("") )
-                d.append("course_pic", editedCourse.getCoursePic());
+            //case of update course info only (not reviews)
+            Bson filter = Filters.eq("_id", editedCourse.getId());
+            List<Bson> updates = new ArrayList<>();
+            updates.add(Updates.set("description", editedCourse.getDescription()));
+            updates.add(Updates.set("language", editedCourse.getLanguage()));
+            updates.add(Updates.set("level", editedCourse.getLevel()));
 
-            if (editedCourse.getDuration() != 0)
-                d.append("duration", editedCourse.getDuration());
+            if (editedCourse.getCategory() == null)
+                updates.add(Updates.unset("category"));
+            else
+                updates.add(Updates.set("category", editedCourse.getCategory()));
 
-            if (editedCourse.getPrice() != 0)
-                d.append("price", editedCourse.getPrice());
+            if (editedCourse.getModality() == null)
+                updates.add(Updates.unset("modality"));
+            else
+                updates.add(Updates.set("modality", editedCourse.getModality()));
 
-            if (editedCourse.getNum_reviews() != 0)
-                d.append("num_reviews", editedCourse.getNum_reviews());
+            if (editedCourse.getLink() == null)
+                updates.add(Updates.unset("link"));
+            else
+                updates.add(Updates.set("link", editedCourse.getLink()));
 
-            if (editedCourse.getSum_ratings() != 0)
-                d.append("sum_ratings", editedCourse.getSum_ratings());
+            if (editedCourse.getCoursePic() == null)
+                updates.add(Updates.unset("course_pic"));
+            else
+                updates.add(Updates.set("course_pic", editedCourse.getCoursePic()));
 
-            if (editedCourse.getReviews() != null)
-                d.append("sum_ratings")
+            if (editedCourse.getDuration() == 0)
+                updates.add(Updates.unset("duration"));
+            else
+                updates.add(Updates.set("duration", editedCourse.getDuration()));
 
-            Bson updateOperation = new Document("$set", d);
+            if (editedCourse.getPrice() == 0)
+                updates.add(Updates.unset("price"));
+            else
+                updates.add(Updates.set("price", editedCourse.getPrice()));
 
-            coursesCollection.updateOne(new Document("_id", editedCourse.getId()), updateOperation);
+            if (editedCourse.getNum_reviews() == 0)
+                updates.add(Updates.unset("num_reviews"));
+            else
+                updates.add(Updates.set("num_reviews", editedCourse.getNum_reviews()));
 
-            /*
-            db.learnitprova.updateMany(
-  { reviews: {$exists: true}},
-  { $set: { "reviews.$[elem].author.username" : "hello" } },
-  {  arrayFilters: [ { "elem.author.username": "william" } ],
-  multi: true
- })
+            if (editedCourse.getSum_ratings() == 0)
+                updates.add(Updates.unset("sum_ratings"));
+            else
+                updates.add(Updates.set("sum_ratings", editedCourse.getSum_ratings()));
 
-             */
 
-            //nuova
-            /*
-            Bson filter = Filters.exists("reviewed", true);
-            Bson set = Updates.set("reviews.[$elem].author.username", "pino");
-            UpdateOptions options = new UpdateOptions().arrayFilters(Collections.singletonList(Filters.eq("elem.author.username", "michael")));
-            coursesCollection.updateMany(filter, set, options);
+            //if this optional fields change, we need to update the snapshots present
+            //in the user collection
+            List<Bson> update_snapshots = new ArrayList<>();
+            if (!editedCourse.getCoursePic().equals(oldCourse.getCoursePic())) {
+                if (editedCourse.getCoursePic() == null)
+                    update_snapshots.add(Updates.unset("reviewed.[$elem].course_pic"));
+                else
+                    update_snapshots.add(Updates.set("reviewed.[$elem].course_pic", editedCourse.getCoursePic()));
+            }
 
-             */
-            return true;
-        } catch (Exception e) {
-            System.err.println("Error: cannot edit course");
-            return false;
+            if (editedCourse.getPrice() != oldCourse.getPrice()) {
+                update_snapshots.add(Updates.set("reviewed.[$elem].new_price", editedCourse.getPrice()));
+            }
+
+            if (editedCourse.getDuration() != oldCourse.getDuration()) {
+                update_snapshots.add(Updates.set("reviewed.[$elem].new_duration", editedCourse.getDuration()));
+            }
+
+            //if there are no changes to be made to the snapshots in the user collection
+            if (update_snapshots.size() == 0) {
+                try {
+                    coursesCollection.updateOne(filter, Updates.combine(updates));
+                    return true;
+                } catch (MongoException e) {
+                    return false;
+                }
+            } else {
+                //there is at least one field to change in the snapshots of the user collection
+                try {
+                    coursesCollection.updateOne(filter, updates);
+                } catch (MongoException e) {
+                    return false;
+                }
+
+                Bson exists = Filters.exists("reviewed", true);
+                Bson set = Updates.combine(update_snapshots);
+                UpdateOptions options = new UpdateOptions().arrayFilters(Collections.singletonList(Filters.eq("elem.title", editedCourse.getTitle())));
+                try {
+                    //try to perform the update
+                    usersCollection.updateMany(filter, set, options);
+                    return true;
+                } catch (MongoException e) {
+                    //if the update goes bad, try to rollback by reupdating the course with old information
+                    //and write to log
+                    boolean ret = updateCourse(oldCourse, oldCourse); //rollback
+                    if (!ret)
+                        mongoLogger.error(e.getMessage());
+                    return false;
+                }
+            }
         }
+
     }
 
     //non cancellare snapshot
@@ -238,120 +285,53 @@ public class MongoDBDriver implements DBDriver {
         try {
             Bson match = Filters.eq("_id", toBeDeleted.getId());
             coursesCollection.deleteOne(match);
-        } catch (MongoException e) {
-            System.err.println("Error: cannot delete course");
-            return false;
-        }
-
-        String errmsg;
-        try {
-            Bson update = Updates.pull("reviewed", Filters.eq("title", toBeDeleted.getTitle()));
-            Bson empty = Filters.empty();
-            usersCollection.updateMany(empty, update);
             return true;
         } catch (MongoException e) {
-            System.err.println("Could not delete course in users collection");
-            errmsg = e.getMessage();
-        }
-
-        try {
-            coursesCollection.insertOne(toBeDeleted);
-        } catch (MongoException e) {
-            mongoLogger.error(errmsg);
+            System.err.println("Error: cannot delete course");
             return false;
         }
     }
 
     //non cancellare snapshot su collection utenti
     public boolean deleteUserCourses(User2 user) { // aggiungere indice per la find ???
-
-        List<Course2> toBeDeleted = coursesCollection.find(Filters.eq("instructor", user.getUsername())).projection(Projections.exclude("reviews")).into(new ArrayList<>());
-
-        List<String> titles = new ArrayList<>();
-
-        for (int i = 0; i < toBeDeleted.size(); i++) {
-            titles.add(toBeDeleted.get(i).getTitle());
-        }
-        Bson deleteFilter = Filters.in("title", titles);
-
-        return coursesCollection.deleteMany(deleteFilter).wasAcknowledged();
-    }
-
-    //ripensare e aggiungere snapshot su user collection
-    private boolean addReviewToCourse(Course2 course, Review2 review) {
+        Bson deleteFilter = Filters.eq("instructor", user.getUsername());
         try {
-            List<Review2> reviewsList = course.getReviews();
-            if (reviewsList == null)
-                reviewsList = new ArrayList<>();
-            reviewsList.add(review);
-            updateReviews(course.getId(), reviewsList);
+            coursesCollection.deleteMany(deleteFilter);
             return true;
-        } catch (Exception e) {
+        } catch (MongoException e) {
             return false;
         }
     }
 
-    //accorpare a quella sopra
-    public boolean addReviewRedundancies(Course2 course, Review2 review) {
-        try {
-            boolean result = addReview(course, review);
-            System.out.println(result);
-            if(result){
-                System.out.println(course.getNum_reviews());
-                System.out.println(course.getSum_ratings());
-                System.out.println(review.getRating());
-                course.setNum_reviews(course.getNum_reviews() + 1);
-                course.setSum_ratings(course.getSum_ratings() + review.getRating());
-                return updateCourse(course);
-            }
-            return false;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public boolean updateReviews(ObjectId id, List<Review2> reviews) {
-        Bson update = new Document("reviews", reviews);
-        Bson updateOperation = new Document("$set", update);
-        return coursesCollection.updateOne(new Document("_id", id), updateOperation).wasAcknowledged();
-    }
 
     //fare solo updatecourse aggiornata con aggiornamento ridondanze
     public boolean editReview(Course2 course, Review2 review){
-        List<Review2> reviewsList = course.getReviews();
+        List<Review2> reviews = course.getReviews();
         int count = 0;
-        for (Review2 r: reviewsList) {
-            //System.out.println("scorro review \n title: "+ review.getTitle() + "\n content: "+ review.getContent() +"\n rating: "+ review.getRating()+"\n timestamp: "+review.getTimestamp().toString());
-
-            if(r.getAuthor().getUsername().equals(review.getAuthor().getUsername())){
-                //System.out.println("stesso author, count: "+count);
-                course.setSum_ratings(review.getRating()-r.getRating()+course.getSum_ratings());
-                reviewsList.set(count, review);
-
+        int sum_ratings = course.getSum_ratings();
+        for (Review2 r: reviews) {
+            if (r.getUsername().equals(review.getUsername())) {
+                sum_ratings -= r.getRating();
+                reviews.set(count, review);
                 break;
             }
             count++;
         }
-        return updateCourse(course) && updateReviews(course.getId(), reviewsList);
-    }
 
-    //fare solo updatecourse aggiornata e rimuovere snapshot con rollback
-    //non aggiornare ridondanze
-    public boolean deleteReview(Course2 course, Review2 review){
-        List<Review2> reviewsList  = course.getReviews();
-        reviewsList.remove(review);
-        course.setNum_reviews(course.getNum_reviews()-1);
-        course.setSum_ratings(course.getSum_ratings()-review.getRating());
-        return updateCourse(course) && updateReviews(course.getId(), reviewsList);
+        course.setSum_ratings(sum_ratings + review.getRating());
+        return updateCourse(course, null);
     }
 
     //rivedere ma va bene
-    public boolean deleteUserReviews(User2 user){
-
-            //System.out.println("qui");
-            Bson pullFilter = Updates.pull("reviews", Filters.eq("author.username", user.getUsername()));
-            return coursesCollection.updateMany(new Document(), pullFilter).wasAcknowledged();
-
+    //new
+    public boolean deleteUserReviews(User2 user) {
+        Bson pullFilter = Updates.pull("reviews", Filters.eq("username", user.getUsername()));
+        try {
+            coursesCollection.updateMany(Filters.empty(), pullFilter);
+            return true;
+        } catch (MongoException e) {
+            return false;
+        }
     }
 
     //provata
@@ -412,17 +392,13 @@ public class MongoDBDriver implements DBDriver {
     //provata - OK
     public List<Course2> findBestRatings(int limit){ // trasformare come trindingCourses se funziona ???
 
-        List<Document> aggregation = Arrays.asList(new Document("$match",
-                        new Document("num_reviews",
-                        new Document("$gt", 0L))),
-                        new Document("$addFields",
-                        new Document("avg",
-                        new Document("$divide", Arrays.asList("$sum_ratings", "$num_reviews")))),
-                        new Document("$sort",
-                        new Document("avg", -1L)),
-                        new Document("$limit", 10L),
-                        new Document("$project",
-                        new Document("reviews", 0L)));
+        List<Document> aggregation = Arrays.asList(
+                new Document("$match", new Document("num_reviews", new Document("$gt", 0))),
+                new Document("$addFields", new Document("avg", new Document("$divide",
+                        Arrays.asList("$sum_ratings", "$num_reviews")))),
+                new Document("$sort", new Document("avg", -1)),
+                new Document("$limit", 10),
+                new Document("$project", new Document("reviews", 0)));
 
         List<Course2> c = coursesCollection.aggregate(aggregation).into(new ArrayList<>());
 
@@ -462,15 +438,6 @@ public class MongoDBDriver implements DBDriver {
         List<Course2> res = coursesCollection.find(Filters.in("_id", ids)).projection(Projections.exclude("reviews")).into(new ArrayList<>());
         return res;
     }
-
-
-    /*
-db.learnit.aggregate([{"$match": {"title": " Atención prehospitalaria del ictus agudo y selección de pacientes para tratamiento endovascular con la escala RACE"}},
-{"$unwind": "$reviews"},
-{"$group": {_id: {year: {"$year": "$reviews.edited_timestamp"}}, num_reviews: {"$sum": 1}}},
-{"$set": {title: "$_id.year"}}, {"$unset": ["_id"]}])
-
-    */
 
     //provata
     public HashMap<String, Double> getCourseAnnualRatings(Course2 course) {
@@ -512,10 +479,39 @@ db.learnit.aggregate([{"$match": {"title": " Atención prehospitalaria del ictus
         return true;
     }
 
-    //aggiungere
-    /*
-    mostActiveUsers
-    bestUsers
-     */
+    public List<User2> mostActiveUsers(int limit) {
+        Date d = new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(d);
+        cal.add(Calendar.DATE, -90);
+        Date d2 = cal.getTime();
+
+        List<Document> aggregation;
+        aggregation = Arrays.asList(new Document("$match", new Document("reviewed", new Document("$exists", true))),
+                    new Document("$unwind", new Document("path", "$reviewed")),
+                    new Document("$match", new Document("reviewed.review_timestamp", new Document("$gte", d2))),
+                    new Document("$group", new Document("_id", new Document("username", "$username"))
+                                                                .append("pic", new Document("$first", "$pic"))
+                                                                .append("gender", new Document("$first", "$gender"))
+                                                                .append("count", new Document("$sum", 1))),
+                    new Document("$sort", new Document("count", -1)),
+                    new Document("$project", new Document("username", "$_id.username")
+                                                .append("pic", "$pic")
+                                                .append("gender", "$gender")
+                                                .append("_id", 0)),
+                    new Document("$limit", 10));
+
+        List<User2> res = usersCollection.aggregate(aggregation).into(new ArrayList<>());
+        return res;
+    }
+
+    public User2 getUserByUsername(String username) {
+        try {
+            User2 u = usersCollection.find(Filters.eq("username", username)).first();
+            return u;
+        } catch (MongoException e) {
+            return null;
+        }
+    }
 
 }
