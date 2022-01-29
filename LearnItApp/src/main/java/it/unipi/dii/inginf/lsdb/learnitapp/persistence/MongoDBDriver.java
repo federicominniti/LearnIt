@@ -460,18 +460,6 @@ public class MongoDBDriver implements DBDriver {
         return annualRatings;
     }
 
-    public Review2 getCourseReviewByUser(Course2 course, User2 user) {
-        Course2 c = coursesCollection.find(Filters.eq("_id", course.getId())).projection(Projections.elemMatch("reviews", Filters.eq("author.username", user.getUsername()))).first();
-        if (c == null)
-            return null;
-        else {
-            if (c.getReviews() == null)
-                return null;
-            else
-                return c.getReviews().get(0);
-        }
-    }
-
     public boolean checkCourseExists(String title) {
         Course2 c = coursesCollection.find(Filters.eq("title", title)).projection(Projections.include("title")).first();
         if (c == null)
@@ -499,7 +487,7 @@ public class MongoDBDriver implements DBDriver {
                                                 .append("pic", "$pic")
                                                 .append("gender", "$gender")
                                                 .append("_id", 0)),
-                    new Document("$limit", 10));
+                    new Document("$limit", limit));
 
         List<User2> res = usersCollection.aggregate(aggregation).into(new ArrayList<>());
         return res;
@@ -514,4 +502,147 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
+    public List<User2> bestUsers(int limit){
+        List<Document> aggregation = Arrays.asList(new Document("$unwind",
+                        new Document("path", "$reviewed")),
+                new Document("$match",
+                        new Document("reviewed.duration",
+                                new Document("$gt", 0))
+                                .append("reviewed.price",
+                                        new Document("$gt", 0))),
+                new Document("$addFields",
+                        new Document("duration_div_price",
+                                new Document("$divide", Arrays.asList("$reviewed.duration", "$reviewed.price")))),
+                new Document("$group",
+                        new Document("_id",
+                                new Document("username", "$username"))
+                                .append("value",
+                                        new Document("$avg", "$duration_div_price"))
+                                .append("pic",
+                                        new Document("$first", "$pic"))
+                                .append("gender",
+                                        new Document("$first", "$gender"))),
+                new Document("$project",
+                        new Document("_id", 0)
+                                .append("username", "$_id.username")
+                                .append("value", "$value")
+                                .append("pic", "$pic")
+                                .append("gender", "$gender")),
+                new Document("$sort",
+                        new Document("value", 1)),
+                new Document("$limit", limit));
+
+        List<User2> users = usersCollection.aggregate(aggregation).into(new ArrayList<>());
+        return users;
+    }
+
+    private void addReviewToCourse(Course2 course, Review2 review) throws MongoException{
+        List<Review2> reviewsList = course.getReviews();
+        if (reviewsList == null)
+            reviewsList = new ArrayList<>();
+        reviewsList.add(review);
+        course.setReviews(reviewsList);
+        course.setNum_reviews(course.getNum_reviews() + 1);
+        course.setSum_ratings(course.getSum_ratings() + review.getRating());
+        updateCourse(course, null);
+    }
+
+    private void addSnapshotCourseToUser(Course2 course, Review2 review) throws MongoException{
+        Document d = new Document("title", course.getTitle())
+                .append("review_timestamp", review.getTimestamp());
+
+        if (course.getDuration() != 0)
+            d.append("duration", course.getDuration());
+
+        if (course.getPrice() != 0)
+            d.append("price", course.getPrice());
+
+        if (course.getCoursePic() != null)
+            d.append("course_pic", course.getCoursePic());
+
+        usersCollection.updateOne(Filters.eq("username", review.getUsername()),
+                Updates.push("reviewed", d));
+
+    }
+
+    public boolean addReview(Course2 course, Review2 review){
+        try{
+            addReviewToCourse(course, review);
+        }catch (MongoException e){
+            return false;
+        }
+
+        String exception;
+        try{
+            addSnapshotCourseToUser(course, review);
+            return true;
+        }catch (MongoException e){
+            exception = e.getMessage();
+        }
+
+        //rollback
+        try {
+            deleteReview(course, review, true);
+        } catch (MongoException e){
+            mongoLogger.error(exception);
+        }
+        return false;
+    }
+
+    private void deleteSnapshotCourseFromUser(Course2 course, Review2 review) throws MongoException{
+        Bson userFilter = Filters.eq("username", review.getUsername());
+        Bson pullFilter = Updates.pull("reviewed", Filters.eq("title", course.getTitle()));
+        coursesCollection.updateOne(userFilter, pullFilter);
+    }
+
+    private void deleteReviewFromCourses(Course2 course, Review2 review) throws MongoException{
+        Bson courseFilter = Filters.eq("title", course.getTitle());
+        Bson pullFilter = Updates.pull("reviews", Filters.eq("username", review.getUsername()));
+        coursesCollection.updateOne(courseFilter, pullFilter);
+    }
+
+    public boolean deleteReview(Course2 course, Review2 review, boolean redundanciesRollback){
+        List<Review2> reviewsList  = course.getReviews();
+        reviewsList.remove(review);
+        if(redundanciesRollback) { //rollback of an add review operation. In this case we must update redundancies to
+            // avoid to fake them
+            course.setNum_reviews(course.getNum_reviews() - 1);
+            course.setSum_ratings(course.getSum_ratings() - review.getRating());
+            return updateCourse(course, null);
+        }else {
+            try {
+                deleteReviewFromCourses(course, review);
+            } catch (MongoException e) {
+                return false;
+            }
+
+            String exception;
+            try {
+                deleteSnapshotCourseFromUser(course, review);
+                return true;
+            } catch (MongoException e) {
+                exception = e.getMessage();
+            }
+
+            try {
+                addSnapshotCourseToUser(course, review);
+            } catch (MongoException e){
+                mongoLogger.error(exception);
+            }
+            return false;
+        }
+    }
+
+    public Review2 getCourseReviewByUser(Course2 course, User2 user) {
+        Course2 c = coursesCollection.find(Filters.eq("_id", course.getId())).projection(Projections.elemMatch(
+                "reviews", Filters.eq("username", user.getUsername()))).first();
+        if (c == null)
+            return null;
+        else {
+            if (c.getReviews() == null)
+                return null;
+            else
+                return c.getReviews().get(0);
+        }
+    }
 }
