@@ -46,6 +46,20 @@ public class Course2 {
 
     }
 
+    public Course2(String title, Double duration, Double price, String course_pic){
+        this.title = title;
+
+        if(duration!=null)
+            this.duration = duration;
+
+        if(price!=null)
+            this.price = price;
+
+        if(course_pic != null)
+            this.coursePic = course_pic;
+
+    }
+
     public ObjectId getId() {
         return id;
     }

@@ -35,6 +35,17 @@ public class User2 {
 
     }
 
+    public User2(String username, String profilePic, String gender) {
+
+        this.username = username;
+
+        if(profilePic!=null)
+            this.profilePic = profilePic;
+
+        if(gender != null)
+            this.gender = gender;
+    }
+
     public String getUsername() {
         return username;
     }

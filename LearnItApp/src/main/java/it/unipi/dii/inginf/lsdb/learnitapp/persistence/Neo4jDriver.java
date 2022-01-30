@@ -1,11 +1,12 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.persistence;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.*;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import org.bson.types.ObjectId;
 import org.neo4j.driver.*;
 import org.neo4j.driver.Record;
+import org.neo4j.driver.Session;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -13,9 +14,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 
 import static org.neo4j.driver.Values.parameters;
 import static org.neo4j.driver.internal.value.NullValue.NULL;
@@ -146,13 +144,11 @@ public class Neo4jDriver implements DBDriver {
 
 
     //cambiare
-    public boolean editProfileInfo(User user){
+    public boolean editProfileInfo(User2 user){
         try(Session session = neo4jDriver.session()){
-            session.writeTransaction((TransactionWork<Void>) tx -> {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                String birth = sdf.format(user.getDateOfBirth());
-                tx.run( "MATCH (u:User {username: $username} ) "+
-                        "SET u = {username: $username, complete_name: $complete_name, date_of_birth: $date_of_birth, gender: $gender, email: $email, password: $password, role: $role, profile_picture: $profile_picture}", parameters("username", user.getUsername(), "complete_name", user.getCompleteName(), "date_of_birth", birth, "gender", user.getGender(), "email", user.getEmail(), "password", user.getPassword(), "role", user.getRole().ordinal(), "profile_picture", user.getProfilePic())
+            session.writeTransaction((TransactionWork<Void>) tx -> {;
+                tx.run( "MATCH (u:User {username: $username}) "+
+                        "SET u = {username: $username, gender: $gender, profile_picture: $profile_picture}", parameters("username", user.getUsername(), "gender", user.getGender(), "profile_picture", user.getProfilePic())
                 );
                 return null;
             });
@@ -473,26 +469,12 @@ public class Neo4jDriver implements DBDriver {
     }
 
     //cambiare e aggiungere su mongo
-    public boolean registerUser(final String username, final String complete_name, final String dateOfBirth,
-                                final String gender, final String email, final String password, final String profilePicture,
-                                final boolean isAdmin) {
+    public boolean registerUser(final String username, final String gender, final String profilePicture) {
         try (Session session = neo4jDriver.session())
         {
             session.writeTransaction((TransactionWork<Void>) tx -> {
-                String query = "CREATE (u:User {username: $username, complete_name: $complete_name, " +
-                        " email: $email, password: $password, date_of_birth: $date_of_birth, gender: $gender," +
-                        " profile_picture: $profile_picture, role: ";
-
-                if(isAdmin)
-                    query += "1";
-                else
-                    query += "0";
-                query += "})";
-
-                tx.run( query,
-                        parameters( "username", username, "complete_name", complete_name,
-                                "date_of_birth", dateOfBirth, "gender", gender, "email", email, "password", password,
-                                "profile_picture", profilePicture));
+                tx.run( "CREATE (u:User {username: $username, gender: $gender, profile_picture: $profile_picture})",
+                        parameters( "username", username, "gender", gender, "profile_picture", profilePicture));
                 return null;
             });
             return true;
@@ -540,30 +522,19 @@ public class Neo4jDriver implements DBDriver {
 
     //cambiare
     //Find suggested users that have participated to the same courses of you
-    public List<User> findSuggestedUsers(User loggedUser, int skip, int limit) {
+    public List<User2> findSuggestedUsers(User2 loggedUser, int skip, int limit) {
         try (Session session = neo4jDriver.session())
         {
-            List<User> resultUsers = session.readTransaction((TransactionWork<List<User>>) tx -> {
-                List<User> users = new ArrayList<>();
-                Result result = tx.run("MATCH (u:User{username: $username})-[:REVIEW]->(c)<-[:REVIEW]-(suggested)" +
-                                "WHERE u<>suggested RETURN suggested.username AS username, suggested.complete_name AS complete_name, " +
-                                "suggested.profile_picture AS picture, suggested.gender as gender, suggested.date_of_birth as birth " +
+            List<User2> resultUsers = session.readTransaction(tx -> {
+                List<User2> users = new ArrayList<>();
+                Result result = tx.run("MATCH (u:User{username: $username})-[:REVIEW]->(c)<-[:REVIEW]-(suggested) " +
+                                "WHERE u<>suggested " +
+                                "RETURN suggested.username, suggested.pic, suggested.gender " +
                                 "SKIP $skip LIMIT $limit",
                         parameters( "username", loggedUser.getUsername(), "skip", skip, "limit", limit));
                 while(result.hasNext()){
                     Record record = result.next();
-                    //System.out.println(record.get("username").asString());
-                    User u = new User(record.get("username").asString(), record.get("complete_name").asString());
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                    try {
-                        u.setDateOfBirth(sdf.parse(record.get("birth").asString()));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
-                    if (record.get("gender") != null)
-                        u.setGender(record.get("gender").asString());
-                    u.setProfilePic(record.get("picture").asString());
+                    User2 u = new User2(loggedUser.getUsername(),record.get("gender").asString(), record.get("pic").asString());
                     users.add(u);
                 }
                 return users;
@@ -634,33 +605,19 @@ public class Neo4jDriver implements DBDriver {
     }
 
     //cambiare
-    public List<User> findFollowerUsers(User followedUser, int toSkip, int limit){
-        List<User> users = new ArrayList<>();
+    public List<User2> findFollowerUsers(User2 followedUser, int toSkip, int limit){
+        List<User2> users = new ArrayList<>();
         try (Session session = neo4jDriver.session())
         {
             session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (a:User{username: $username})<-[:FOLLOW]-(b:User) " +
-                                "RETURN b.username as username, b.complete_name as name, b.profile_picture as pic, " +
-                                "b.date_of_birth as date_of_birth, b.gender as gender " +
+                                "RETURN b.username, b.pic, b.gender " +
                                 "SKIP " + toSkip + " LIMIT " + limit,
                         parameters( "username", followedUser.getUsername()));
 
                 while(result.hasNext()){
                     Record record = result.next();
-                    User u = new User(record.get("username").asString(), record.get("name").asString());
-                    if (record.get("pic") != null)
-                        u.setProfilePic(record.get("pic").asString());
-
-                    if (record.get("gender") != null)
-                        u.setGender(record.get("gender").asString());
-
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                    try {
-                        u.setDateOfBirth(sdf.parse(record.get("date_of_birth").asString()));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
+                    User2 u = new User2(record.get("username").asString(), record.get("pic").asString(), record.get("gender").asString());
                     users.add(u);
                 }
 
@@ -713,33 +670,19 @@ public class Neo4jDriver implements DBDriver {
     }
 
     //cambiare
-    public List<User> findFollowedUsers(User followedUser, int toSkip, int limit){
-        List<User> users = new ArrayList<>();
+    public List<User2> findFollowedUsers(User2 followedUser, int toSkip, int limit){
+        List<User2> users = new ArrayList<>();
         try (Session session = neo4jDriver.session())
         {
             session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (a:User{username: $username})-[:FOLLOW]->(b:User) " +
-                                "RETURN b.username as username, b.complete_name as name, b.profile_picture as pic, " +
-                                "b.date_of_birth as date_of_birth, b.gender as gender " +
+                                "RETURN b.username, b.pic, b.gender " +
                                 "SKIP " + toSkip + " LIMIT " + limit,
                         parameters( "username", followedUser.getUsername()));
 
                 while(result.hasNext()){
                     Record record = result.next();
-                    User u = new User(record.get("username").asString(), record.get("name").asString());
-                    if (record.get("pic") != null)
-                        u.setProfilePic(record.get("pic").asString());
-
-                    if (record.get("gender") != null)
-                        u.setGender(record.get("gender").asString());
-
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-                    try {
-                        u.setDateOfBirth(sdf.parse(record.get("date_of_birth").asString()));
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-
+                    User2 u = new User2(record.get("username").asString(), record.get("pic").asString(), record.get("gender").asString());
                     users.add(u);
                 }
 
@@ -803,6 +746,68 @@ public class Neo4jDriver implements DBDriver {
             });
 
             return courses;
+        }
+        catch (Exception ex) {
+            System.err.println("Error while retrieving suggestions from Neo4J");
+            return null;
+        }
+    }
+
+    // nuova, ricontrollare
+    public List<Course2> findMostLikedCourses(int limit){
+        List<Course2> courses = new ArrayList<>();
+        try (Session session = neo4jDriver.session()) {
+            session.readTransaction(tx -> {
+
+                Result r = tx.run("MATCH (:User)-[l:LIKE]->(c:Course) " +
+                                "RETURN c, COUNT (l) AS like_count, "+
+                                "CASE c.duration WHEN null THEN 0 ELSE CASE c.price "+
+                                "WHEN null THEN 1 ELSE c.duration/c.price END "+
+                                "END " +
+                                "AS quality_ratio "+
+                                "ORDER BY like_count DESC, quality_ratio DESC "+
+                                "LIMIT $limit",
+                        parameters("limit", limit));
+
+                while (r.hasNext()) {
+                    Record rec = r.next();
+                    Course2 c = new Course2(rec.get("title").asString(), rec.get("duration").asDouble(), rec.get("price").asDouble(), rec.get("course_pic").asString());
+                    courses.add(c);
+                }
+                return null;
+            });
+
+            return courses;
+        }
+        catch (Exception ex) {
+            System.err.println("Error while retrieving suggestions from Neo4J");
+            return null;
+        }
+    }
+
+    // nuova, ricontrollare
+    public List<User2> findMostFollowedUsers(int limit){
+        List<User2> users = new ArrayList<>();
+        try (Session session = neo4jDriver.session()) {
+            session.readTransaction(tx -> {
+                Result r = tx.run("MATCH (u:User)<-[f:FOLLOW]-(u2:User) " +
+                                "OPTIONAL MATCH (u)-[l:LIKE]->(:Course) "+
+                                "WHERE u.username <> u2.username "+
+                                "RETURN DISTINCT u, COUNT(DISTINCT(f)) AS followers, COUNT(DISTINCT(l)) AS likes "+
+                                "ORDER BY followers DESC, likes DESC "+
+                                "LIMIT $limit ",
+                        parameters("limit", limit));
+
+                while (r.hasNext()) {
+                    Record rec = r.next();
+                    User2 u = new User2(rec.get("username").asString(), rec.get("pic").asString(), rec.get("gender").asString());
+                    users.add(u);
+                }
+
+                return null;
+            });
+
+            return users;
         }
         catch (Exception ex) {
             System.err.println("Error while retrieving suggestions from Neo4J");
