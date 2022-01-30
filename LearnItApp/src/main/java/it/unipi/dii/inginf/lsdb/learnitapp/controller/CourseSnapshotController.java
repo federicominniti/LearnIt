@@ -1,6 +1,6 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -16,14 +16,14 @@ public class CourseSnapshotController {
     @FXML private ImageView coursePicImage;
     @FXML private Label durationLabel;
     @FXML private Label priceLabel;
-    private Course2 course;
+    private Course course;
 
     public void initialize(){
         courseSnapshot.setCursor(Cursor.HAND);
         courseSnapshot.setOnMouseClicked(mouseEvent -> showCompleteCourseInfo(mouseEvent));
     }
 
-    public void setSnapshotCourse(Course2 course) {
+    public void setSnapshotCourse(Course course) {
         titleLabel.setText(course.getTitle());
         if(course.getCoursePic() != null){
             coursePicImage = new ImageView(new Image(course.getCoursePic()));

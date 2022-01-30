@@ -1,6 +1,6 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
@@ -18,14 +18,14 @@ public class UserSnapshotController {
     @FXML private Label completeNameLabel;
     @FXML private Label genderLabel;
     @FXML private Label totalCoursesLabel;
-    private User2 referredUser;
+    private User referredUser;
 
     public void initialize(){
         userSnapshot.setOnMouseClicked(mouseEvent -> showCompleteUserInfo(mouseEvent));
         userSnapshot.setCursor(Cursor.HAND);
     }
 
-    public void setSnapshotUser(User2 user) {
+    public void setSnapshotUser(User user) {
         usernameLabel.setText(user.getUsername());
         if(user.getProfilePic() != null)
             userPicImage = new ImageView(new Image(user.getProfilePic()));

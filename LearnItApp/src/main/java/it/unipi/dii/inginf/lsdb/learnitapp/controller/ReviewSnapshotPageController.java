@@ -1,9 +1,9 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Review2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
@@ -29,8 +29,8 @@ public class ReviewSnapshotPageController {
 
     private VBox container;
 
-    private Course2 course;
-    private Review2 review;
+    private Course course;
+    private Review review;
 
     public void initialize() {
         if (Session.getLocalSession().getLoggedUser().getRole() == 1) {
@@ -48,7 +48,7 @@ public class ReviewSnapshotPageController {
     }
 
     private void loadReviewInformation(){
-        User2 author = MongoDBDriver.getInstance().getUserByUsername(review.getUsername());
+        User author = MongoDBDriver.getInstance().getUserByUsername(review.getUsername());
         if(review.getTitle()!=null)
             courseTitleLabel.setText(review.getTitle());
         else
@@ -73,18 +73,18 @@ public class ReviewSnapshotPageController {
         lastModifiedLabel.setText("Last-modified: "+review.getTimestamp().toString());
     }
 
-    public void setReview(Review2 review, VBox container){
+    public void setReview(Review review, VBox container){
         this.review = review;
         this.container = container;
         loadReviewInformation();
     }
 
-    public void setCourse(Course2 course) {
+    public void setCourse(Course course) {
         this.course = course;
     }
 
     public void visitAuthorProfile(MouseEvent mouseEvent){
-        User2 author = new User2();
+        User author = new User();
         author.setUsername(review.getUsername());
 
         ProfilePageController profilePageController = (ProfilePageController) Utils.changeScene(Utils.PROFILE_PAGE, mouseEvent);

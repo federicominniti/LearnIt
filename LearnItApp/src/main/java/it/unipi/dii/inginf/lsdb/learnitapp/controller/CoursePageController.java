@@ -1,10 +1,10 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Review2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
@@ -60,8 +60,8 @@ public class CoursePageController {
     private XYChart.Series series;
 
 
-    private Course2 course;
-    private Review2 myReview;
+    private Course course;
+    private Review myReview;
     private int pageNumber = 0;
     private int limit;
     private MongoDBDriver mongoDBDriver;
@@ -85,13 +85,13 @@ public class CoursePageController {
         Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
     }
 
-    public void setCourse(Course2 snapCourse){
+    public void setCourse(Course snapCourse){
         this.course = mongoDBDriver.getCourseByTitle(snapCourse.getTitle());
 
         moreReviewsImageView.setOnMouseClicked(clickEvent -> loadMore());
         moreReviewsImageView.setCursor(Cursor.HAND);
 
-        User2 loggedUser = Session.getLocalSession().getLoggedUser();
+        User loggedUser = Session.getLocalSession().getLoggedUser();
         if (loggedUser.getRole() == 1) {
             ImageView trash = new ImageView(new Image(String.valueOf(CoursePageController.class.getResource(Utils.TRASH_BIN))));
             trash.setPreserveRatio(true);
@@ -200,7 +200,7 @@ public class CoursePageController {
         if (skip >= toIndex)
             return;
 
-        List<Review2> toAdd = course.getReviews().subList(skip, toIndex);
+        List<Review> toAdd = course.getReviews().subList(skip, toIndex);
         if(myReview != null) {
             int i;
             boolean found = false;
@@ -223,15 +223,15 @@ public class CoursePageController {
         }
     }
 
-    private void createReviewsElements(List<Review2> reviewsList, VBox container){
+    private void createReviewsElements(List<Review> reviewsList, VBox container){
         BorderPane reviewBorderPane;
-        for(Review2 r: reviewsList){
+        for(Review r: reviewsList){
             reviewBorderPane = loadSingleReview(r);
             container.getChildren().add(reviewBorderPane);
         }
     }
 
-    private BorderPane loadSingleReview(Review2 review) {
+    private BorderPane loadSingleReview(Review review) {
         BorderPane borderPane = null;
 
         try {
@@ -250,14 +250,14 @@ public class CoursePageController {
     public void saveReviewButtonHandler(){
         if(saveReviewButton.getText().equals("Save")) { // save operation
             int rating = getRatingFromStars();
-            User2 loggedUser = Session.getLocalSession().getLoggedUser();
+            User loggedUser = Session.getLocalSession().getLoggedUser();
             Date currentTimestamp = new Date();
 
             String comment = commentTextArea.getText().equals("") ? null : commentTextArea.getText();
             String title = reviewTitleTextField.getText().equals("") ? null : reviewTitleTextField.getText();
 
             if(myReview==null) { // add review
-                myReview = new Review2(title, comment, rating, currentTimestamp, loggedUser.getUsername());
+                myReview = new Review(title, comment, rating, currentTimestamp, loggedUser.getUsername());
 
                 if (DBOperations.addReview(myReview, course)) {
                     Utils.showInfoAlert("Added new review with success!");
@@ -360,7 +360,7 @@ public class CoursePageController {
     }
 
     public void likeCourseButtonHandler(){
-        User2 loggedUser = Session.getLocalSession().getLoggedUser();
+        User loggedUser = Session.getLocalSession().getLoggedUser();
         if(neo4jDriver.isCourseLikedByUser(course, loggedUser)){
             //dislike
             neo4jDriver.dislikeCourse(loggedUser, course);
@@ -472,19 +472,19 @@ public class CoursePageController {
         modality = (modality == null || modality.equals("")) ? null : modality;
         link = (link == null || link.equals("")) ? null : link;
 
-        Course2 newCourse;
+        Course newCourse;
         if(categoryTextField.getText().equals("")) {
-            newCourse = new Course2(course.getTitle(), description, course.getInstructor(), language, level, duration, price, link, null,
+            newCourse = new Course(course.getTitle(), description, course.getInstructor(), language, level, duration, price, link, null,
                     modality, coursePic);
         }
         else
-            newCourse = new Course2(course.getTitle(), description, course.getInstructor(), language, level, duration, price, link, categoryList,
+            newCourse = new Course(course.getTitle(), description, course.getInstructor(), language, level, duration, price, link, categoryList,
                      modality, coursePic);
 
         newCourse.setId(course.getId());
         course = newCourse;
 
-        if(DBOperations.updateCourse(newCourse))
+        if(DBOperations.updateCourse(newCourse, course))
             Utils.showInfoAlert("Course's information updated with success!");
         else
             Utils.showErrorAlert("Error in updating course's information.");

@@ -1,9 +1,9 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.collections.FXCollections;
@@ -45,7 +45,7 @@ public class DiscoveryPageController {
     private GridPane gridPane;
     private int limit;
 
-    private User2 loggedUser = Session.getLocalSession().getLoggedUser();
+    private User loggedUser = Session.getLocalSession().getLoggedUser();
 
     private final static String CREATE_NEW_COURSE_PAGE = "/fxml/NewCoursePage.fxml";
 
@@ -213,7 +213,7 @@ public class DiscoveryPageController {
     }
 
     private void addMoreResearchedCourses(String title, String level, String language, double duration, double price){
-        List<Course2> searchedCourses = mongoDBDriver.findCourses(price, duration, title, level, language, ((currentI*4)+currentJ), limit);
+        List<Course> searchedCourses = mongoDBDriver.findCourses(price, duration, title, level, language, ((currentI*4)+currentJ), limit);
         for(int i = currentI; i<currentI + 4; i++){
             int j;
             if(i == currentI)
@@ -251,7 +251,7 @@ public class DiscoveryPageController {
     }
 
     private void addMoreResearchedUsers(String username) {
-        List<User2> searchedUsers;
+        List<User> searchedUsers;
         if (currentI == 0)
             searchedUsers = mongoDBDriver.searchUserByUsername(username, 0, limit);
         else

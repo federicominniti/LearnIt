@@ -1,23 +1,28 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.persistence;
 
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Review2;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
-import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
+import com.mongodb.MongoException;
+import it.unipi.dii.inginf.lsdb.learnitapp.log.LearnItLogger;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import org.apache.log4j.Logger;
+import org.neo4j.driver.exceptions.Neo4jException;
 
 public class DBOperations {
     private static Neo4jDriver neo4jDriver = Neo4jDriver.getInstance();
     private static MongoDBDriver mongoDBDriver = MongoDBDriver.getInstance();
+    private static Logger mongoLogger = LearnItLogger.getMongoLogger();
+    private static Logger neo4jLogger = LearnItLogger.getNeo4jLogger();
 
-    public static boolean updateCourse(Course course){
-        Course oldCourse = mongoDBDriver.getCourseByTitle(course.getTitle());
-        if (mongoDBDriver.updateCourse(course)) {
-            if (!neo4jDriver.updateCourse(course)) {
-                mongoDBDriver.updateCourse(oldCourse);
-                //Utils.showErrorAlert("Something has gone wrong");
-                return false;
+    public static boolean updateCourse(Course newCourse, Course oldCourse){
+        if (mongoDBDriver.updateCourse(newCourse, oldCourse)) {
+            if (!neo4jDriver.updateCourse(newCourse)) {
+                try {
+                    return mongoDBDriver.updateCourse(oldCourse, oldCourse);
+                } catch (MongoException e) {
+                    mongoLogger.error(e.getMessage());
+                }
             } else {
-                //Utils.showInfoAlert("Course updated successfully");
                 return true;
             }
         }
@@ -28,11 +33,14 @@ public class DBOperations {
         Course oldCourse = mongoDBDriver.getCourseByTitle(course.getTitle());
         if (mongoDBDriver.deleteCourse(course)) {
             if (!neo4jDriver.deleteCourse(course)) {
-                mongoDBDriver.addCourse(oldCourse);
-                Utils.showErrorAlert("Something has gone wrong");
-                return false;
+                try {
+                    mongoDBDriver.addCourse(oldCourse);
+                    return true;
+                } catch (MongoException e) {
+                    mongoLogger.error(e.getMessage());
+                    return false;
+                }
             } else {
-                Utils.showInfoAlert("Course removed successfully");
                 return true;
             }
         }
@@ -40,56 +48,138 @@ public class DBOperations {
     }
 
     public static boolean addReview(Review newReview, Course course){
-        if (mongoDBDriver.addReviewRedundancies(course, newReview)) {
-            if (!neo4jDriver.addReview(course, newReview.getAuthor())) {
-                mongoDBDriver.deleteReview(course, newReview);
-                Utils.showErrorAlert("Something has gone wrong in adding your review");
+        try {
+            mongoDBDriver.addReview(course, newReview);
+        } catch (MongoException e) {
+            return false;
+        }
+
+        if (!neo4jDriver.addReview(course, newReview.getUsername())) {
+            try {
+                mongoDBDriver.deleteReview(course, newReview, true);
                 return false;
-            } else {
-                //Utils.showInfoAlert("Review added successfully");
-                return true;
+            } catch (MongoException e) {
+                mongoLogger.error(e.getMessage());
+                return false;
             }
         }
-        return false;
+
+        return true;
     }
 
     public static boolean deleteReview(Review review, Course course){
-        if (mongoDBDriver.deleteReview(course, review)) {
-            if (!neo4jDriver.deleteReview(course, review.getAuthor())) {
-                mongoDBDriver.addReview(course, review);
-                Utils.showErrorAlert("Something has gone wrong in deleting your review");
+        try {
+            mongoDBDriver.deleteReview(course, review, false);
+        } catch (MongoException e) {
+            return false;
+        }
+
+        if (!neo4jDriver.deleteReview(course, review.getUsername())) {
+            try {
+                mongoDBDriver.deleteReview(course, review, false);
                 return false;
-            } else {
-                Utils.showInfoAlert("Review deleted correctly");
-                return true;
+            } catch (MongoException e) {
+                mongoLogger.error(e.getMessage());
+                return false;
             }
         }
-        return false;
+
+        return true;
     }
 
 
     public static boolean addCourse(Course course){
-        if (mongoDBDriver.addCourse(course)) {
-            if (!neo4jDriver.addCourse(course)) {
+        try {
+            mongoDBDriver.addCourse(course);
+        } catch (MongoException e) {
+            return false;
+        }
+
+        if (!neo4jDriver.addCourse(course)) {
+            try {
                 mongoDBDriver.deleteCourse(course);
-                //Utils.showErrorAlert("Something has gone wrong");
                 return false;
-            } else {
-               // Utils.showInfoAlert("Course added successfully");
-                return true;
+            } catch (MongoException e) {
+                mongoLogger.error(e.getMessage());
+                return false;
             }
         }
-        return false;
+
+        return true;
     }
 
     public static boolean deleteUser(User user) {
-        boolean ret;
-        ret = neo4jDriver.deleteUser(user);
-        if (ret)
-            ret = ret && mongoDBDriver.deleteUserCourses(user) && mongoDBDriver.deleteUserReviewsRedundancies(user);
+        try {
+            mongoDBDriver.deleteUserReviews(user);
+        } catch (MongoException e) {
+            return false;
+        }
 
-        if (!ret)
-            Utils.showErrorAlert("Something has gone wrong. Please retry");
-        return ret;
+        try {
+            mongoDBDriver.deleteUserCourses(user);
+        } catch (MongoException e) {
+            mongoLogger.error(e.getMessage());
+            return false;
+        }
+
+        try {
+            neo4jDriver.deleteUser(user);
+        } catch (Neo4jException e) {
+            neo4jLogger.error(e.getMessage());
+            return false;
+        }
+
+        try {
+            mongoDBDriver.deleteUser(user);
+        } catch (MongoException e) {
+            mongoLogger.error(e.getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean editProfileInfo(User newUser, User oldUser) {
+        try {
+            mongoDBDriver.editProfileInfo(newUser);
+            if (newUser.getRole() == 1)
+                return true;
+        } catch (MongoException e) {
+            return false;
+        }
+
+        if (!neo4jDriver.editProfileInfo(newUser)) {
+            try {
+                mongoDBDriver.editProfileInfo(oldUser);
+            } catch (MongoException e) {
+                mongoLogger.error(e.getMessage());
+            }
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public static boolean addUser(User newUser) {
+        try {
+            mongoDBDriver.addUser(newUser);
+            if (newUser.getRole() == 1)
+                return true;
+        } catch (MongoException e) {
+            return false;
+        }
+
+        if (!neo4jDriver.registerUser(newUser.getUsername(), newUser.getGender(), newUser.getProfilePic())) {
+            try {
+                mongoDBDriver.deleteUser(newUser);
+            } catch (MongoException e) {
+                mongoLogger.error(e.getMessage());
+            }
+
+            return false;
+        }
+
+        return true;
     }
 }

@@ -4,11 +4,9 @@ import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Course {
-
     @BsonId
     private ObjectId id;
     @BsonProperty(value = "title")
@@ -16,7 +14,7 @@ public class Course {
     @BsonProperty(value = "description")
     private String description;
     @BsonProperty(value = "instructor")
-    private User instructor;
+    private String instructor;
     @BsonProperty(value = "language")
     private String language;
     @BsonProperty(value = "category")
@@ -24,9 +22,9 @@ public class Course {
     @BsonProperty(value = "level")
     private String level;
     @BsonProperty(value = "duration")
-    private double duration;
+    private Double duration;
     @BsonProperty(value = "price")
-    private double price;
+    private Double price;
     @BsonProperty(value = "link")
     private String link;
     @BsonProperty(value = "modality")
@@ -34,124 +32,56 @@ public class Course {
     @BsonProperty(value = "reviews")
     private List<Review> reviews;
     @BsonProperty(value="num_reviews")
-    private int num_reviews;
+    private Integer num_reviews;
     @BsonProperty(value="sum_ratings")
-    private int sum_ratings;
+    private Integer sum_ratings;
     @BsonProperty(value="course_pic")
     private String coursePic;
+    @BsonProperty(value="new_price")
+    private Integer newPrice;
     @BsonProperty(value="year")
-    private int year;
-
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public Course(ObjectId id, String title, String description, User instructor, String language, List<String> category,
-                  String level, double duration, double price, String link, String modality, List<Review> reviews,
-                  int num_reviews, int sum_ratings, String coursePic) {
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.instructor = instructor;
-        this.language = language;
-        this.category = category;
-        this.level = level;
-        this.duration = duration;
-        this.price = price;
-        this.link = link;
-        this.modality = modality;
-        this.reviews = reviews;
-        this.num_reviews = num_reviews;
-        this.sum_ratings = sum_ratings;
-        this.coursePic = coursePic;
-    }
-
-    public Course(String title) {
-        this.title = title;
-    }
-
-    public Course(ObjectId id) { this.id = id; }
-
-    public Course(String title, String description, User instructor, String language, List<String> category, String level,
-                  double duration, double price, String link, String modality, List<Review> reviews, int num_reviews,
-                  int sum_ratings, String coursePic) {
-        this.title = title;
-        this.description = description;
-        this.instructor = instructor;
-        this.language = language;
-        this.category = category;
-        this.level = level;
-        this.duration = duration;
-        this.price = price;
-        this.link = link;
-        this.modality = modality;
-        this.reviews = reviews;
-        this.num_reviews = num_reviews;
-        this.sum_ratings = sum_ratings;
-        this.coursePic = coursePic;
-    }
-
-    public Course(ObjectId id, String title, double duration, double price) {
-        this.id = id;
-        this.title = title;
-        this.duration = duration;
-        this.price = price;
-    }
-
-    public Course(String title, double duration, double price, String coursePic) {
-        this.title = title;
-        this.duration = duration;
-        this.price = price;
-        this.coursePic = coursePic;
-    }
+    private Integer year;
 
     public Course() {
 
     }
 
-    public Course(ObjectId oid, String title, String description, User instructor, String language, List<String> category,
-                  String level, double duration, double price, String link, String modality, int num_reviews,
-                  int sum_ratings, String coursePic) {
-        this(oid, title, description, instructor, language, category, level, duration, price, link, modality,
-                new ArrayList<Review>(), num_reviews, sum_ratings, coursePic);
+    public Course(String title, Double duration, Double price, String course_pic){ // for snapshots
+        this.title = title;
+
+        if(duration!=null)
+            this.duration = duration;
+
+        if(price!=null)
+            this.price = price;
+
+        if(course_pic != null)
+            this.coursePic = course_pic;
+
     }
 
-    public Course(ObjectId oid, String title, String description, User instructor, String language, String level,
-                  double duration, double price, String link, String modality, List<Review> reviews, int num_reviews,
-                  int sum_ratings, String coursePic) {
-        this(oid, title, description, instructor, language, new ArrayList<String>(), level, duration, price, link,
-                modality, reviews, num_reviews, sum_ratings, coursePic);
-    }
-
-    public Course(ObjectId oid, String title, String description, User instructor, String language, String level,
-                  double duration, double price, String link, String modality, int num_reviews, int sum_ratings,
-                  String coursePic) {
-        this(oid, title, description, instructor, language, new ArrayList<String>(), level, duration, price, link,
-                modality, new ArrayList<Review>(), num_reviews, sum_ratings, coursePic);
-    }
-
-    public Course(String title, String description, User instructor, String language, String level,
-                  double duration, double price, String link, String modality, String coursePic) {
-        this(title, description, instructor, language, new ArrayList<String>(), level, duration, price, link,
-                modality, new ArrayList<Review>(), 0, 0, coursePic);
-    }
-
-    public Course(String title, String description, User instructor, String language, List<String> category, String level,
-                  double duration, double price, String link, String modality, String coursePic) {
-        this(title, description, instructor, language, category, level, duration, price, link,
-                modality, new ArrayList<Review>(), 0, 0, coursePic);
-    }
-
-    public void addReview(Review review) {
-        this.reviews.add(review);
-    }
-
-    public void setInstructor(User user) {
-        this.instructor = user;
+    public Course(String title, String description, String instructor, String language, String level,
+                  Double duration, Double price, String link, List<String> category, String modality, String coursePic){
+        this.title = title;
+        this.description = description;
+        this.instructor = instructor;
+        if(language != null)
+            this.language = language;
+        this.level = level;
+        if(duration!=null)
+            this.duration = duration;
+        if(price!=null)
+            this.price = price;
+        if(link!=null)
+            this.link = link;
+        if(category!=null){
+            if(category.size()>0)
+                this.category = category;
+        }
+        if(modality!=null)
+            this.modality = modality;
+        if(coursePic!=null)
+            this.coursePic = coursePic;
     }
 
     public ObjectId getId() {
@@ -160,26 +90,6 @@ public class Course {
 
     public void setId(ObjectId id) {
         this.id = id;
-    }
-
-    public void addCategory(String category) {
-        this.category.add(category);
-    }
-
-    public void deleteReview(Review review) {
-        this.reviews.remove(review);
-    }
-
-    public void deleteCategory(String category) {
-        this.category.remove(category);
-    }
-
-    public List<Review> getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(List<Review> reviews) {
-        this.reviews = reviews;
     }
 
     public String getTitle() {
@@ -198,8 +108,12 @@ public class Course {
         this.description = description;
     }
 
-    public User getInstructor() {
+    public String getInstructor() {
         return instructor;
+    }
+
+    public void setInstructor(String instructor) {
+        this.instructor = instructor;
     }
 
     public String getLanguage() {
@@ -226,19 +140,19 @@ public class Course {
         this.level = level;
     }
 
-    public double getDuration() {
+    public Double getDuration() {
         return duration;
     }
 
-    public void setDuration(double duration) {
+    public void setDuration(Double duration) {
         this.duration = duration;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -258,27 +172,51 @@ public class Course {
         this.modality = modality;
     }
 
-    public int getSum_ratings() {
-        return sum_ratings;
+    public List<Review> getReviews() {
+        return reviews;
     }
 
-    public void setSum_ratings(int sum_ratings) {
-        this.sum_ratings = sum_ratings;
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 
-    public int getNum_reviews() {
+    public Integer getNum_reviews() {
         return num_reviews;
     }
 
-    public void setNum_reviews(int num_reviews) {
+    public void setNum_reviews(Integer num_reviews) {
         this.num_reviews = num_reviews;
     }
 
-    public String  getCoursePic() {
+    public Integer getSum_ratings() {
+        return sum_ratings;
+    }
+
+    public void setSum_ratings(Integer sum_ratings) {
+        this.sum_ratings = sum_ratings;
+    }
+
+    public String getCoursePic() {
         return coursePic;
     }
 
     public void setCoursePic(String coursePic) {
         this.coursePic = coursePic;
+    }
+
+    public Integer getNewPrice() {
+        return newPrice;
+    }
+
+    public void setNewPrice(Integer newPrice) {
+        this.newPrice = newPrice;
+    }
+
+    public Integer getYear() {
+        return year;
+    }
+
+    public void setYear(Integer year) {
+        this.year = year;
     }
 }

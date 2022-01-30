@@ -1,8 +1,8 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.persistence;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.*;
@@ -69,7 +69,7 @@ public class Neo4jDriver implements DBDriver {
             neo4jDriver.close();
     }
 
-    public boolean followUser(User2 follower, User2 followed){
+    public boolean followUser(User follower, User followed){
         try(Session session = neo4jDriver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH (a:User) WHERE a.username = $followed " +
@@ -85,7 +85,7 @@ public class Neo4jDriver implements DBDriver {
         return false;
     }
 
-    public boolean unfollowUser(User2 follower, User2 followed){
+    public boolean unfollowUser(User follower, User followed){
         try(Session session = neo4jDriver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH (a:User {username:$follower})-[r:FOLLOW]->(b:User{username:$followed}) " +
@@ -100,7 +100,7 @@ public class Neo4jDriver implements DBDriver {
         return false;
     }
 
-    public boolean likeCourse(User2 user, Course2 course){
+    public boolean likeCourse(User user, Course course){
         try(Session session = neo4jDriver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH (u:User) WHERE u.username = $username " +
@@ -117,7 +117,7 @@ public class Neo4jDriver implements DBDriver {
     }
 
 
-    public boolean dislikeCourse(User2 user, Course2 course){
+    public boolean dislikeCourse(User user, Course course){
         try(Session session = neo4jDriver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH (u:User {username: $username} )-[r:LIKE]->(c:Course {title: $title}) " +
@@ -133,7 +133,7 @@ public class Neo4jDriver implements DBDriver {
     }
 
 
-    public boolean editProfileInfo(User2 user){
+    public boolean editProfileInfo(User user){
         try(Session session = neo4jDriver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {;
                 tx.run( "MATCH (u:User {username: $username}) "+
@@ -149,7 +149,7 @@ public class Neo4jDriver implements DBDriver {
         return false;
     }
 
-    public boolean deleteUser(User2 user){
+    public boolean deleteUser(User user){
         try(Session session = neo4jDriver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run( "MATCH (u:User{username: $username}) "+
@@ -165,8 +165,8 @@ public class Neo4jDriver implements DBDriver {
         return false;
     }
 
-    public List<Course2> findSuggestedCoursesByCompletedCourses(User2 user, int skip, int limit){
-        List<Course2> courses = new ArrayList<>();
+    public List<Course> findSuggestedCoursesByCompletedCourses(User user, int skip, int limit){
+        List<Course> courses = new ArrayList<>();
 
         try(Session session = neo4jDriver.session()){
 
@@ -179,7 +179,7 @@ public class Neo4jDriver implements DBDriver {
 
                 while(result.hasNext()){
                     Record r = result.next();
-                    courses.add(new Course2(r.get("title").asString(), r.get("duration").asDouble(), r.get("price").asDouble(), r.get("pic").asString()));
+                    courses.add(new Course(r.get("title").asString(), r.get("duration").asDouble(), r.get("price").asDouble(), r.get("pic").asString()));
                 }
                 return null;
             });
@@ -191,7 +191,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    public boolean addCourse(Course2 course) {
+    public boolean addCourse(Course course) {
         try (Session session = neo4jDriver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run( "CREATE (c:Course {title: $title, duration: $duration, price: $price})",
@@ -208,7 +208,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    public boolean updateCourse(Course2 course) {
+    public boolean updateCourse(Course course) {
         try (Session session = neo4jDriver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH (c:Course {title: $title}) " +
@@ -225,7 +225,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    public boolean deleteCourse(Course2 course) {
+    public boolean deleteCourse(Course course) {
         try (Session session = neo4jDriver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run( "MATCH (c:Course) WHERE c.title = $title DETACH DELETE c",
@@ -240,14 +240,14 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    public boolean addReview(Course2 ratedCourse, User2 user) {
+    public boolean addReview(Course ratedCourse, String username) {
         try (Session session = neo4jDriver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH" +
                                 "  (u:User {username: $username})," +
                                 "  (c:Course {title: $title})" +
                                 "MERGE (u)-[:REVIEW]->(c)",
-                        parameters("username", user.getUsername(),
+                        parameters("username", username,
                                 "title", ratedCourse.getTitle()));
                 return null;
             });
@@ -259,11 +259,11 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    public boolean deleteReview(Course2 ratedCourse, User2 user) {
+    public boolean deleteReview(Course ratedCourse, String username) {
         try (Session session = neo4jDriver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run("MATCH (u:User {username: $username})-[r:REVIEW]->(c:Course {title: $title}) DELETE r",
-                        parameters("username", user.getUsername(), "title", ratedCourse.getTitle()));
+                        parameters("username", username, "title", ratedCourse.getTitle()));
                 return null;
             });
             return true;
@@ -274,9 +274,9 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    public List<Course2> findSuggestedCourses(User2 user, int skipFirstLvl, int limitFirstLvl, int skipSecondLvl,
-                                              int limitSecondLvl, int numRelationships) {
-        List<Course2> suggested = new ArrayList<>();
+    public List<Course> findSuggestedCourses(User user, int skipFirstLvl, int limitFirstLvl, int skipSecondLvl,
+                                             int limitSecondLvl, int numRelationships) {
+        List<Course> suggested = new ArrayList<>();
         try (Session session = neo4jDriver.session()) {
             session.readTransaction(tx -> {
                 Result r = tx.run(
@@ -308,7 +308,7 @@ public class Neo4jDriver implements DBDriver {
                     double duration = rec.get("duration").asDouble();
                     double price = rec.get("price").asDouble();
                     String pic = rec.get("pic").asString();
-                    suggested.add(new Course2(title, duration, price, pic));
+                    suggested.add(new Course(title, duration, price, pic));
                 }
 
                 return null;
@@ -322,9 +322,9 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    public List<User2> findSuggestedUsers(User2 user, int followedThreshold, int skipFirstLvl, int limitFirstLvl,
-                                          int skipSecondLvl, int limitSecondLvl, int numCommonCourses) {
-        List<User2> suggested = new ArrayList<>();
+    public List<User> findSuggestedUsers(User user, int followedThreshold, int skipFirstLvl, int limitFirstLvl,
+                                         int skipSecondLvl, int limitSecondLvl, int numCommonCourses) {
+        List<User> suggested = new ArrayList<>();
         try (Session session = neo4jDriver.session()) {
             session.readTransaction(tx -> {
                 Result r = tx.run(
@@ -354,7 +354,7 @@ public class Neo4jDriver implements DBDriver {
                     String username = rec.get("username").asString();
                     String gender = rec.get("gender").asString();
                     String pic = rec.get("pic").asString();
-                    suggested.add(new User2(username, pic, gender));
+                    suggested.add(new User(username, pic, gender));
                 }
 
                 return null;
@@ -385,14 +385,14 @@ public class Neo4jDriver implements DBDriver {
     }
 
     //Find courses liked or completed by a specific user
-    public List<Course2> findCoursesLikedOrCompletedByUser(User2 user, final boolean researchFlag, int skip, int limit) {
+    public List<Course> findCoursesLikedOrCompletedByUser(User user, final boolean researchFlag, int skip, int limit) {
         //0 -> liked
         //1 -> completed
         try (Session session = neo4jDriver.session())
         {
-            List<Course2> resultCourses = session.readTransaction((TransactionWork<List<Course2>>) tx -> {
+            List<Course> resultCourses = session.readTransaction((TransactionWork<List<Course>>) tx -> {
                 String relationship;
-                List<Course2> courses = new ArrayList<>();
+                List<Course> courses = new ArrayList<>();
                 if(researchFlag)
                     relationship = "REVIEW";
                 else
@@ -404,7 +404,7 @@ public class Neo4jDriver implements DBDriver {
                         "limit", limit));
                 while(result.hasNext()){
                     Record record = result.next();
-                    courses.add(new Course2(record.get("title").asString(), record.get("duration").asDouble(),
+                    courses.add(new Course(record.get("title").asString(), record.get("duration").asDouble(),
                             record.get("price").asDouble(), record.get("pic").asString()));
                 }
                 return courses;
@@ -419,11 +419,11 @@ public class Neo4jDriver implements DBDriver {
     }
 
     //Find suggested users that have participated to the same courses of you
-    public List<User2> findSuggestedUsers(User2 loggedUser, int skip, int limit) {
+    public List<User> findSuggestedUsers(User loggedUser, int skip, int limit) {
         try (Session session = neo4jDriver.session())
         {
-            List<User2> resultUsers = session.readTransaction(tx -> {
-                List<User2> users = new ArrayList<>();
+            List<User> resultUsers = session.readTransaction(tx -> {
+                List<User> users = new ArrayList<>();
                 Result result = tx.run("MATCH (u:User{username: $username})-[:REVIEW]->(c)<-[:REVIEW]-(suggested) " +
                                 "WHERE u<>suggested " +
                                 "RETURN suggested.username, suggested.pic, suggested.gender " +
@@ -431,7 +431,7 @@ public class Neo4jDriver implements DBDriver {
                         parameters( "username", loggedUser.getUsername(), "skip", skip, "limit", limit));
                 while(result.hasNext()){
                     Record record = result.next();
-                    User2 u = new User2(loggedUser.getUsername(),record.get("gender").asString(), record.get("pic").asString());
+                    User u = new User(loggedUser.getUsername(),record.get("gender").asString(), record.get("pic").asString());
                     users.add(u);
                 }
                 return users;
@@ -446,7 +446,7 @@ public class Neo4jDriver implements DBDriver {
     }
 
 
-    public boolean offerCourse(User2 user, Course2 course) {
+    public boolean offerCourse(User user, Course course) {
         try (Session session = neo4jDriver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
                 tx.run( "MATCH (u:User {username: $username}) " +
@@ -483,8 +483,8 @@ public class Neo4jDriver implements DBDriver {
         return false;
     }
 
-    public List<User2> findFollowerUsers(User2 followedUser, int toSkip, int limit){
-        List<User2> users = new ArrayList<>();
+    public List<User> findFollowerUsers(User followedUser, int toSkip, int limit){
+        List<User> users = new ArrayList<>();
         try (Session session = neo4jDriver.session())
         {
             session.readTransaction(tx -> {
@@ -495,7 +495,7 @@ public class Neo4jDriver implements DBDriver {
 
                 while(result.hasNext()){
                     Record record = result.next();
-                    User2 u = new User2(record.get("username").asString(), record.get("pic").asString(), record.get("gender").asString());
+                    User u = new User(record.get("username").asString(), record.get("pic").asString(), record.get("gender").asString());
                     users.add(u);
                 }
 
@@ -511,7 +511,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    public boolean isCourseLikedByUser(Course2 course, User2 user) {
+    public boolean isCourseLikedByUser(Course course, User user) {
         try (Session session = neo4jDriver.session()) {
             boolean res = session.readTransaction(tx -> {
                 Result r = tx.run("MATCH (u:User {username: $username})-[:LIKE]->(c:Course {title: $title}) RETURN u",
@@ -529,7 +529,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    public boolean isCourseReviewedByUser(Course2 course, User2 user) {
+    public boolean isCourseReviewedByUser(Course course, User user) {
         try (Session session = neo4jDriver.session()) {
             boolean res = session.readTransaction(tx -> {
                 Result r = tx.run("MATCH (u:User {username: $username})-[:REVIEW]->(c:Course {title: $title}) RETURN u",
@@ -547,8 +547,8 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    public List<User2> findFollowedUsers(User2 followedUser, int toSkip, int limit){
-        List<User2> users = new ArrayList<>();
+    public List<User> findFollowedUsers(User followedUser, int toSkip, int limit){
+        List<User> users = new ArrayList<>();
         try (Session session = neo4jDriver.session())
         {
             session.readTransaction(tx -> {
@@ -559,7 +559,7 @@ public class Neo4jDriver implements DBDriver {
 
                 while(result.hasNext()){
                     Record record = result.next();
-                    User2 u = new User2(record.get("username").asString(), record.get("pic").asString(), record.get("gender").asString());
+                    User u = new User(record.get("username").asString(), record.get("pic").asString(), record.get("gender").asString());
                     users.add(u);
                 }
 
@@ -575,7 +575,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    public List<Integer> getFollowStats(User2 u) {
+    public List<Integer> getFollowStats(User u) {
         List<Integer> followStats = new ArrayList<>();
         try (Session session = neo4jDriver.session()) {
             session.readTransaction(tx -> {
@@ -604,8 +604,8 @@ public class Neo4jDriver implements DBDriver {
     }
 
     // nuova, ricontrollare
-    public List<Course2> findMostLikedCourses(int limit){
-        List<Course2> courses = new ArrayList<>();
+    public List<Course> findMostLikedCourses(int limit){
+        List<Course> courses = new ArrayList<>();
         try (Session session = neo4jDriver.session()) {
             session.readTransaction(tx -> {
 
@@ -621,7 +621,7 @@ public class Neo4jDriver implements DBDriver {
 
                 while (r.hasNext()) {
                     Record rec = r.next();
-                    Course2 c = new Course2(rec.get("title").asString(), rec.get("duration").asDouble(), rec.get("price").asDouble(), rec.get("course_pic").asString());
+                    Course c = new Course(rec.get("title").asString(), rec.get("duration").asDouble(), rec.get("price").asDouble(), rec.get("course_pic").asString());
                     courses.add(c);
                 }
                 return null;
@@ -636,8 +636,8 @@ public class Neo4jDriver implements DBDriver {
     }
 
     // nuova, ricontrollare
-    public List<User2> findMostFollowedUsers(int limit){
-        List<User2> users = new ArrayList<>();
+    public List<User> findMostFollowedUsers(int limit){
+        List<User> users = new ArrayList<>();
         try (Session session = neo4jDriver.session()) {
             session.readTransaction(tx -> {
                 Result r = tx.run("MATCH (u:User)<-[f:FOLLOW]-(u2:User) " +
@@ -650,7 +650,7 @@ public class Neo4jDriver implements DBDriver {
 
                 while (r.hasNext()) {
                     Record rec = r.next();
-                    User2 u = new User2(rec.get("username").asString(), rec.get("pic").asString(), rec.get("gender").asString());
+                    User u = new User(rec.get("username").asString(), rec.get("pic").asString(), rec.get("gender").asString());
                     users.add(u);
                 }
 

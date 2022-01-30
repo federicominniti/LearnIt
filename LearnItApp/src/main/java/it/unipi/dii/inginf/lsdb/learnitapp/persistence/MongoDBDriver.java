@@ -30,8 +30,8 @@ public class MongoDBDriver implements DBDriver {
 
     private static MongoClient mongoClient;
     private static MongoDatabase database;
-    private static MongoCollection<Course2> coursesCollection;
-    private static MongoCollection<User2> usersCollection;
+    private static MongoCollection<Course> coursesCollection;
+    private static MongoCollection<User> usersCollection;
     private static String mongoDBPrimaryIP;
     private static int mongoDBPrimaryPort;
     private static String mongoDBSecondIP;
@@ -112,10 +112,10 @@ public class MongoDBDriver implements DBDriver {
 
             DBObject ping = new BasicDBObject("ping","1");
 
-            coursesCollection = database.getCollection("learnit_edited", Course2.class);
-            usersCollection = database.getCollection("users", User2.class);
+            coursesCollection = database.getCollection("learnit_edited", Course.class);
+            usersCollection = database.getCollection("users", User.class);
 
-            User2 u = usersCollection.find().first();
+            User u = usersCollection.find().first();
             System.out.println(u.getUsername());
             database.runCommand((Bson) ping);
         } catch (Exception e) {
@@ -133,29 +133,21 @@ public class MongoDBDriver implements DBDriver {
     }
 
     //provata - ok
-    public boolean addCourse(Course2 newCourse) {
-        try {
-            coursesCollection.insertOne(newCourse);
-        } catch (Exception e) {
-            System.err.println("Error: cannot add new course");
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
+    public void addCourse(Course newCourse) throws MongoException {
+        coursesCollection.insertOne(newCourse);
     }
 
     //provata
-    public Course2 getCourseByTitle(String title) {
+    public Course getCourseByTitle(String title) {
         try {
-            Course2 c = coursesCollection.find(Filters.eq("title", title)).first();
+            Course c = coursesCollection.find(Filters.eq("title", title)).first();
             return c;
         } catch (Exception e) {
             return null;
         }
     }
 
-    public boolean updateCourse(Course2 editedCourse, Course2 oldCourse) throws MongoException {
+    public boolean updateCourse(Course editedCourse, Course oldCourse) throws MongoException {
         if (oldCourse == null) {
             //this is the case when you want to update the course reviews only
             Bson filter = Filters.eq("_id", editedCourse.getId());
@@ -246,19 +238,11 @@ public class MongoDBDriver implements DBDriver {
 
             //if there are no changes to be made to the snapshots in the user collection
             if (update_snapshots.size() == 0) {
-                try {
-                    coursesCollection.updateOne(filter, Updates.combine(updates));
-                    return true;
-                } catch (MongoException e) {
-                    return false;
-                }
+                coursesCollection.updateOne(filter, Updates.combine(updates));
+                return true;
             } else {
                 //there is at least one field to change in the snapshots of the user collection
-                try {
-                    coursesCollection.updateOne(filter, updates);
-                } catch (MongoException e) {
-                    return false;
-                }
+                coursesCollection.updateOne(filter, updates);
 
                 Bson exists = Filters.exists("reviewed", true);
                 Bson set = Updates.combine(update_snapshots);
@@ -281,7 +265,7 @@ public class MongoDBDriver implements DBDriver {
     }
 
     //non cancellare snapshot
-    public boolean deleteCourse(Course2 toBeDeleted) {
+    public boolean deleteCourse(Course toBeDeleted) {
         try {
             Bson match = Filters.eq("_id", toBeDeleted.getId());
             coursesCollection.deleteOne(match);
@@ -293,23 +277,17 @@ public class MongoDBDriver implements DBDriver {
     }
 
     //non cancellare snapshot su collection utenti
-    public boolean deleteUserCourses(User2 user) { // aggiungere indice per la find ???
+    public void deleteUserCourses(User user) throws MongoException { // aggiungere indice per la find ???
         Bson deleteFilter = Filters.eq("instructor", user.getUsername());
-        try {
-            coursesCollection.deleteMany(deleteFilter);
-            return true;
-        } catch (MongoException e) {
-            return false;
-        }
+        coursesCollection.deleteMany(deleteFilter);
     }
 
-
     //fare solo updatecourse aggiornata con aggiornamento ridondanze
-    public boolean editReview(Course2 course, Review2 review){
-        List<Review2> reviews = course.getReviews();
+    public boolean editReview(Course course, Review review){
+        List<Review> reviews = course.getReviews();
         int count = 0;
         int sum_ratings = course.getSum_ratings();
-        for (Review2 r: reviews) {
+        for (Review r: reviews) {
             if (r.getUsername().equals(review.getUsername())) {
                 sum_ratings -= r.getRating();
                 reviews.set(count, review);
@@ -324,20 +302,15 @@ public class MongoDBDriver implements DBDriver {
 
     //rivedere ma va bene
     //new
-    public boolean deleteUserReviews(User2 user) {
+    public void deleteUserReviews(User user) throws MongoException {
         Bson pullFilter = Updates.pull("reviews", Filters.eq("username", user.getUsername()));
-        try {
-            coursesCollection.updateMany(Filters.empty(), pullFilter);
-            return true;
-        } catch (MongoException e) {
-            return false;
-        }
+        coursesCollection.updateMany(Filters.empty(), pullFilter);
     }
 
     //provata
-    public List<Course2> findCourses(double priceThreshold, double durationThreshold, String title, String level, String language, int toSkip, int quantity){
+    public List<Course> findCourses(double priceThreshold, double durationThreshold, String title, String level, String language, int toSkip, int quantity){
 
-        List<Course2> courses = null;
+        List<Course> courses = null;
 
         Bson filter = null;
 
@@ -384,13 +357,13 @@ public class MongoDBDriver implements DBDriver {
                 .skip(toSkip)
                 .limit(quantity)
                 .projection(Projections.exclude("reviews"))
-                .into(new ArrayList<Course2>());
+                .into(new ArrayList<Course>());
 
         return courses;
     }
 
     //provata - OK
-    public List<Course2> findBestRatings(int limit){ // trasformare come trindingCourses se funziona ???
+    public List<Course> findBestRatings(int limit){ // trasformare come trindingCourses se funziona ???
 
         List<Document> aggregation = Arrays.asList(
                 new Document("$match", new Document("num_reviews", new Document("$gt", 0))),
@@ -400,13 +373,13 @@ public class MongoDBDriver implements DBDriver {
                 new Document("$limit", 10),
                 new Document("$project", new Document("reviews", 0)));
 
-        List<Course2> c = coursesCollection.aggregate(aggregation).into(new ArrayList<>());
+        List<Course> c = coursesCollection.aggregate(aggregation).into(new ArrayList<>());
 
         return c;
     }
 
     //provata
-    public List<Course2> trendingCourses(int limit){
+    public List<Course> trendingCourses(int limit){
         Date d = new Date();
 
         Calendar cal = Calendar.getInstance();
@@ -416,7 +389,7 @@ public class MongoDBDriver implements DBDriver {
 
         Date d2 = cal.getTime();
 
-        List<Course2> c = coursesCollection.aggregate(Arrays.asList(
+        List<Course> c = coursesCollection.aggregate(Arrays.asList(
                 new Document("$match", new Document("reviews.edited_timestamp", new Document("$gte", d2))),
                 new Document("$unwind", "$reviews"),
                 new Document("$group", new Document("_id", "$_id")
@@ -427,22 +400,22 @@ public class MongoDBDriver implements DBDriver {
 
 
         List<ObjectId> ids = new ArrayList<>();
-        for (Course2 item: c) {
+        for (Course item: c) {
             ids.add(item.getId());
         }
-        List<Course2> res = findSnapshotsByIds(ids);
+        List<Course> res = findSnapshotsByIds(ids);
         return res;
     }
 
-    public List<Course2> findSnapshotsByIds(List<ObjectId> ids) {
-        List<Course2> res = coursesCollection.find(Filters.in("_id", ids)).projection(Projections.exclude("reviews")).into(new ArrayList<>());
+    public List<Course> findSnapshotsByIds(List<ObjectId> ids) {
+        List<Course> res = coursesCollection.find(Filters.in("_id", ids)).projection(Projections.exclude("reviews")).into(new ArrayList<>());
         return res;
     }
 
     //provata
-    public HashMap<String, Double> getCourseAnnualRatings(Course2 course) {
+    public HashMap<String, Double> getCourseAnnualRatings(Course course) {
         HashMap<String, Double> annualRatings = new HashMap<>();
-        List<Course2> doc = coursesCollection.aggregate(Arrays.asList(
+        List<Course> doc = coursesCollection.aggregate(Arrays.asList(
                 new Document("$match", new Document("_id", course.getId())),
                 new Document("$unwind", "$reviews"),
                 new Document("$group", new Document("_id", new Document("year", new Document("$year", "$reviews.edited_timestamp")))
@@ -453,7 +426,7 @@ public class MongoDBDriver implements DBDriver {
                 new Document("$sort", new Document("year", 1))
         )).into(new ArrayList<>());
 
-        for (Course2 c: doc) {
+        for (Course c: doc) {
             System.out.println(c.getYear());
             annualRatings.put(String.valueOf(c.getYear()), ((double)c.getSum_ratings() / c.getNum_reviews()));
         }
@@ -461,13 +434,13 @@ public class MongoDBDriver implements DBDriver {
     }
 
     public boolean checkCourseExists(String title) {
-        Course2 c = coursesCollection.find(Filters.eq("title", title)).projection(Projections.include("title")).first();
+        Course c = coursesCollection.find(Filters.eq("title", title)).projection(Projections.include("title")).first();
         if (c == null)
             return false;
         return true;
     }
 
-    public List<User2> mostActiveUsers(int limit) {
+    public List<User> mostActiveUsers(int limit) {
         Date d = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(d);
@@ -489,20 +462,20 @@ public class MongoDBDriver implements DBDriver {
                         .append("_id", 0)),
                 new Document("$limit", limit));
 
-        List<User2> res = usersCollection.aggregate(aggregation).into(new ArrayList<>());
+        List<User> res = usersCollection.aggregate(aggregation).into(new ArrayList<>());
         return res;
     }
 
-    public User2 getUserByUsername(String username) {
+    public User getUserByUsername(String username) {
         try {
-            User2 u = usersCollection.find(Filters.eq("username", username)).first();
+            User u = usersCollection.find(Filters.eq("username", username)).first();
             return u;
         } catch (MongoException e) {
             return null;
         }
     }
 
-    public List<User2> bestUsers(int limit){
+    public List<User> bestUsers(int limit){
         List<Document> aggregation = Arrays.asList(new Document("$unwind",
                         new Document("path", "$reviewed")),
                 new Document("$match",
@@ -532,12 +505,12 @@ public class MongoDBDriver implements DBDriver {
                         new Document("value", 1)),
                 new Document("$limit", limit));
 
-        List<User2> users = usersCollection.aggregate(aggregation).into(new ArrayList<>());
+        List<User> users = usersCollection.aggregate(aggregation).into(new ArrayList<>());
         return users;
     }
 
-    private void addReviewToCourse(Course2 course, Review2 review) throws MongoException{
-        List<Review2> reviewsList = course.getReviews();
+    private void addReviewToCourse(Course course, Review review) throws MongoException{
+        List<Review> reviewsList = course.getReviews();
         if (reviewsList == null)
             reviewsList = new ArrayList<>();
         reviewsList.add(review);
@@ -547,7 +520,7 @@ public class MongoDBDriver implements DBDriver {
         updateCourse(course, null);
     }
 
-    private void addSnapshotCourseToUser(Course2 course, Review2 review) throws MongoException{
+    private void addSnapshotCourseToUser(Course course, Review review) throws MongoException{
         Document d = new Document("title", course.getTitle())
                 .append("review_timestamp", review.getTimestamp());
 
@@ -565,7 +538,7 @@ public class MongoDBDriver implements DBDriver {
 
     }
 
-    public boolean addReview(Course2 course, Review2 review){
+    public boolean addReview(Course course, Review review){
         try{
             addReviewToCourse(course, review);
         }catch (MongoException e){
@@ -589,20 +562,20 @@ public class MongoDBDriver implements DBDriver {
         return false;
     }
 
-    private void deleteSnapshotCourseFromUser(Course2 course, Review2 review) throws MongoException{
+    private void deleteSnapshotCourseFromUser(Course course, Review review) throws MongoException{
         Bson userFilter = Filters.eq("username", review.getUsername());
         Bson pullFilter = Updates.pull("reviewed", Filters.eq("title", course.getTitle()));
         coursesCollection.updateOne(userFilter, pullFilter);
     }
 
-    private void deleteReviewFromCourses(Course2 course, Review2 review) throws MongoException{
+    private void deleteReviewFromCourses(Course course, Review review) throws MongoException{
         Bson courseFilter = Filters.eq("title", course.getTitle());
         Bson pullFilter = Updates.pull("reviews", Filters.eq("username", review.getUsername()));
         coursesCollection.updateOne(courseFilter, pullFilter);
     }
 
-    public boolean deleteReview(Course2 course, Review2 review, boolean redundanciesRollback){
-        List<Review2> reviewsList  = course.getReviews();
+    public boolean deleteReview(Course course, Review review, boolean redundanciesRollback){
+        List<Review> reviewsList  = course.getReviews();
         reviewsList.remove(review);
         if(redundanciesRollback) { //rollback of an add review operation. In this case we must update redundancies to
             // avoid to fake them
@@ -633,8 +606,8 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
-    public Review2 getCourseReviewByUser(Course2 course, User2 user) {
-        Course2 c = coursesCollection.find(Filters.eq("_id", course.getId())).projection(Projections.elemMatch(
+    public Review getCourseReviewByUser(Course course, User user) {
+        Course c = coursesCollection.find(Filters.eq("_id", course.getId())).projection(Projections.elemMatch(
                 "reviews", Filters.eq("username", user.getUsername()))).first();
         if (c == null)
             return null;
@@ -646,27 +619,22 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
-    public User2 login(String username, String password) {
+    public User login(String username, String password) {
         Bson eqUsername = Filters.eq("username", username);
         Bson eqPass = Filters.eq("password", password);
         try {
-            User2 loggedUser = usersCollection.find(Filters.and(eqUsername, eqPass)).first();
+            User loggedUser = usersCollection.find(Filters.and(eqUsername, eqPass)).first();
             return loggedUser;
         } catch (MongoException e) {
             return null;
         }
     }
 
-    public boolean editProfileInfo(User2 newInfo) {
+    public void editProfileInfo(User newInfo) throws MongoException {
         if (newInfo.getRole() == 1) {
-            try {
-                Bson match = Filters.eq("username", newInfo.getUsername());
-                Bson update = Updates.set("password", newInfo.getPassword());
-                usersCollection.updateOne(match, update);
-                return true;
-            } catch (MongoException e) {
-                return false;
-            }
+            Bson match = Filters.eq("username", newInfo.getUsername());
+            Bson update = Updates.set("password", newInfo.getPassword());
+            usersCollection.updateOne(match, update);
         }
 
         List<Bson> updates = new ArrayList<>();
@@ -689,16 +657,11 @@ public class MongoDBDriver implements DBDriver {
         updates.add(Updates.set("password", newInfo.getPassword()));
         updates.add(Updates.set("complete_name", newInfo.getCompleteName()));
 
-        try {
-            Bson filter = Filters.eq("username", newInfo.getUsername());
-            usersCollection.updateOne(filter, Updates.combine(updates));
-            return true;
-        } catch (MongoException e) {
-            return false;
-        }
+        Bson filter = Filters.eq("username", newInfo.getUsername());
+        usersCollection.updateOne(filter, Updates.combine(updates));
     }
 
-    public HashMap<String, Integer> avgStatistics(User2 user) {
+    public HashMap<String, Integer> avgStatistics(User user) {
         List<Document> aggregation =
                 Arrays.asList(new Document("$match", new Document("username", user.getUsername())
                                 .append("reviewed", new Document("$exists", true))),
@@ -709,7 +672,7 @@ public class MongoDBDriver implements DBDriver {
                                 .append("avgduration", new Document("$avg", "$reviewed.duration"))));
 
         List<Integer> res = new ArrayList<>();
-        User2 doc = null;
+        User doc = null;
         try {
             doc = usersCollection.aggregate(aggregation).first();
         } catch (MongoException e) {
@@ -732,12 +695,12 @@ public class MongoDBDriver implements DBDriver {
         return hashMap;
     }
 
-    public List<User2> searchUserByUsername(String searchedText, int skip, int limit) {
+    public List<User> searchUserByUsername(String searchedText, int skip, int limit) {
         try {
             Pattern pattern = Pattern.compile("^.*" + searchedText + ".*$", Pattern.CASE_INSENSITIVE);
             Bson usernameFilter = Filters.regex("username", pattern);
             Bson completeNameFilter = Filters.regex("complete_name", pattern);
-            List<User2> res = usersCollection.find(Filters.or(usernameFilter, completeNameFilter))
+            List<User> res = usersCollection.find(Filters.or(usernameFilter, completeNameFilter))
                     .skip(skip)
                     .limit(limit)
                     .projection(Projections.exclude("reviewed"))
@@ -751,7 +714,7 @@ public class MongoDBDriver implements DBDriver {
 
     public boolean checkIfUserExists(String username) {
         try {
-            User2 user = usersCollection.find(Filters.eq("username", username))
+            User user = usersCollection.find(Filters.eq("username", username))
                     .projection(Projections.exclude("reviewed"))
                     .first();
             return (user != null);
@@ -760,18 +723,13 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
-    public boolean addUser(User2 user) {
-        try {
-            usersCollection.insertOne(user);
-            return true;
-        } catch (MongoException e) {
-            return false;
-        }
+    public void addUser(User user) throws MongoException {
+        usersCollection.insertOne(user);
     }
 
-    public List<Course2> findCoursesOfferedByUser(User2 user, int skip, int limit) {
+    public List<Course> findCoursesOfferedByUser(User user, int skip, int limit) {
         try {
-            List<Course2> list = coursesCollection.find(Filters.eq("instructor", user.getUsername()))
+            List<Course> list = coursesCollection.find(Filters.eq("instructor", user.getUsername()))
                     .projection(Projections.exclude("reviews"))
                     .skip(skip)
                     .limit(limit)
@@ -781,6 +739,11 @@ public class MongoDBDriver implements DBDriver {
         } catch (MongoException e) {
             return new ArrayList<>();
         }
+    }
+
+    public void deleteUser(User user) throws MongoException {
+        Bson filter = Filters.eq("username", user.getUsername());
+        usersCollection.deleteOne(filter);
     }
 
 }

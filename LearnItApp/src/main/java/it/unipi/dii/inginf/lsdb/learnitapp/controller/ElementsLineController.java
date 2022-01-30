@@ -1,9 +1,9 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
@@ -24,8 +24,8 @@ public class ElementsLineController {
     @FXML private HBox itemsHBox;
 
     private Neo4jDriver neo4jDriver;
-    private Course2 course;
-    private User2 user;
+    private Course course;
+    private User user;
     private int listType;
     private int pageNumber;
     private int limit;
@@ -38,7 +38,7 @@ public class ElementsLineController {
         mongoDBDriver = MongoDBDriver.getInstance();
     }
 
-    public void setCoursesUsers(Course2 course, User2 user, int type){
+    public void setCoursesUsers(Course course, User user, int type){
         listType = type;
         this.course = course;
         this.user = user;
@@ -88,7 +88,7 @@ public class ElementsLineController {
     }
 
     private void loadData(){
-        List<Course2> moreCourses = null;
+        List<Course> moreCourses = null;
         switch (listType){
             case Utils.BEST_RATING:
                 moreCourses = mongoDBDriver.findBestRatings(limit);
@@ -108,11 +108,11 @@ public class ElementsLineController {
     }
 
     private void loadMore() {
-        User2 myUser = Session.getLocalSession().getLoggedUser();
+        User myUser = Session.getLocalSession().getLoggedUser();
         int skip = pageNumber*limit;
         pageNumber++;
-        List<Course2> moreCourses = null;
-        List<User2> moreUsers = null;
+        List<Course> moreCourses = null;
+        List<User> moreUsers = null;
         switch (listType) {
             case Utils.OFFERED_COURSES:
                 moreCourses = mongoDBDriver.findCoursesOfferedByUser(user, skip, limit);

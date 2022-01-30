@@ -1,10 +1,8 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -95,7 +93,7 @@ public class NewCoursePageController {
         modality = (modality.equals("")) ? null : modality;
         link = (link.equals("")) ? null : link;
 
-        Course2 newCourse = new Course2();
+        Course newCourse = new Course();
         newCourse.setTitle(title);
         newCourse.setDescription(description);
         newCourse.setInstructor(Session.getLocalSession().getLoggedUser().getUsername());

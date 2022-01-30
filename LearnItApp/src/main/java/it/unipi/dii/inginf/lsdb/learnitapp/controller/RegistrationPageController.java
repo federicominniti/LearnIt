@@ -1,9 +1,9 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -14,8 +14,6 @@ import javafx.scene.input.MouseEvent;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.ZoneId;
-import java.util.Date;
 
 public class RegistrationPageController {
 
@@ -36,7 +34,7 @@ public class RegistrationPageController {
     @FXML private Label genderLabel;
     @FXML private Label birthDateLabel;
 
-    private User2 admin;
+    private User admin;
     private MongoDBDriver mongo;
 
     public void initialize() {
@@ -100,12 +98,12 @@ public class RegistrationPageController {
             return;
         }
 
-        User2 newAdmin = new User2();
+        User newAdmin = new User();
         newAdmin.setUsername(usernameTextField.getText());
         newAdmin.setPassword(passwordPasswordField.getText());
         newAdmin.setRole(1);
 
-        boolean ret = mongo.addUser(newAdmin);
+        boolean ret = DBOperations.addUser(newAdmin);
         if (ret) {
             Utils.showInfoAlert("Admin registered with success");
             Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
@@ -141,7 +139,7 @@ public class RegistrationPageController {
         } else if (usernameTextField.getText().length() < 5) {
             Utils.showErrorAlert("Username too short, try another username");
             return true;
-        } else if (Neo4jDriver.getInstance().checkUserExists(usernameTextField.getText())) {
+        } else if (MongoDBDriver.getInstance().checkIfUserExists(usernameTextField.getText())) {
             Utils.showErrorAlert("Username already taken, try another username");
             return true;
         }
@@ -170,7 +168,7 @@ public class RegistrationPageController {
     }
 
     private boolean registerUser() {
-        User2 newUser = new User2();
+        User newUser = new User();
         newUser.setUsername(usernameTextField.getText());
         newUser.setPassword(passwordPasswordField.getText());
         newUser.setCompleteName(completeNameTextField.getText());
@@ -183,6 +181,6 @@ public class RegistrationPageController {
         if (genderChoiceBox.getValue() != null)
             newUser.setGender(genderChoiceBox.getValue());
 
-        return mongo.addUser(newUser);
+        return DBOperations.addUser(newUser);
     }
 }

@@ -3,6 +3,7 @@ package it.unipi.dii.inginf.lsdb.learnitapp.model;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import java.util.Date;
+import java.util.List;
 
 public class User {
     @BsonProperty(value = "username")
@@ -18,54 +19,31 @@ public class User {
     @BsonProperty(value = "email")
     private String email;
     @BsonProperty(value = "role")
-    private Role role;
-    @BsonProperty(value = "profile_picture")
+    private Integer role;
+    @BsonProperty(value = "pic")
     private String profilePic;
+    @BsonProperty(value = "reviewed")
+    private List<Course> reviewedCourses;
+    @BsonProperty(value = "count")
+    private Integer count;
+    @BsonProperty(value = "avgprice")
+    private Integer avgPrice;
+    @BsonProperty(value = "avgduration")
+    private Integer avgDuration;
 
     public User() {
 
     }
-    public User(String username, String password, String completeName, Date dateOfBirth, String gender, String email, Role role, String profilePic) {
+
+    public User(String username, String profilePic, String gender) {
+
         this.username = username;
-        this.password = password;
-        this.completeName = completeName;
-        this.dateOfBirth = dateOfBirth;
-        this.gender = gender;
-        this.email = email;
-        this.role = role;
-        this.profilePic = profilePic;
-    }
 
-    public User(String username, String completeName) {
-        this.username = username;
-        this.completeName = completeName;
-    }
+        if(profilePic!=null)
+            this.profilePic = profilePic;
 
-
-    public User(String username, String completeName, String picture) {
-        this.username = username;
-        this.completeName = completeName;
-        this.profilePic = picture;
-    }
-
-    public User(String username, Role role) {
-        this.username = username;
-        this.role = role;
-    }
-
-    public enum Role {
-        STANDARD,
-        ADMINISTRATOR;
-
-        public static Role fromInteger(int x) {
-            switch(x) {
-                case 0:
-                    return STANDARD;
-                case 1:
-                    return ADMINISTRATOR;
-            }
-            return null;
-        }
+        if(gender != null)
+            this.gender = gender;
     }
 
     public String getUsername() {
@@ -116,11 +94,11 @@ public class User {
         this.email = email;
     }
 
-    public Role getRole() {
+    public Integer getRole() {
         return role;
     }
 
-    public void setRole(Role role) {
+    public void setRole(Integer role) {
         this.role = role;
     }
 
@@ -130,5 +108,37 @@ public class User {
 
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
+    }
+
+    public List<Course> getReviewedCourses() {
+        return reviewedCourses;
+    }
+
+    public void setReviewedCourses(List<Course> reviewedCourses) {
+        this.reviewedCourses = reviewedCourses;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
+    }
+
+    public Integer getAvgPrice() {
+        return avgPrice;
+    }
+
+    public void setAvgPrice(Integer avgPrice) {
+        this.avgPrice = avgPrice;
+    }
+
+    public Integer getAvgDuration() {
+        return avgDuration;
+    }
+
+    public void setAvgDuration(Integer avgDuration) {
+        this.avgDuration = avgDuration;
     }
 }

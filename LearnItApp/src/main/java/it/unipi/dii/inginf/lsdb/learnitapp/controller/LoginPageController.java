@@ -2,9 +2,7 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -34,7 +32,7 @@ public class LoginPageController {
         if (usernameTextField.getText().equals("") || passwordField.getText().equals(""))
             return;
 
-        User2 loggedUser = mongo.login(usernameTextField.getText(), passwordField.getText());
+        User loggedUser = mongo.login(usernameTextField.getText(), passwordField.getText());
         if (loggedUser == null) {
             Utils.showErrorAlert("Error: wrong username or password");
         } else {

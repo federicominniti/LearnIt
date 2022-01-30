@@ -13,19 +13,31 @@ public class Review {
     private int rating;
     @BsonProperty(value = "edited_timestamp")
     private Date timestamp;
-    @BsonProperty(value = "author")
-    private User author;
+    @BsonProperty(value = "username")
+    private String username;
 
     public Review() {
 
     }
 
-    public Review(String title, String content, int rating, Date timestamp, User author) {
-        this.title = title;
-        this.content = content;
+    public Review(String title, String content, int rating, Date timestamp, String username) {
+        if(title!=null)
+            this.title = title;
+        if(content!=null)
+            this.content = content;
+
         this.rating = rating;
         this.timestamp = timestamp;
-        this.author = author;
+        this.username = username;
+    }
+
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getTitle() {
@@ -58,13 +70,5 @@ public class Review {
 
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
-    }
-
-    public User getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(User author) {
-        this.author = author;
     }
 }

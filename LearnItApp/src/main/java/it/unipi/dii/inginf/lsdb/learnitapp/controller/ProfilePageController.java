@@ -3,7 +3,6 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
@@ -21,10 +20,8 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.List;
 
 public class ProfilePageController {
 
@@ -51,8 +48,8 @@ public class ProfilePageController {
 
     private Neo4jDriver neo4jDriver;
     private MongoDBDriver mongoDriver;
-    private User2 profileUser;
-    private User2 loggedUser;
+    private User profileUser;
+    private User loggedUser;
     private boolean isProfileMine;
     private int limit;
 
@@ -106,7 +103,7 @@ public class ProfilePageController {
             averagePriceLabel.setText("Average price of reviewed courses:" + stats.get("avgprice"));
     }
 
-    public void setProfileUser(User2 user){
+    public void setProfileUser(User user){
         loggedUser = Session.getLocalSession().getLoggedUser();
         profileUser = mongoDriver.getUserByUsername(user.getUsername());
         isProfileMine = loggedUser.getUsername().equals(profileUser.getUsername());
@@ -222,15 +219,17 @@ public class ProfilePageController {
             return;
         }
 
+        User newAdmin = new User();
         if(newPassword.equals(repeatPassword)) {
-            loggedUser.setPassword(newPassword);
-            if (!mongoDriver.editProfileInfo(loggedUser)) {
-                loggedUser.setPassword(oldPassword);
+            newAdmin.setPassword(newPassword);
+            newAdmin.setUsername(loggedUser.getUsername());
+            newAdmin.setRole(1);
+            if (!DBOperations.editProfileInfo(newAdmin, loggedUser)) {
                 Utils.showErrorAlert("Something has gone wrong");
-                return;
             }
         }
 
+        loggedUser = newAdmin;
         Utils.showInfoAlert("Password modified!");
 
         oldPasswordField.setText("");
@@ -248,7 +247,7 @@ public class ProfilePageController {
     }
 
     public void followHandler(MouseEvent clickEvent){
-        User2 loggedUser = Session.getLocalSession().getLoggedUser();
+        User loggedUser = Session.getLocalSession().getLoggedUser();
 
         if(neo4jDriver.isUserFollowedByUser(usernameLabel.getText(), loggedUser.getUsername())){
             // Unfollow operation

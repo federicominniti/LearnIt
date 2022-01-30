@@ -2,10 +2,7 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -33,7 +30,7 @@ public class PersonalPageController {
     @FXML private ImageView profileImageView;
     @FXML private ImageView learnitImageView;
 
-    private User2 loggedUser;
+    private User loggedUser;
 
     public void initialize() {
         loggedUser = Session.getLocalSession().getLoggedUser();
@@ -139,7 +136,7 @@ public class PersonalPageController {
         if (email.equals(""))
             email = loggedUser.getEmail();
 
-        User2 editedUser = new User2();
+        User editedUser = new User();
         editedUser.setUsername(loggedUser.getUsername());
         editedUser.setPassword(password);
         editedUser.setGender(gender);
@@ -149,7 +146,7 @@ public class PersonalPageController {
         editedUser.setCompleteName(complete_name);
         editedUser.setProfilePic(propic);
 
-        if (DBOperations.editProfile(editedUser)) {
+        if (DBOperations.editProfileInfo(editedUser, loggedUser)) {
             Session.getLocalSession().setLoggedUser(editedUser);
             return true;
         }
