@@ -44,17 +44,23 @@ import java.util.regex.Pattern;
 import static java.lang.Thread.sleep;
 
 public class Utils {
+    //Courses suggestions
+    public final static int BEST_RATING = 1;
+    public final static int TRENDING_COURSE = 2;
+    public final static int COURSES_SUGGESTIONS = 3;
+    public final static int INSTRUCTORS_SUGGESTIONS = 4;
+    public final static int MOST_LIKED_COURSES = 5;
+    //Users suggestions
+    public final static int BEST_USERS = 6;
+    public final static int USER_SUGGESTIONS = 7;
+    public final static int MOST_ACTIVE_USERS = 8;
+    public final static int MOST_FOLLOWED_USERS = 9;
 
-    public final static int LIKED_COURSES = 4;
-    public final static int REVIEWED_COURSES = 5;
-    public final static int OFFERED_COURSES = 6;
-    public final static int FOLLOWER_USERS = 7;
-    public final static int FOLLOWING_USERS = 8;
-    public final static int FRIENDS_COMPLETED_LIKED = 1;
-    public final static int INSTRUCTORS_SUGGESTIONS = 2;
-    public final static int USER_SUGGESTIONS = 3;
-    public final static int BEST_RATING = -1;
-    public final static int TRENDING_COURSE = -2;
+    public final static int LIKED_COURSES = 10;
+    public final static int REVIEWED_COURSES = 11;
+    public final static int OFFERED_COURSES = 12;
+    public final static int FOLLOWER_USERS = 13;
+    public final static int FOLLOWING_USERS = 14;
 
     public final static String[] LANGUAGES = {"Arabic", "Chinese", "English", "French", "German", "Hebrew", "Hungarian", "Indonesian",
             "Italian", "Japanese", "Korean", "Portuguese", "Russian", "Spanish", "Swedish", "Turkish", "Ukrainian", "Albanian",

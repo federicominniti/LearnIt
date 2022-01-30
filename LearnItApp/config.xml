@@ -9,9 +9,14 @@
     <mongoDBUsername>root</mongoDBUsername>
     <mongoDBPassword></mongoDBPassword>
     <mongoDBName>learnitmongo</mongoDBName>
-    <limitNumber>10</limitNumber>
     <neo4jIP>127.0.0.1</neo4jIP>
     <neo4jPort>7687</neo4jPort>
     <neo4jUsername>neo4j</neo4jUsername>
     <neo4jPassword>password</neo4jPassword>
+    <limitNumber>10</limitNumber>
+    <limitFirstLvl>5</limitFirstLvl>
+    <limitSecondLvl>5</limitSecondLvl>
+    <numRelationships>1</numRelationships>
+    <numCommonCourses>1</numCommonCourses>
+    <followedThreshold>1</followedThreshold>
 </it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams>

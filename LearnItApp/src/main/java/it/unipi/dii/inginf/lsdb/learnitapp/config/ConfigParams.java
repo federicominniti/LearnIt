@@ -23,6 +23,11 @@ public class ConfigParams {
     private String neo4jPassword;
 
     private int limitNumber;
+    private int limitFirstLvl;
+    private int limitSecondLvl;
+    private int numRelationships;
+    private int numCommonCourses;
+    private int followedThreshold;
 
     public static ConfigParams getInstance() throws IOException {
         if (localConfig == null) {
@@ -153,5 +158,45 @@ public class ConfigParams {
 
     public void setLimitNumber(int limitNumber) {
         this.limitNumber = limitNumber;
+    }
+
+    public int getLimitFirstLvl() {
+        return limitFirstLvl;
+    }
+
+    public void setLimitFirstLvl(int limitFirstLvl) {
+        this.limitFirstLvl = limitFirstLvl;
+    }
+
+    public int getLimitSecondLvl() {
+        return limitSecondLvl;
+    }
+
+    public void setLimitSecondLvl(int limitSecondLvl) {
+        this.limitSecondLvl = limitSecondLvl;
+    }
+
+    public int getNumRelationships() {
+        return numRelationships;
+    }
+
+    public void setNumRelationships(int numRelationships) {
+        this.numRelationships = numRelationships;
+    }
+
+    public int getNumCommonCourses() {
+        return numCommonCourses;
+    }
+
+    public void setNumCommonCourses(int numCommonCourses) {
+        this.numCommonCourses = numCommonCourses;
+    }
+
+    public int getFollowedThreshold() {
+        return followedThreshold;
+    }
+
+    public void setFollowedThreshold(int followedThreshold) {
+        this.followedThreshold = followedThreshold;
     }
 }

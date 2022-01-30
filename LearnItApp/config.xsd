@@ -12,11 +12,16 @@
                 <xs:element name="mongoDBUsername" type="xs:string"/>
                 <xs:element name="mongoDBPassword" type="xs:string"/>
                 <xs:element name="mongoDBName" type="xs:string"/>
-                <xs:element name="limitNumber" type="xs:int"/>
                 <xs:element name="neo4jIP" type="xs:string"/>
                 <xs:element name="neo4jPort" type="xs:int"/>
                 <xs:element name="neo4jUsername" type="xs:string"/>
                 <xs:element name="neo4jPassword" type="xs:string"/>
+                <xs:element name="limitNumber" type="xs:int"/>
+                <xs:element name="limitFirstLvl" type="xs:int"/>
+                <xs:element name="limitSecondLvl" type="xs:int"/>
+                <xs:element name="numRelationships" type="xs:int"/>
+                <xs:element name="numCommonCourses" type="xs:int"/>
+                <xs:element name="followedThreshold" type="xs:int"/>
             </xs:sequence>
         </xs:complexType>
     </xs:element>

@@ -16,6 +16,7 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -37,6 +38,9 @@ public class DiscoveryPageController {
     @FXML private Button createNewCourseButton;
     @FXML private ImageView learnItImageView;
     @FXML private Button logoutButton;
+    @FXML private Label discoveryPageLabel;
+    @FXML private Button suggestionsSwitchButton;
+    @FXML private AnchorPane allContentAnchorPane;
 
     private ToggleGroup searchType;
     private MongoDBDriver mongoDBDriver;
@@ -68,7 +72,10 @@ public class DiscoveryPageController {
         profilePic.setOnMouseClicked(clickEvent -> myProfile(clickEvent));
         profilePic.setCursor(Cursor.HAND);
         if (loggedUser.getRole() == 0) {
-            initializeSuggestions();
+            coursesSuggestions();
+        }else{
+            allContentAnchorPane.getChildren().remove(discoveryPageLabel);
+            allContentAnchorPane.getChildren().remove(suggestionsSwitchButton);
         }
 
         searchButton.setOnMouseClicked(clickEvent -> searchHandler(clickEvent));
@@ -129,17 +136,28 @@ public class DiscoveryPageController {
             profilePic.setImage(new Image(loggedUser.getProfilePic()));
     }
 
-    private void initializeSuggestions(){
+    private void coursesSuggestions(){
+        suggestionsSwitchButton.setOnMouseClicked(clickEvent -> usersSuggestions());
+        suggestionsSwitchButton.setText("Courses");
+        suggestionsSwitchButton.setStyle("-fx-background-color: #9370DB; -fx-text-fill: #E6E6FA;");
+        elementsVBox.getChildren().clear();
         Utils.addLine(elementsVBox, null, null, Utils.BEST_RATING);
-
         Utils.addLine(elementsVBox, null, null, Utils.TRENDING_COURSE);
-
-        Utils.addLine(elementsVBox, null, null, Utils.FRIENDS_COMPLETED_LIKED);
-
+        Utils.addLine(elementsVBox, null, null, Utils.COURSES_SUGGESTIONS);
         Utils.addLine(elementsVBox, null, null, Utils.INSTRUCTORS_SUGGESTIONS);
-
-        Utils.addLine(elementsVBox, null, null, Utils.USER_SUGGESTIONS);
+        Utils.addLine(elementsVBox, null, null, Utils.MOST_LIKED_COURSES);
     }
+
+   private void usersSuggestions(){
+       suggestionsSwitchButton.setOnMouseClicked(clickEvent -> coursesSuggestions());
+       suggestionsSwitchButton.setText("Users");
+       suggestionsSwitchButton.setStyle("-fx-background-color: #E6E6FA; -fx-text-fill: #9370DB;");
+       elementsVBox.getChildren().clear();
+       Utils.addLine(elementsVBox, null, null, Utils.BEST_USERS);
+       Utils.addLine(elementsVBox, null, null, Utils.USER_SUGGESTIONS);
+       Utils.addLine(elementsVBox, null, null, Utils.MOST_ACTIVE_USERS);
+       Utils.addLine(elementsVBox, null, null, Utils.MOST_FOLLOWED_USERS);
+   }
 
     private void searchHandler(MouseEvent clickEvent){
         currentI = 0;
@@ -192,7 +210,7 @@ public class DiscoveryPageController {
                 duration == -1 && price == -1) || (selected.getText().equals("Courses") && title.equals("") && level.equals("") && language.equals("") &&
                 duration == -1 && price == -1) || (selected.getText().equals("Users") && searchTextField.getText().equals(""))) {
 
-            initializeSuggestions();
+            coursesSuggestions();
         } else if(selected.getText().equals("Courses")) {
             addMoreResearchedCourses(title, level, language, duration, price);
         } else if(selected.getText().equals("Users")) {
