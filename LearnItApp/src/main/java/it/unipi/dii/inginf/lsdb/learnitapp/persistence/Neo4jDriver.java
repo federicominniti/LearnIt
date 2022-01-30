@@ -77,7 +77,7 @@ public class Neo4jDriver implements DBDriver {
             neo4jDriver.close();
     }
 
-    //provata
+    //provata OK
     public boolean followUser(User follower, User followed){
         try(Session session = neo4jDriver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -94,7 +94,7 @@ public class Neo4jDriver implements DBDriver {
         return false;
     }
 
-    //provata
+    //provata OK
     public boolean unfollowUser(User follower, User followed){
         try(Session session = neo4jDriver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -110,7 +110,7 @@ public class Neo4jDriver implements DBDriver {
         return false;
     }
 
-    //provata
+    //provata ok
     public boolean likeCourse(User user, Course course){
         try(Session session = neo4jDriver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -128,7 +128,7 @@ public class Neo4jDriver implements DBDriver {
     }
 
 
-    //provata
+    //provata ok
     public boolean dislikeCourse(User user, Course course){
         try(Session session = neo4jDriver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -145,7 +145,7 @@ public class Neo4jDriver implements DBDriver {
     }
 
 
-    //provata
+    //cambiare
     public boolean editProfileInfo(User user){
         try(Session session = neo4jDriver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -164,7 +164,7 @@ public class Neo4jDriver implements DBDriver {
         return false;
     }
 
-    //provata
+    //ok
     public boolean deleteUser(User user){
         try(Session session = neo4jDriver.session()){
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -181,7 +181,7 @@ public class Neo4jDriver implements DBDriver {
         return false;
     }
 
-    //provata
+    //ok
     public List<Course> findSuggestedCoursesByCompletedCourses(User user, int skip, int limit){
         List<Course> courses = new ArrayList<>();
 
@@ -208,7 +208,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    // spostare su mongodb
     public int findTotCourses(User user){
         Integer tot;
         try(Session session = neo4jDriver.session()){
@@ -227,7 +227,7 @@ public class Neo4jDriver implements DBDriver {
         return 0;
     }
 
-    //provata
+    // spostare su mongo
     public double findAvgStatisticOfCompletedCourses(User user, String attribute){
         double avg;
         try(Session session = neo4jDriver.session()){
@@ -251,7 +251,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //ok
     public boolean addCourse(Course course) {
         try (Session session = neo4jDriver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -269,7 +269,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //ok
     public boolean updateCourse(Course course) {
         try (Session session = neo4jDriver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -287,7 +287,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //ok
     public boolean deleteCourse(Course course) {
         try (Session session = neo4jDriver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -303,7 +303,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //ok
     public boolean addReview(Course ratedCourse, User user) {
         try (Session session = neo4jDriver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -324,7 +324,7 @@ public class Neo4jDriver implements DBDriver {
     }
 
 
-    //provata
+    //ok
     public boolean deleteReview(Course ratedCourse, User user) {
         try (Session session = neo4jDriver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -340,7 +340,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //spostare su mongo
     public User login(String username, String password) {
         User loggedUser = null;
         try (Session session = neo4jDriver.session()) {
@@ -393,7 +393,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //cambiare
     public List<Course> findSuggestedCourses(User user, int toSkip, int limit) {
         List<Course> suggested = new ArrayList<>();
         try (Session session = neo4jDriver.session()) {
@@ -426,7 +426,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //spostare su mongo / togliere
     public List<User> searchUserByUsername (int limit, int toSkip, String searchText)
     {
         List<User> users = new ArrayList<>();
@@ -472,7 +472,7 @@ public class Neo4jDriver implements DBDriver {
         return users;
     }
 
-    //provata
+    //cambiare e aggiungere su mongo
     public boolean registerUser(final String username, final String complete_name, final String dateOfBirth,
                                 final String gender, final String email, final String password, final String profilePicture,
                                 final boolean isAdmin) {
@@ -503,7 +503,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //ok
     //Find courses liked or completed by a specific user
     public List<Course> findCoursesLikedOrCompletedByUser(User user, final boolean researchFlag, int skip, int limit) {
         //0 -> liked
@@ -538,7 +538,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //cambiare
     //Find suggested users that have participated to the same courses of you
     public List<User> findSuggestedUsers(User loggedUser, int skip, int limit) {
         try (Session session = neo4jDriver.session())
@@ -577,7 +577,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //spostare su mongo
     public boolean checkUserExists(String username) {
         try (Session session = neo4jDriver.session()) {
             boolean res = session.readTransaction(tx -> {
@@ -595,7 +595,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //ok
     public boolean offerCourse(User user, Course course) {
         try (Session session = neo4jDriver.session()) {
             session.writeTransaction((TransactionWork<Void>) tx -> {
@@ -614,7 +614,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //ok
     public boolean isUserFollowedByUser(String followed, String follower){
         try (Session session = neo4jDriver.session())
         {
@@ -633,7 +633,7 @@ public class Neo4jDriver implements DBDriver {
         return false;
     }
 
-    //provata
+    //cambiare
     public List<User> findFollowerUsers(User followedUser, int toSkip, int limit){
         List<User> users = new ArrayList<>();
         try (Session session = neo4jDriver.session())
@@ -675,7 +675,7 @@ public class Neo4jDriver implements DBDriver {
             return null;
         }
     }
-
+//ok
     public boolean isCourseLikedByUser(Course course, User user) {
         try (Session session = neo4jDriver.session()) {
             boolean res = session.readTransaction(tx -> {
@@ -693,7 +693,7 @@ public class Neo4jDriver implements DBDriver {
             return false;
         }
     }
-
+//ok
     public boolean isCourseReviewedByUser(Course course, User user) {
         try (Session session = neo4jDriver.session()) {
             boolean res = session.readTransaction(tx -> {
@@ -712,7 +712,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //cambiare
     public List<User> findFollowedUsers(User followedUser, int toSkip, int limit){
         List<User> users = new ArrayList<>();
         try (Session session = neo4jDriver.session())
@@ -755,7 +755,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    //ok
     public List<Integer> getFollowStats(User u) {
         List<Integer> followStats = new ArrayList<>();
         try (Session session = neo4jDriver.session()) {
@@ -784,7 +784,7 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //provata
+    // spostare su mongodb
     public List<Course> findCoursesOfferedByUser(User user, int toSkip, int limit) {
         List<Course> courses = new ArrayList<>();
         try (Session session = neo4jDriver.session()) {
@@ -809,5 +809,20 @@ public class Neo4jDriver implements DBDriver {
             return null;
         }
     }
+
+    /*
+
+    QUERY DA AGGIUNGERE
+
+        Most liked courses
+
+        Most followed users
+
+        Suggested users
+
+        Suggested courses
+
+        Find suggested courses considering instructors of the others courses you  have completed
+     */
 
 }
