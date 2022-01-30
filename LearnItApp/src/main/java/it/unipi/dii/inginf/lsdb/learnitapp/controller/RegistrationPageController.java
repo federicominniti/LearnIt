@@ -1,7 +1,8 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
@@ -11,7 +12,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
@@ -26,7 +26,7 @@ public class RegistrationPageController {
     @FXML private TextField completeNameTextField;
     @FXML private TextField emailTextField;
     @FXML private DatePicker birthDatePicker;
-    @FXML private ChoiceBox genderChoiceBox;
+    @FXML private ChoiceBox<String> genderChoiceBox;
     @FXML private TextField propicTextField;
     @FXML private ImageView learnitLogoImageView;
     @FXML private ImageView learnitImageView;
@@ -36,10 +36,12 @@ public class RegistrationPageController {
     @FXML private Label genderLabel;
     @FXML private Label birthDateLabel;
 
-    private User admin;
+    private User2 admin;
+    private MongoDBDriver mongo;
 
     public void initialize() {
         admin = Session.getLocalSession().getLoggedUser();
+        mongo = MongoDBDriver.getInstance();
         //System.out.println("user: "+admin.getUsername());
         if (admin != null) {
             prepareForAdminCreation();
@@ -98,7 +100,12 @@ public class RegistrationPageController {
             return;
         }
 
-        boolean ret = Neo4jDriver.getInstance().registerUser(usernameTextField.getText(), "", "", "", "", passwordPasswordField.getText(), "", true);
+        User2 newAdmin = new User2();
+        newAdmin.setUsername(usernameTextField.getText());
+        newAdmin.setPassword(passwordPasswordField.getText());
+        newAdmin.setRole(1);
+
+        boolean ret = mongo.addUser(newAdmin);
         if (ret) {
             Utils.showInfoAlert("Admin registered with success");
             Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
@@ -110,16 +117,11 @@ public class RegistrationPageController {
 
     public void signUpHandler(MouseEvent clickEvent) {
         boolean ret;
-        String birthDate;
 
         if (!validateNonOptionalFields())
             return;
 
-        birthDate = getValueFromDatePicker();
-        if (birthDate == null)
-            return;
-
-        ret = registerUser(birthDate);
+        ret = registerUser();
 
         if (ret) {
             Utils.showInfoAlert("User registered with success");
@@ -152,50 +154,35 @@ public class RegistrationPageController {
             return false;
         }
 
-        return !validateUsernameAndPassword();
-    }
-
-    private String getValueFromDatePicker() {
-        String birthDate = "";
-        if (birthDatePicker.getValue() != null) {
-            Date dateBirth = Date.from(birthDatePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
+        if (birthDatePicker.getValue() == null) {
+            Utils.showErrorAlert("Please enter your date of birth");
+            return false;
+        } else {
             LocalDate today = LocalDate.now();
-
             Period period = Period.between(birthDatePicker.getValue(), today);
             if (period.getYears() < 18) {
                 Utils.showErrorAlert("Only over 18 people can join LearnIt!");
-                return null;
+                return false;
             }
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-            birthDate = sdf.format(dateBirth);
         }
 
-        return birthDate;
+        return !validateUsernameAndPassword();
     }
 
-    private boolean registerUser(String birthDate) {
-        String username = usernameTextField.getText();
-        String password = passwordPasswordField.getText();
-        String complete_name = completeNameTextField.getText();
+    private boolean registerUser() {
+        User2 newUser = new User2();
+        newUser.setUsername(usernameTextField.getText());
+        newUser.setPassword(passwordPasswordField.getText());
+        newUser.setCompleteName(completeNameTextField.getText());
+        newUser.setDateOfBirth(java.sql.Date.valueOf(birthDatePicker.getValue()));
+        newUser.setEmail(emailTextField.getText());
 
-        if (birthDate.equals(""))
-            birthDate = null;
-
-        String propic = null;
         if (!propicTextField.getText().equals(""))
-            propic = propicTextField.getText();
+            newUser.setProfilePic(propicTextField.getText());
 
-        String gender = null;
         if (genderChoiceBox.getValue() != null)
-            gender = genderChoiceBox.getValue().toString();
-        return Neo4jDriver.getInstance().registerUser(username,
-                complete_name,
-                birthDate,
-                gender,
-                emailTextField.getText(),
-                password,
-                propic,
-                false);
+            newUser.setGender(genderChoiceBox.getValue());
 
+        return mongo.addUser(newUser);
     }
 }

@@ -476,18 +476,18 @@ public class MongoDBDriver implements DBDriver {
 
         List<Document> aggregation;
         aggregation = Arrays.asList(new Document("$match", new Document("reviewed", new Document("$exists", true))),
-                    new Document("$unwind", new Document("path", "$reviewed")),
-                    new Document("$match", new Document("reviewed.review_timestamp", new Document("$gte", d2))),
-                    new Document("$group", new Document("_id", new Document("username", "$username"))
-                                                                .append("pic", new Document("$first", "$pic"))
-                                                                .append("gender", new Document("$first", "$gender"))
-                                                                .append("count", new Document("$sum", 1))),
-                    new Document("$sort", new Document("count", -1)),
-                    new Document("$project", new Document("username", "$_id.username")
-                                                .append("pic", "$pic")
-                                                .append("gender", "$gender")
-                                                .append("_id", 0)),
-                    new Document("$limit", limit));
+                new Document("$unwind", new Document("path", "$reviewed")),
+                new Document("$match", new Document("reviewed.review_timestamp", new Document("$gte", d2))),
+                new Document("$group", new Document("_id", new Document("username", "$username"))
+                        .append("pic", new Document("$first", "$pic"))
+                        .append("gender", new Document("$first", "$gender"))
+                        .append("count", new Document("$sum", 1))),
+                new Document("$sort", new Document("count", -1)),
+                new Document("$project", new Document("username", "$_id.username")
+                        .append("pic", "$pic")
+                        .append("gender", "$gender")
+                        .append("_id", 0)),
+                new Document("$limit", limit));
 
         List<User2> res = usersCollection.aggregate(aggregation).into(new ArrayList<>());
         return res;
@@ -658,6 +658,17 @@ public class MongoDBDriver implements DBDriver {
     }
 
     public boolean editProfileInfo(User2 newInfo) {
+        if (newInfo.getRole() == 1) {
+            try {
+                Bson match = Filters.eq("username", newInfo.getUsername());
+                Bson update = Updates.set("password", newInfo.getPassword());
+                usersCollection.updateOne(match, update);
+                return true;
+            } catch (MongoException e) {
+                return false;
+            }
+        }
+
         List<Bson> updates = new ArrayList<>();
         if (newInfo.getProfilePic() == null)
             updates.add(Updates.unset("pic"));
@@ -687,15 +698,15 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
-    public List<Integer> avgStatistics(User2 user) {
+    public HashMap<String, Integer> avgStatistics(User2 user) {
         List<Document> aggregation =
                 Arrays.asList(new Document("$match", new Document("username", user.getUsername())
-                                                    .append("reviewed", new Document("$exists", true))),
-                            new Document("$unwind", new Document("path", "$reviewed")),
-                            new Document("$group", new Document("_id", "$username")
-                                                    .append("count", new Document("$sum", 1))
-                                                    .append("avgprice", new Document("$avg", "$reviewed.price"))
-                                                    .append("avgduration", new Document("$avg", "$reviewed.duration"))));
+                                .append("reviewed", new Document("$exists", true))),
+                        new Document("$unwind", new Document("path", "$reviewed")),
+                        new Document("$group", new Document("_id", "$username")
+                                .append("count", new Document("$sum", 1))
+                                .append("avgprice", new Document("$avg", "$reviewed.price"))
+                                .append("avgduration", new Document("$avg", "$reviewed.duration"))));
 
         List<Integer> res = new ArrayList<>();
         User2 doc = null;
@@ -708,10 +719,17 @@ public class MongoDBDriver implements DBDriver {
         if (doc == null)
             return null;
 
-        res.add(doc.getCount());
-        res.add((int) doc.getAvgPrice());
-        res.add((int) doc.getAvgDuration());
-        return res;
+        HashMap<String, Integer> hashMap = new HashMap<>();
+        if (doc.getCount() != null && doc.getCount() != 0)
+            hashMap.put("count", doc.getCount());
+
+        if (doc.getAvgPrice() != null && doc.getAvgPrice() != 0)
+            hashMap.put("avgprice", doc.getAvgPrice());
+
+        if (doc.getAvgDuration() != null && doc.getAvgDuration() != 0)
+            hashMap.put("avgduration", doc.getAvgDuration());
+
+        return hashMap;
     }
 
     public List<User2> searchUserByUsername(String searchedText, int skip, int limit) {

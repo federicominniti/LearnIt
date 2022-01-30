@@ -2,6 +2,8 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
@@ -17,7 +19,11 @@ public class LoginPageController {
     @FXML private Button loginButton;
     @FXML private Button signUpButton;
 
+    private MongoDBDriver mongo;
+
+
     public void initialize() {
+        mongo = MongoDBDriver.getInstance();
         loginButton.setOnMouseClicked(clickEvent -> loginHandler(clickEvent));
         loginButton.setCursor(Cursor.HAND);
         signUpButton.setOnMouseClicked(clickEvent -> signUpHandler(clickEvent));
@@ -25,8 +31,10 @@ public class LoginPageController {
     }
 
     public void loginHandler(MouseEvent clickEvent) {
-        Neo4jDriver neo4j = Neo4jDriver.getInstance();
-        User loggedUser = neo4j.login(usernameTextField.getText(), passwordField.getText());
+        if (usernameTextField.getText().equals("") || passwordField.getText().equals(""))
+            return;
+
+        User2 loggedUser = mongo.login(usernameTextField.getText(), passwordField.getText());
         if (loggedUser == null) {
             Utils.showErrorAlert("Error: wrong username or password");
         } else {

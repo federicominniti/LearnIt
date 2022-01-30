@@ -3,7 +3,9 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
@@ -21,6 +23,8 @@ import javafx.scene.text.Font;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.HashMap;
+import java.util.List;
 
 public class ProfilePageController {
 
@@ -46,13 +50,15 @@ public class ProfilePageController {
     private static final String PERSONAL_PAGE = "/fxml/PersonalPage.fxml";
 
     private Neo4jDriver neo4jDriver;
-    private User profileUser;
-    private User loggedUser;
+    private MongoDBDriver mongoDriver;
+    private User2 profileUser;
+    private User2 loggedUser;
     private boolean isProfileMine;
     private int limit;
 
     public void initialize() {
         neo4jDriver = Neo4jDriver.getInstance();
+        mongoDriver = MongoDBDriver.getInstance();
         limit = ConfigParams.getLocalConfig().getLimitNumber();
         learnItLabel.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
         learnItLabel.setCursor(Cursor.HAND);
@@ -62,15 +68,13 @@ public class ProfilePageController {
         completeNameLabel.setText(profileUser.getCompleteName());
         usernameLabel.setText(profileUser.getUsername());
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-
-        if (profileUser.getDateOfBirth() != null)
-            birthDateLabel.setText(dateFormat.format(profileUser.getDateOfBirth()));
+        birthDateLabel.setText(dateFormat.format(profileUser.getDateOfBirth()));
 
         if (profileUser.getGender() != null)
             genderLabel.setText(profileUser.getGender());
 
-        followerNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(0).toString()); // ??? ricontrollare indice
-        followingNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(1).toString()); // ??? ricontrollare indice
+        followerNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(0).toString());
+        followingNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(1).toString());
 
         if(profileUser.getProfilePic() != null){
             Image profilePicture = new Image(profileUser.getProfilePic());
@@ -83,24 +87,31 @@ public class ProfilePageController {
     }
 
     private void loadStatistics() {
-        int totCourses = neo4jDriver.findTotCourses(profileUser);
-        reviewedCoursesLabel.setText("Reviewed courses: " + totCourses);
-        DecimalFormat numberFormat = new DecimalFormat("#.00");
-        if (totCourses > 0) {
-            double avgDuration = neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "duration");
-            double avgPrice = neo4jDriver.findAvgStatisticOfCompletedCourses(profileUser, "price");
-            averageDurationLabel.setText("Average hours spent learning: " + numberFormat.format(avgDuration));
-            averagePriceLabel.setText("Average price of reviewed courses: " + numberFormat.format(avgPrice));
+        HashMap<String, Integer> stats = mongoDriver.avgStatistics(profileUser);
+        if (stats == null || stats.get("count") == null || stats.get("count") == 0) {
+            reviewedCoursesLabel.setText("Reviewed courses: 0");
+            averagePriceLabel.setText("");
+            averageDurationLabel.setText("");
+            return;
         }
 
+        reviewedCoursesLabel.setText("Reviewed courses: " + stats.get("count"));
+        if (stats.get("avgduration") == null)
+            averageDurationLabel.setText("Average hours spent learning: 0");
+        else
+            averageDurationLabel.setText("Average hours spent learning" + stats.get("avgduration"));
+        if (stats.get("avgprice") == null)
+            averagePriceLabel.setText("Average price of reviewed courses: 0");
+        else
+            averagePriceLabel.setText("Average price of reviewed courses:" + stats.get("avgprice"));
     }
 
-    public void setProfileUser(User user){
+    public void setProfileUser(User2 user){
         loggedUser = Session.getLocalSession().getLoggedUser();
-        profileUser = user;
+        profileUser = mongoDriver.getUserByUsername(user.getUsername());
         isProfileMine = loggedUser.getUsername().equals(profileUser.getUsername());
 
-        if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
+        if (loggedUser.getRole() == 1 && isProfileMine) { //admin
             pageAnchorPane.getChildren().remove(elementsVBox);
 
             profileContentBorderPane.setPrefHeight(440);
@@ -188,7 +199,9 @@ public class ProfilePageController {
             followButton.setCursor(Cursor.HAND);
         }
         else{ // another profile
-            followButton.setOnMouseClicked(clickEvent -> followHandler(clickEvent));
+            //gestire eliminazione utente da parte di admin
+            followButton.setText("Delete user");
+            followButton.setOnMouseClicked(clickEvent -> deleteUserHandler(clickEvent));
             followButton.setCursor(Cursor.HAND);
         }
 
@@ -204,19 +217,28 @@ public class ProfilePageController {
         String newPassword = newPasswordTextField.getText();
         String repeatPassword = repeatPasswordTextField.getText();
 
-        //if(! QUERY MONGO PER VERIFICA OLD PASSWORD CORRETTA)
-            //Utils.showErrorAlert("Old password is wrong!!");
+        if (mongoDriver.login(loggedUser.getUsername(), oldPassword) == null) {
+            Utils.showErrorAlert("Error! Old password is wrong");
+            return;
+        }
 
-        if(newPassword.equals(repeatPassword))
-            //QUERY DI MODIFICA PASSWORD UTENTE
-            Utils.showInfoAlert("Password modified!");
+        if(newPassword.equals(repeatPassword)) {
+            loggedUser.setPassword(newPassword);
+            if (!mongoDriver.editProfileInfo(loggedUser)) {
+                loggedUser.setPassword(oldPassword);
+                Utils.showErrorAlert("Something has gone wrong");
+                return;
+            }
+        }
+
+        Utils.showInfoAlert("Password modified!");
 
         oldPasswordField.setText("");
         newPasswordTextField.setText("");
         repeatPasswordTextField.setText("");
     }
 
-    public void deleteUserHandler(User profileUser, MouseEvent clickEvent) {
+    public void deleteUserHandler(MouseEvent clickEvent) {
         if (DBOperations.deleteUser(profileUser)) {
             Utils.showInfoAlert("User deleted successfully");
             Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
@@ -226,19 +248,17 @@ public class ProfilePageController {
     }
 
     public void followHandler(MouseEvent clickEvent){
-        String loggedUser = Session.getLocalSession().getLoggedUser().getUsername();
+        User2 loggedUser = Session.getLocalSession().getLoggedUser();
 
-        if(neo4jDriver.isUserFollowedByUser(usernameLabel.getText(), loggedUser)){
+        if(neo4jDriver.isUserFollowedByUser(usernameLabel.getText(), loggedUser.getUsername())){
             // Unfollow operation
-            neo4jDriver.unfollowUser(Session.getLocalSession().getLoggedUser(),
-                    new User(usernameLabel.getText(), completeNameLabel.getText()));
+            neo4jDriver.unfollowUser(loggedUser, profileUser));
             followButton.setText("Follow");
             followerNumberLabel.setText(Integer.toString((Integer.parseInt(followerNumberLabel.getText())-1)));
         }
         else{
             // Follow operation
-            neo4jDriver.followUser(Session.getLocalSession().getLoggedUser(),
-                    new User(usernameLabel.getText(), completeNameLabel.getText()));
+            neo4jDriver.followUser(loggedUser, profileUser));
             followButton.setText("Unfollow");
             followerNumberLabel.setText(Integer.toString((Integer.parseInt(followerNumberLabel.getText())+1)));
         }

@@ -2,6 +2,9 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
@@ -24,13 +27,13 @@ public class PersonalPageController {
     @FXML private TextField emailTextField;
     @FXML private PasswordField passwordPasswordField;
     @FXML private PasswordField confirmPasswordField;
-    @FXML private ChoiceBox genderChoiceBox;
+    @FXML private ChoiceBox<String> genderChoiceBox;
     @FXML private DatePicker birthDatePicker;
     @FXML private TextField propicTextField;
     @FXML private ImageView profileImageView;
     @FXML private ImageView learnitImageView;
 
-    private User loggedUser;
+    private User2 loggedUser;
 
     public void initialize() {
         loggedUser = Session.getLocalSession().getLoggedUser();
@@ -54,10 +57,9 @@ public class PersonalPageController {
             profileImageView.setImage(new Image(loggedUser.getProfilePic()));
         }
 
-        if (loggedUser.getDateOfBirth() != null)
-            birthDatePicker.setValue(loggedUser.getDateOfBirth().toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate());
+        birthDatePicker.setValue(loggedUser.getDateOfBirth().toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate());
     }
 
     public void backToHomeButtonHandler(MouseEvent clickEvent) {
@@ -76,9 +78,9 @@ public class PersonalPageController {
         }
 
         birthDate = getValueFromDatePicker();
-        if (birthDate == null)
-            return;
+        if (birthDate == null) {
 
+        }
         ret = editProfileInfo(birthDate);
 
         if (ret) {
@@ -101,7 +103,7 @@ public class PersonalPageController {
     }
 
     private Date getValueFromDatePicker() {
-        Date birthDate = null;
+        Date birthDate = loggedUser.getDateOfBirth();
         if (birthDatePicker.getValue() != null) {
             birthDate = Date.from(birthDatePicker.getValue().atStartOfDay(ZoneId.systemDefault()).toInstant());
             LocalDate today = LocalDate.now();
@@ -109,7 +111,7 @@ public class PersonalPageController {
             Period period = Period.between(birthDatePicker.getValue(), today);
             if (period.getYears() < 18) {
                 Utils.showErrorAlert("Only over 18 people can join LearnIt!");
-                return null;
+                return loggedUser.getDateOfBirth();
             }
         }
 
@@ -131,23 +133,23 @@ public class PersonalPageController {
 
         String gender = null;
         if (genderChoiceBox.getValue() != null)
-            gender = genderChoiceBox.getValue().toString();
+            gender = genderChoiceBox.getValue();
 
         String email = emailTextField.getText();
         if (email.equals(""))
             email = loggedUser.getEmail();
 
-        User editedUser = new User();
+        User2 editedUser = new User2();
         editedUser.setUsername(loggedUser.getUsername());
         editedUser.setPassword(password);
         editedUser.setGender(gender);
         editedUser.setEmail(email);
         editedUser.setDateOfBirth(birthDate);
-        editedUser.setRole(User.Role.STANDARD);
+        editedUser.setRole(0);
         editedUser.setCompleteName(complete_name);
         editedUser.setProfilePic(propic);
 
-        if (Neo4jDriver.getInstance().editProfileInfo(editedUser)) {
+        if (DBOperations.editProfile(editedUser)) {
             Session.getLocalSession().setLoggedUser(editedUser);
             return true;
         }

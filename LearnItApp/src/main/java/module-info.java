@@ -9,6 +9,7 @@ module it.unipi.dii.inginf.lsdb.learnitapp {
     requires org.mongodb.bson;
     requires org.neo4j.driver;
     requires log4j;
+    requires java.sql;
 
     opens it.unipi.dii.inginf.lsdb.learnitapp.config to xstream;
     opens it.unipi.dii.inginf.lsdb.learnitapp.app to javafx.fxml;

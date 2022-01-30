@@ -1,6 +1,7 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
@@ -24,11 +25,11 @@ public class NewCoursePageController {
     @FXML private TextField titleTextField;
     @FXML private TextArea descriptionTextArea;
     @FXML private TextField coursePicTextField;
-    @FXML private ChoiceBox languageChoiceBox;
+    @FXML private ChoiceBox<String> languageChoiceBox;
     @FXML private TextArea categoriesTextArea;
     @FXML private TextField hourTextField;
     @FXML private TextField modalityTextField;
-    @FXML private ChoiceBox levelChoiceBox;
+    @FXML private ChoiceBox<String> levelChoiceBox;
     @FXML private TextField priceTextField;
     @FXML private Button backButton;
     @FXML private Button createButton;
@@ -55,11 +56,11 @@ public class NewCoursePageController {
             return;
 
         String title = titleTextField.getText();
-        String language = languageChoiceBox.getValue().toString();
+        String language = languageChoiceBox.getValue();
         String coursePic = coursePicTextField.getText();
         String modality = modalityTextField.getText();
         String description = descriptionTextArea.getText();
-        String level = levelChoiceBox.getValue().toString();
+        String level = levelChoiceBox.getValue();
         double price;
         double duration;
         try {
@@ -94,10 +95,10 @@ public class NewCoursePageController {
         modality = (modality.equals("")) ? null : modality;
         link = (link.equals("")) ? null : link;
 
-        Course newCourse = new Course();
+        Course2 newCourse = new Course2();
         newCourse.setTitle(title);
         newCourse.setDescription(description);
-        newCourse.setInstructor(Session.getLocalSession().getLoggedUser());
+        newCourse.setInstructor(Session.getLocalSession().getLoggedUser().getUsername());
         newCourse.setLanguage(language);
         newCourse.setLevel(level);
         if (duration != -1)
