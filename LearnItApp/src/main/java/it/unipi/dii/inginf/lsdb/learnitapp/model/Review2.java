@@ -20,6 +20,18 @@ public class Review2 {
 
     }
 
+    public Review2(String title, String content, int rating, Date timestamp, String username) {
+        if(title!=null)
+            this.title = title;
+        if(content!=null)
+            this.content = content;
+
+        this.rating = rating;
+        this.timestamp = timestamp;
+        this.username = username;
+    }
+
+
     public String getUsername() {
         return username;
     }

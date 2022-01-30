@@ -9,9 +9,9 @@ import it.unipi.dii.inginf.lsdb.learnitapp.controller.CoursePageController;
 import it.unipi.dii.inginf.lsdb.learnitapp.controller.CourseSnapshotController;
 import it.unipi.dii.inginf.lsdb.learnitapp.controller.ElementsLineController;
 import it.unipi.dii.inginf.lsdb.learnitapp.controller.UserSnapshotController;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -66,6 +66,7 @@ public class Utils {
 
     public static final String READ_MORE = "/img/readMore.png";
     public static final String STAR_ON = "/img/star-on.png";
+    public static final String STAR_OFF = "/img/star-off.png";
     public static final String TRASH_BIN = "/img/trash-bin.png";
     public static final String USER_DEFAULT = "/img/userDefault.png";
     public static final String LOGIN_PAGE = "/fxml/LoginPage.fxml";
@@ -74,6 +75,7 @@ public class Utils {
     public final static String PROFILE_PAGE = "/fxml/ProfilePage.fxml";
     public final static String COURSE_PAGE = "/fxml/CoursePage.fxml";
     public final static String REVIEW_SNAPSHOT = "/fxml/ReviewSnapshotPage.fxml";
+    public final static String USER_SNAPSHOT = "/fxml/UserSnapshot.fxml";
 
     public static ConfigParams getParams() {
         if (validConfigParams()) {
@@ -92,7 +94,7 @@ public class Utils {
             return (ConfigParams) xstream.fromXML(text);
 
         } else {
-            System.out.println("problema con config.xml");
+            System.out.println("problem con config.xml");
             //Utils.showAlert("Problem with the configuration file!");
             try {
                 sleep(5000);
@@ -152,7 +154,7 @@ public class Utils {
         errorAlert.setContentText(text);
         errorAlert.setHeaderText("Please click 'OK' and try again");
         errorAlert.setTitle("Error...");
-        Image errorImage = new Image(Utils.class.getResource("/img/error.png").toString());
+        Image errorImage = new Image(String.valueOf(Utils.class.getResource("/img/error.png")));
         ImageView errorImageView = new ImageView(errorImage);
         errorImageView.setFitHeight(70);
         errorImageView.setFitWidth(70);
@@ -174,7 +176,7 @@ public class Utils {
         alert.show();
     }
 
-    public static Pane loadCourseSnapshot(Course course) {
+    public static Pane loadCourseSnapshot(Course2 course) {
         Pane pane = null;
         try {
             FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/fxml/CourseSnapshot.fxml"));
@@ -187,19 +189,19 @@ public class Utils {
         return pane;
     }
 
-    public static void addCoursesSnapshot(HBox courseHBox, List<Course> courses) {
+    public static void addCoursesSnapshot(HBox courseHBox, List<Course2> courses) {
         for(int i = 0; i<courses.size(); i++) {
             Pane coursePane = loadCourseSnapshot(courses.get(i));
             courseHBox.getChildren().add(coursePane);
         }
     }
 
-    public static void addLine(VBox discoverySections, Course course, User user, int type) {
+    public static void addLine(VBox discoverySections, Course2 course, User2 user, int type) {
         Pane line = loadElementsLine(course, user, type);
         discoverySections.getChildren().add(line);
     }
 
-    private static Pane loadElementsLine(Course course, User user, int type) {
+    private static Pane loadElementsLine(Course2 course, User2 user, int type) {
         //coursesUsersLine
         // 0 -> courses
         // 1 -> users
@@ -226,11 +228,11 @@ public class Utils {
         return pane;
     }
 
-    public static Pane loadUserSnapshot (User user)
+    public static Pane loadUserSnapshot (User2 user)
     {
         Pane pane = null;
         try {
-            FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/fxml/UserSnapshot.fxml"));
+            FXMLLoader loader = new FXMLLoader(Utils.class.getResource(USER_SNAPSHOT));
             pane = (Pane) loader.load();
             UserSnapshotController userSnapshotController = (UserSnapshotController) loader.getController();
             userSnapshotController.setSnapshotUser(user);
@@ -240,7 +242,7 @@ public class Utils {
         return pane;
     }
 
-    public static void addUsersSnapshot(HBox usersHBox, List<User> users) {
+    public static void addUsersSnapshot(HBox usersHBox, List<User2> users) {
         for(int i = 0; i<users.size(); i++) {
             Pane coursePane = loadUserSnapshot(users.get(i));
             usersHBox.getChildren().add(coursePane);
@@ -254,7 +256,7 @@ public class Utils {
                 break;
             ImageView starImageView = (ImageView)star;
             Image starImage = new Image(
-                    String.valueOf(CoursePageController.class.getResource(Utils.STAR_ON)));
+                    String.valueOf(CoursePageController.class.getResource(STAR_ON)));
             starImageView.setImage(starImage);
             ratingHBox.getChildren().set(index, (Node)starImageView);
         }
@@ -263,7 +265,7 @@ public class Utils {
             Node star = ratingHBox.getChildren().get(index);
             ImageView starImageView = (ImageView)star;
             Image starImage = new Image(
-                    String.valueOf(CoursePageController.class.getResource("/img/star-off.png")));
+                    String.valueOf(CoursePageController.class.getResource(STAR_OFF)));
             starImageView.setImage(starImage);
             ratingHBox.getChildren().set(index, (Node)starImageView);
         }

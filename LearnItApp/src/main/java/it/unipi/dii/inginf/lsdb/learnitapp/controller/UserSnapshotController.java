@@ -1,7 +1,7 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -18,14 +18,14 @@ public class UserSnapshotController {
     @FXML private Label completeNameLabel;
     @FXML private Label genderLabel;
     @FXML private Label totalCoursesLabel;
-    private User referredUser;
+    private User2 referredUser;
 
     public void initialize(){
         userSnapshot.setOnMouseClicked(mouseEvent -> showCompleteUserInfo(mouseEvent));
         userSnapshot.setCursor(Cursor.HAND);
     }
 
-    public void setSnapshotUser(User user) {
+    public void setSnapshotUser(User2 user) {
         usernameLabel.setText(user.getUsername());
         if(user.getProfilePic() != null)
             userPicImage = new ImageView(new Image(user.getProfilePic()));
@@ -34,7 +34,8 @@ public class UserSnapshotController {
             genderLabel.setText(user.getGender());
         else
             genderLabel.setText("N/S");
-        totalCoursesLabel.setText("Completed courses: " + Neo4jDriver.getInstance().findTotCourses(user));
+
+        totalCoursesLabel.setText("Completed courses: " + MongoDBDriver.getInstance().avgStatistics(user).get(0));
 
         referredUser = user;
     }

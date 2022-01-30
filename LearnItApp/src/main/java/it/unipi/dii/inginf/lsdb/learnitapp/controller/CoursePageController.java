@@ -1,10 +1,10 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Review2;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
@@ -60,8 +60,8 @@ public class CoursePageController {
     private XYChart.Series series;
 
 
-    private Course course;
-    private Review myReview;
+    private Course2 course;
+    private Review2 myReview;
     private int pageNumber = 0;
     private int limit;
     private MongoDBDriver mongoDBDriver;
@@ -85,16 +85,15 @@ public class CoursePageController {
         Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
     }
 
-    public void setCourse(Course snapCourse){
+    public void setCourse(Course2 snapCourse){
         this.course = mongoDBDriver.getCourseByTitle(snapCourse.getTitle());
 
         moreReviewsImageView.setOnMouseClicked(clickEvent -> loadMore());
         moreReviewsImageView.setCursor(Cursor.HAND);
 
-        User loggedUser = Session.getLocalSession().getLoggedUser();
-        if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
-            ImageView trash = new ImageView(new Image(
-                    String.valueOf(CoursePageController.class.getResource(Utils.TRASH_BIN))));
+        User2 loggedUser = Session.getLocalSession().getLoggedUser();
+        if (loggedUser.getRole() == 1) {
+            ImageView trash = new ImageView(new Image(String.valueOf(CoursePageController.class.getResource(Utils.TRASH_BIN))));
             trash.setPreserveRatio(true);
             trash.setFitWidth(40);
             trash.setFitHeight(40);
@@ -104,9 +103,8 @@ public class CoursePageController {
             trash.setCursor(Cursor.HAND);
             allContentVBox.getChildren().remove(newReviewVBox);
         } else {
-            if (course.getInstructor().getUsername().equals(loggedUser.getUsername())) { // own course
-                ImageView trash = new ImageView(new Image(
-                        String.valueOf(CoursePageController.class.getResource(Utils.TRASH_BIN))));
+            if (course.getInstructor().equals(loggedUser.getUsername())) { // own course
+                ImageView trash = new ImageView(new Image(String.valueOf(CoursePageController.class.getResource(Utils.TRASH_BIN))));
                 trash.setPreserveRatio(true);
                 trash.setFitWidth(40);
                 trash.setFitHeight(40);
@@ -168,7 +166,7 @@ public class CoursePageController {
             }
         }
 
-        loadCourseInformation(loggedUser.getUsername().equals(course.getInstructor().getUsername()));
+        loadCourseInformation(loggedUser.getUsername().equals(course.getInstructor()));
         loadAnnualMeanRatingLineChart();
 
         loadMore();
@@ -202,12 +200,12 @@ public class CoursePageController {
         if (skip >= toIndex)
             return;
 
-        List<Review> toAdd = course.getReviews().subList(skip, toIndex);
+        List<Review2> toAdd = course.getReviews().subList(skip, toIndex);
         if(myReview != null) {
             int i;
             boolean found = false;
             for (i = 0; i < toAdd.size(); i++) {
-                if (toAdd.get(i).getAuthor().getUsername().equals(Session.getLocalSession().getLoggedUser().getUsername())) {
+                if (toAdd.get(i).getUsername().equals(Session.getLocalSession().getLoggedUser().getUsername())) {
                     found = true;
                     break;
                 }
@@ -225,15 +223,15 @@ public class CoursePageController {
         }
     }
 
-    private void createReviewsElements(List<Review> reviewsList, VBox container){
+    private void createReviewsElements(List<Review2> reviewsList, VBox container){
         BorderPane reviewBorderPane;
-        for(Review r: reviewsList){
+        for(Review2 r: reviewsList){
             reviewBorderPane = loadSingleReview(r);
             container.getChildren().add(reviewBorderPane);
         }
     }
 
-    private BorderPane loadSingleReview(Review review) {
+    private BorderPane loadSingleReview(Review2 review) {
         BorderPane borderPane = null;
 
         try {
@@ -252,16 +250,14 @@ public class CoursePageController {
     public void saveReviewButtonHandler(){
         if(saveReviewButton.getText().equals("Save")) { // save operation
             int rating = getRatingFromStars();
-            User loggedUser = Session.getLocalSession().getLoggedUser();
-            User author = new User(loggedUser.getUsername(), loggedUser.getCompleteName());
+            User2 loggedUser = Session.getLocalSession().getLoggedUser();
             Date currentTimestamp = new Date();
 
             String comment = commentTextArea.getText().equals("") ? null : commentTextArea.getText();
             String title = reviewTitleTextField.getText().equals("") ? null : reviewTitleTextField.getText();
 
             if(myReview==null) { // add review
-                myReview = new Review(title, comment, rating, currentTimestamp, author);
-                //System.out.println("add review \n title: "+ myReview.getTitle() + "\n content: "+ myReview.getContent() +"\n rating: "+ myReview.getRating()+"\n timestamp: "+myReview.getTimestamp().toString());
+                myReview = new Review2(title, comment, rating, currentTimestamp, loggedUser.getUsername());
 
                 if (DBOperations.addReview(myReview, course)) {
                     Utils.showInfoAlert("Added new review with success!");
@@ -277,8 +273,6 @@ public class CoursePageController {
                 myReview.setTitle(title);
                 myReview.setRating(rating);
                 myReview.setTimestamp(currentTimestamp);
-
-                //System.out.println("edit review \n title: "+ myReview.getTitle() + "\n content: "+ myReview.getContent() +"\n rating: "+ myReview.getRating()+"\n timestamp: "+myReview.getTimestamp().toString());
 
                 if(mongoDBDriver.editReview(course, myReview)){
                     Utils.showInfoAlert("Review edited with success!");
@@ -366,7 +360,7 @@ public class CoursePageController {
     }
 
     public void likeCourseButtonHandler(){
-        User loggedUser = Session.getLocalSession().getLoggedUser();
+        User2 loggedUser = Session.getLocalSession().getLoggedUser();
         if(neo4jDriver.isCourseLikedByUser(course, loggedUser)){
             //dislike
             neo4jDriver.dislikeCourse(loggedUser, course);
@@ -381,7 +375,6 @@ public class CoursePageController {
 
     private void loadCourseInformation(boolean isCourseMine){
         titleLabel.setText(course.getTitle());
-        instructorLabel.setText(course.getInstructor().getUsername());
         descriptionTextArea.setText(course.getDescription());
         descriptionTextArea.setEditable(isCourseMine);
 
@@ -403,7 +396,6 @@ public class CoursePageController {
         String categories = "";
         if(course.getCategory() != null){
             List<String> listOfCategories = course.getCategory();
-            //StringBuilder categories = new StringBuilder();
             for(String c : listOfCategories){
                 categories += c;
                 if(listOfCategories.indexOf(c) < listOfCategories.size()-1)
@@ -413,7 +405,7 @@ public class CoursePageController {
         categoryTextField.setText(categories);
         categoryTextField.setPromptText("Unknown");
         categoryTextField.setEditable(isCourseMine);
-        instructorLabel.setText(course.getInstructor().getUsername());
+        instructorLabel.setText(course.getInstructor());
         modalityTextField.setText(course.getModality());
         modalityTextField.setPromptText("Unknown");
         modalityTextField.setEditable(isCourseMine);
@@ -429,7 +421,6 @@ public class CoursePageController {
     }
 
     public void editCourseButtonHandler(){
-        System.out.println("sono qui");
         String categoriesString = categoryTextField.getText();
         List<String> categoryList = null;
         if (categoriesString.contains(",")){
@@ -481,14 +472,14 @@ public class CoursePageController {
         modality = (modality == null || modality.equals("")) ? null : modality;
         link = (link == null || link.equals("")) ? null : link;
 
-        Course newCourse;
+        Course2 newCourse;
         if(categoryTextField.getText().equals("")) {
-            newCourse = new Course(course.getTitle(), description, course.getInstructor(), language, level,
-                    duration, price, link, modality, coursePic);
+            newCourse = new Course2(course.getTitle(), description, course.getInstructor(), language, level, duration, price, link, null,
+                    modality, coursePic);
         }
         else
-            newCourse = new Course(course.getTitle(), description, course.getInstructor(), language, categoryList,
-                    level, duration, price, link, modality, coursePic);
+            newCourse = new Course2(course.getTitle(), description, course.getInstructor(), language, level, duration, price, link, categoryList,
+                     modality, coursePic);
 
         newCourse.setId(course.getId());
         course = newCourse;

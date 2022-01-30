@@ -42,11 +42,11 @@ public class Course2 {
     @BsonProperty(value="year")
     private Integer year;
 
-    public Course2 () {
+    public Course2() {
 
     }
 
-    public Course2(String title, Double duration, Double price, String course_pic){
+    public Course2(String title, Double duration, Double price, String course_pic){ // for snapshots
         this.title = title;
 
         if(duration!=null)
@@ -58,6 +58,30 @@ public class Course2 {
         if(course_pic != null)
             this.coursePic = course_pic;
 
+    }
+
+    public Course2(String title, String description, String instructor, String language, String level,
+                   Double duration, Double price, String link, List<String> category, String modality, String coursePic){
+        this.title = title;
+        this.description = description;
+        this.instructor = instructor;
+        if(language != null)
+            this.language = language;
+        this.level = level;
+        if(duration!=null)
+            this.duration = duration;
+        if(price!=null)
+            this.price = price;
+        if(link!=null)
+            this.link = link;
+        if(category!=null){
+            if(category.size()>0)
+                this.category = category;
+        }
+        if(modality!=null)
+            this.modality = modality;
+        if(coursePic!=null)
+            this.coursePic = coursePic;
     }
 
     public ObjectId getId() {

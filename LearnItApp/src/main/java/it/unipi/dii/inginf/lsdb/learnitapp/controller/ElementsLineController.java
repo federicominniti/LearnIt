@@ -1,9 +1,9 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
@@ -17,15 +17,15 @@ import javafx.scene.layout.HBox;
 
 import java.util.List;
 
-public class ElementsLineController{
+public class ElementsLineController {
     @FXML AnchorPane elementsLine;
     @FXML private Label headerLabel;
     @FXML private ImageView buttonImage;
     @FXML private HBox itemsHBox;
 
     private Neo4jDriver neo4jDriver;
-    private Course course;
-    private User user;
+    private Course2 course;
+    private User2 user;
     private int listType;
     private int pageNumber;
     private int limit;
@@ -38,7 +38,7 @@ public class ElementsLineController{
         mongoDBDriver = MongoDBDriver.getInstance();
     }
 
-    public void setCoursesUsers(Course course, User user, int type){
+    public void setCoursesUsers(Course2 course, User2 user, int type){
         listType = type;
         this.course = course;
         this.user = user;
@@ -88,7 +88,7 @@ public class ElementsLineController{
     }
 
     private void loadData(){
-        List<Course> moreCourses = null;
+        List<Course2> moreCourses = null;
         switch (listType){
             case Utils.BEST_RATING:
                 moreCourses = mongoDBDriver.findBestRatings(limit);
@@ -108,14 +108,14 @@ public class ElementsLineController{
     }
 
     private void loadMore() {
-        User myUser = Session.getLocalSession().getLoggedUser();
+        User2 myUser = Session.getLocalSession().getLoggedUser();
         int skip = pageNumber*limit;
         pageNumber++;
-        List<Course> moreCourses = null;
-        List<User> moreUsers = null;
+        List<Course2> moreCourses = null;
+        List<User2> moreUsers = null;
         switch (listType) {
             case Utils.OFFERED_COURSES:
-                moreCourses = neo4jDriver.findCoursesOfferedByUser(user, skip, limit);
+                moreCourses = mongoDBDriver.findCoursesOfferedByUser(user, skip, limit);
                 if (moreCourses != null)
                     Utils.addCoursesSnapshot(itemsHBox, moreCourses);
                 break;

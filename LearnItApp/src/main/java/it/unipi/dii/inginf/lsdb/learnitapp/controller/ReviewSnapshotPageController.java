@@ -1,10 +1,11 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Review2;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -28,11 +29,11 @@ public class ReviewSnapshotPageController {
 
     private VBox container;
 
-    private Course course;
-    private Review review;
+    private Course2 course;
+    private Review2 review;
 
     public void initialize() {
-        if (Session.getLocalSession().getLoggedUser().getRole() == User.Role.ADMINISTRATOR) {
+        if (Session.getLocalSession().getLoggedUser().getRole() == 1) {
             deleteImageView.setVisible(true);
             deleteImageView.setOnMouseClicked(clickEvent -> deleteReview(clickEvent));
             deleteImageView.setCursor(Cursor.HAND);
@@ -47,6 +48,7 @@ public class ReviewSnapshotPageController {
     }
 
     private void loadReviewInformation(){
+        User2 author = MongoDBDriver.getInstance().getUserByUsername(review.getUsername());
         if(review.getTitle()!=null)
             courseTitleLabel.setText(review.getTitle());
         else
@@ -54,12 +56,12 @@ public class ReviewSnapshotPageController {
 
         Utils.fillStars(review.getRating(), ratingHBox);
 
-        usernameLabel.setText(review.getAuthor().getUsername());
+        usernameLabel.setText(review.getUsername());
         usernameLabel.setOnMouseClicked(clickEvent -> visitAuthorProfile(clickEvent));
         profilePicImageView.setOnMouseClicked(clickEvent -> visitAuthorProfile(clickEvent));
 
-        if(review.getAuthor().getProfilePic() != null){
-            Image profilePicture = new Image(review.getAuthor().getProfilePic());
+        if(author.getProfilePic() != null){
+            Image profilePicture = new Image(author.getProfilePic());
             profilePicImageView.setImage(profilePicture);
         }
 
@@ -71,18 +73,20 @@ public class ReviewSnapshotPageController {
         lastModifiedLabel.setText("Last-modified: "+review.getTimestamp().toString());
     }
 
-    public void setReview(Review review, VBox container){
+    public void setReview(Review2 review, VBox container){
         this.review = review;
         this.container = container;
         loadReviewInformation();
     }
 
-    public void setCourse(Course course) {
+    public void setCourse(Course2 course) {
         this.course = course;
     }
 
     public void visitAuthorProfile(MouseEvent mouseEvent){
-        User author = review.getAuthor();
+        User2 author = new User2();
+        author.setUsername(review.getUsername());
+
         ProfilePageController profilePageController = (ProfilePageController) Utils.changeScene(Utils.PROFILE_PAGE, mouseEvent);
         profilePageController.setProfileUser(author);
     }

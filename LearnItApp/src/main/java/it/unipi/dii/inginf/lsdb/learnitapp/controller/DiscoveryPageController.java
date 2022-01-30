@@ -1,11 +1,10 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course2;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
-import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User2;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -40,19 +39,17 @@ public class DiscoveryPageController {
     @FXML private Button logoutButton;
 
     private ToggleGroup searchType;
-    private Neo4jDriver neo4jDriver;
     private MongoDBDriver mongoDBDriver;
     private int currentI = 0;
     private int currentJ = 0;
     private GridPane gridPane;
     private int limit;
 
-    private User loggedUser = Session.getLocalSession().getLoggedUser();
+    private User2 loggedUser = Session.getLocalSession().getLoggedUser();
 
     private final static String CREATE_NEW_COURSE_PAGE = "/fxml/NewCoursePage.fxml";
 
     public void initialize() {
-        neo4jDriver = Neo4jDriver.getInstance();
         mongoDBDriver = MongoDBDriver.getInstance();
         limit = ConfigParams.getLocalConfig().getLimitNumber();
 
@@ -70,7 +67,7 @@ public class DiscoveryPageController {
 
         profilePic.setOnMouseClicked(clickEvent -> myProfile(clickEvent));
         profilePic.setCursor(Cursor.HAND);
-        if (loggedUser.getRole() == User.Role.STANDARD) {
+        if (loggedUser.getRole() == 0) {
             initializeSuggestions();
         }
 
@@ -78,7 +75,7 @@ public class DiscoveryPageController {
         searchButton.setCursor(Cursor.HAND);
 
         createNewCourseButton.setCursor(Cursor.HAND);
-        if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
+        if (loggedUser.getRole() == 1) {
             createNewCourseButton.setText("Create new admin");
             createNewCourseButton.setStyle("-fx-background-color: lightpink;" +
                     "-fx-background-radius: 13px;" + "-fx-text-fill: red");
@@ -121,7 +118,7 @@ public class DiscoveryPageController {
 
         usernameLabel.setText(loggedUser.getUsername());
 
-        if (loggedUser.getRole() == User.Role.ADMINISTRATOR) {
+        if (loggedUser.getRole() == 1) {
             profilePic.setImage(new Image(String.valueOf(DiscoveryPageController.class.getResource("/img/createAdmin.png"))));
             return;
         }
@@ -216,7 +213,7 @@ public class DiscoveryPageController {
     }
 
     private void addMoreResearchedCourses(String title, String level, String language, double duration, double price){
-        List<Course> searchedCourses = mongoDBDriver.findCourses(price, duration, title, level, language, ((currentI*4)+currentJ), limit);
+        List<Course2> searchedCourses = mongoDBDriver.findCourses(price, duration, title, level, language, ((currentI*4)+currentJ), limit);
         for(int i = currentI; i<currentI + 4; i++){
             int j;
             if(i == currentI)
@@ -254,11 +251,11 @@ public class DiscoveryPageController {
     }
 
     private void addMoreResearchedUsers(String username) {
-        List<User> searchedUsers;
+        List<User2> searchedUsers;
         if (currentI == 0)
-            searchedUsers = neo4jDriver.searchUserByUsername(limit, 0, username);
+            searchedUsers = mongoDBDriver.searchUserByUsername(username, 0, limit);
         else
-            searchedUsers = neo4jDriver.searchUserByUsername(15, ((currentI * 4) + currentJ), username);
+            searchedUsers = mongoDBDriver.searchUserByUsername(username, ((currentI * 4) + currentJ), 15);
         for(int i = currentI; i<currentI + 4; i++){
             int j;
             if(i == currentI)
