@@ -252,13 +252,13 @@ public class ProfilePageController {
 
         if(neo4jDriver.isUserFollowedByUser(usernameLabel.getText(), loggedUser.getUsername())){
             // Unfollow operation
-            neo4jDriver.unfollowUser(loggedUser, profileUser));
+            neo4jDriver.unfollowUser(loggedUser, profileUser);
             followButton.setText("Follow");
             followerNumberLabel.setText(Integer.toString((Integer.parseInt(followerNumberLabel.getText())-1)));
         }
         else{
             // Follow operation
-            neo4jDriver.followUser(loggedUser, profileUser));
+            neo4jDriver.followUser(loggedUser, profileUser);
             followButton.setText("Unfollow");
             followerNumberLabel.setText(Integer.toString((Integer.parseInt(followerNumberLabel.getText())+1)));
         }
