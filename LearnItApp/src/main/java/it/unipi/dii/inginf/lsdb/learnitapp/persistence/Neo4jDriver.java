@@ -389,26 +389,87 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //cambiare
-    public List<Course> findSuggestedCourses(User user, int toSkip, int limit) {
-        List<Course> suggested = new ArrayList<>();
+    public List<Course2> findSuggestedCourses(User2 user, int skipFirstLvl, int limitFirstLvl, int skipSecondLvl,
+                                              int limitSecondLvl, int numRelationships) {
+        List<Course2> suggested = new ArrayList<>();
         try (Session session = neo4jDriver.session()) {
             session.readTransaction(tx -> {
-                Result r = tx.run("MATCH (u:User {username: $username})-[:FOLLOW]->(friend:User)-[:LIKE|:REVIEW]->(c:Course) " +
-                        "WHERE NOT ((u)-[:OFFER]->(c) OR (u)-[:REVIEW]->(c)) " +
-                        "RETURN c.title AS title, c.duration AS duration, c.price AS price, c.course_pic AS pic, " +
-                        "COUNT(*) AS occurrence " +
-                        "ORDER BY occurrence DESC " +
-                        "SKIP $skip " +
-                        "LIMIT $limit ", parameters("username", user.getUsername(), "skip", toSkip, "limit", limit));
-
+                Result r = tx.run(
+                        "MATCH (c:Course)<-[l:LIKE]-(u:User)<-[f:FOLLOW]-(me:User{username:$username}) " +
+                                "WHERE NOT EXISTS((me)-[:LIKE]->(c)) " +
+                                "RETURN c.title AS title, c.duration AS duration, c.price AS price, c.course_pic AS pic, " +
+                                "COUNT(*) AS numUser " +
+                                "ORDER BY numUser DESC " +
+                                "SKIP $skipFirstLvl " +
+                                "LIMIT $limitFirstLvl " +
+                                "UNION " +
+                                "MATCH (me:User{username:$username})-[l:LIKE]->(c:Course)<-[l1:LIKE]-(u:User)<-[:FOLLOW*2..2]-(me) " +
+                                "WHERE NOT EXISTS((me)-[:FOLLOW]->(u)) AND me.username <> u.username " +
+                                "WITH DISTINCT(u) as user, COUNT(DISTINCT(c)) as numRelationships " +
+                                "WHERE numRelationships > $numRelationships " +
+                                "MATCH (user)-[:LIKE|:REVIEW]->(c:Course) " +
+                                "WHERE NOT EXISTS((:User{username:$username})-[:LIKE|:REVIEW]->(c)) " +
+                                "RETURN DISTINCT c.title AS title, c.duration AS duration, c.price AS price, c.course_pic AS pic, " +
+                                "ORDER BY CASE c.duration WHEN null THEN 0 ELSE c.duration END DESC, " +
+                                "CASE c.price WHEN null THEN 0 ELSE c.price END ASC " +
+                                "SKIP $skipSecondLvl " +
+                                "LIMIT $limitSecondLvl",
+                        parameters("username", user.getUsername(), "skipFirstLvl", skipFirstLvl,
+                                "limitFirstLvl", limitFirstLvl, "numRelationships", numRelationships,
+                                "skipSecondLvl", skipSecondLvl, "limitSecondLvl", limitSecondLvl));
                 while (r.hasNext()) {
                     Record rec = r.next();
                     String title = rec.get("title").asString();
                     double duration = rec.get("duration").asDouble();
                     double price = rec.get("price").asDouble();
                     String pic = rec.get("pic").asString();
-                    suggested.add(new Course(title, duration, price, pic));
+                    suggested.add(new Course2(title, duration, price, pic));
+                }
+
+                return null;
+            });
+
+            return suggested;
+        }
+        catch (Exception ex) {
+            System.err.println("Error while retrieving suggestions from Neo4J");
+            return null;
+        }
+    }
+
+    public List<User2> findSuggestedUsers(User2 user, int followedThreshold, int skipFirstLvl, int limitFirstLvl,
+                                          int skipSecondLvl, int limitSecondLvl, int numCommonCourses) {
+        List<User2> suggested = new ArrayList<>();
+        try (Session session = neo4jDriver.session()) {
+            session.readTransaction(tx -> {
+                Result r = tx.run(
+                        "MATCH (me:User {username: $username})-[:FOLLOW*2..2]->(u:User) " +
+                                "WHERE NOT EXISTS((me)-[:FOLLOW]->(u)) AND u.username <> me.username " +
+                                "WITH DISTINCT(u) as user, COUNT(u) as followed " +
+                                "WHERE followed > $followedThreshold " +
+                                "RETURN user.username AS username, user.gender AS gender, user.pic as pic " +
+                                "ORDER BY followed DESC " +
+                                "SKIP $skipFirstLvl " +
+                                "LIMIT $limitFirstLvl " +
+                                "UNION " +
+                                "MATCH (me:User {username: $username })-[:LIKE]->(commonCourse:Course)<-[:LIKE]-(u:User) " +
+                                "WHERE NOT EXISTS((me)-[:FOLLOW]->(u)) " +
+                                "WITH DISTINCT(u) as user, COUNT(commonCourse) as numCommonCourses " +
+                                "WHERE numCommonCourses > $numCommonCourses " +
+                                "RETURN  user.username AS username, user.gender AS gender, user.pic as pic " +
+                                "ORDER BY numCommonCourses DESC " +
+                                "SKIP $skipSecondLvl " +
+                                "LIMIT $secondLvl",
+                        parameters("username", user.getUsername(), "followedThreshold", followedThreshold,
+                                "skipFirstLvl", skipFirstLvl, "limitFirstLvl", limitFirstLvl,
+                                "numCommonCourses", numCommonCourses, "skipSecondLvl", skipSecondLvl,
+                                "limitSecondLvl", limitSecondLvl));
+                while (r.hasNext()) {
+                    Record rec = r.next();
+                    String username = rec.get("username").asString();
+                    String gender = rec.get("gender").asString();
+                    String pic = rec.get("pic").asString();
+                    suggested.add(new User2(username, pic, gender));
                 }
 
                 return null;
