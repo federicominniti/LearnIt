@@ -19,11 +19,21 @@ public class User2 {
     @BsonProperty(value = "email")
     private String email;
     @BsonProperty(value = "role")
-    private int role;
+    private Integer role;
     @BsonProperty(value = "pic")
     private String profilePic;
     @BsonProperty(value = "reviewed")
-    private List<Course> reviewedCourses;
+    private List<Course2> reviewedCourses;
+    @BsonProperty(value = "count")
+    private Integer count;
+    @BsonProperty(value = "avgprice")
+    private Integer avgPrice;
+    @BsonProperty(value = "avgduration")
+    private Integer avgDuration;
+
+    public User2() {
+
+    }
 
     public String getUsername() {
         return username;
@@ -73,11 +83,11 @@ public class User2 {
         this.email = email;
     }
 
-    public int getRole() {
+    public Integer getRole() {
         return role;
     }
 
-    public void setRole(int role) {
+    public void setRole(Integer role) {
         this.role = role;
     }
 
@@ -89,15 +99,35 @@ public class User2 {
         this.profilePic = profilePic;
     }
 
-    public List<Course> getReviewedCourses() {
+    public List<Course2> getReviewedCourses() {
         return reviewedCourses;
     }
 
-    public void setReviewedCourses(List<Course> reviewedCourses) {
+    public void setReviewedCourses(List<Course2> reviewedCourses) {
         this.reviewedCourses = reviewedCourses;
     }
 
-    public User2() {
+    public Integer getCount() {
+        return count;
+    }
 
+    public void setCount(Integer count) {
+        this.count = count;
+    }
+
+    public Integer getAvgPrice() {
+        return avgPrice;
+    }
+
+    public void setAvgPrice(Integer avgPrice) {
+        this.avgPrice = avgPrice;
+    }
+
+    public Integer getAvgDuration() {
+        return avgDuration;
+    }
+
+    public void setAvgDuration(Integer avgDuration) {
+        this.avgDuration = avgDuration;
     }
 }

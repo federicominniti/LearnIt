@@ -22,9 +22,9 @@ public class Course2 {
     @BsonProperty(value = "level")
     private String level;
     @BsonProperty(value = "duration")
-    private double duration;
+    private Double duration;
     @BsonProperty(value = "price")
-    private double price;
+    private Double price;
     @BsonProperty(value = "link")
     private String link;
     @BsonProperty(value = "modality")
@@ -32,18 +32,18 @@ public class Course2 {
     @BsonProperty(value = "reviews")
     private List<Review2> reviews;
     @BsonProperty(value="num_reviews")
-    private int num_reviews;
+    private Integer num_reviews;
     @BsonProperty(value="sum_ratings")
-    private int sum_ratings;
+    private Integer sum_ratings;
     @BsonProperty(value="course_pic")
     private String coursePic;
     @BsonProperty(value="new_price")
-    private int newPrice;
-    @BsonProperty(value="")
+    private Integer newPrice;
     @BsonProperty(value="year")
-    private int year;
+    private Integer year;
 
-    public Course2() {
+    public Course2 () {
+
     }
 
     public ObjectId getId() {
@@ -102,19 +102,19 @@ public class Course2 {
         this.level = level;
     }
 
-    public double getDuration() {
+    public Double getDuration() {
         return duration;
     }
 
-    public void setDuration(double duration) {
+    public void setDuration(Double duration) {
         this.duration = duration;
     }
 
-    public double getPrice() {
+    public Double getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(Double price) {
         this.price = price;
     }
 
@@ -142,19 +142,19 @@ public class Course2 {
         this.reviews = reviews;
     }
 
-    public int getNum_reviews() {
+    public Integer getNum_reviews() {
         return num_reviews;
     }
 
-    public void setNum_reviews(int num_reviews) {
+    public void setNum_reviews(Integer num_reviews) {
         this.num_reviews = num_reviews;
     }
 
-    public int getSum_ratings() {
+    public Integer getSum_ratings() {
         return sum_ratings;
     }
 
-    public void setSum_ratings(int sum_ratings) {
+    public void setSum_ratings(Integer sum_ratings) {
         this.sum_ratings = sum_ratings;
     }
 
@@ -166,11 +166,19 @@ public class Course2 {
         this.coursePic = coursePic;
     }
 
-    public int getYear() {
+    public Integer getNewPrice() {
+        return newPrice;
+    }
+
+    public void setNewPrice(Integer newPrice) {
+        this.newPrice = newPrice;
+    }
+
+    public Integer getYear() {
         return year;
     }
 
-    public void setYear(int year) {
+    public void setYear(Integer year) {
         this.year = year;
     }
 }

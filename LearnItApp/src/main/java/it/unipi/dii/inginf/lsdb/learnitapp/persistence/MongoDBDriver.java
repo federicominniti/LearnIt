@@ -115,7 +115,7 @@ public class MongoDBDriver implements DBDriver {
             coursesCollection = database.getCollection("learnit_edited", Course2.class);
             usersCollection = database.getCollection("users", User2.class);
 
-            User u = usersCollection.find().first();
+            User2 u = usersCollection.find().first();
             System.out.println(u.getUsername());
             database.runCommand((Bson) ping);
         } catch (Exception e) {
@@ -645,4 +645,124 @@ public class MongoDBDriver implements DBDriver {
                 return c.getReviews().get(0);
         }
     }
+
+    public User2 login(String username, String password) {
+        Bson eqUsername = Filters.eq("username", username);
+        Bson eqPass = Filters.eq("password", password);
+        try {
+            User2 loggedUser = usersCollection.find(Filters.and(eqUsername, eqPass)).first();
+            return loggedUser;
+        } catch (MongoException e) {
+            return null;
+        }
+    }
+
+    public boolean editProfileInfo(User2 newInfo) {
+        List<Bson> updates = new ArrayList<>();
+        if (newInfo.getProfilePic() == null)
+            updates.add(Updates.unset("pic"));
+        else
+            updates.add(Updates.set("pic", newInfo.getProfilePic()));
+
+        if (newInfo.getGender() == null)
+            updates.add(Updates.unset("gender"));
+        else
+            updates.add(Updates.set("gender", newInfo.getGender()));
+
+        if (newInfo.getDateOfBirth() == null)
+            updates.add(Updates.unset("birthdate"));
+        else
+            updates.add(Updates.set("birthdate", newInfo.getDateOfBirth()));
+
+        updates.add(Updates.set("email", newInfo.getEmail()));
+        updates.add(Updates.set("password", newInfo.getPassword()));
+        updates.add(Updates.set("complete_name", newInfo.getCompleteName()));
+
+        try {
+            Bson filter = Filters.eq("username", newInfo.getUsername());
+            usersCollection.updateOne(filter, Updates.combine(updates));
+            return true;
+        } catch (MongoException e) {
+            return false;
+        }
+    }
+
+    public List<Integer> avgStatistics(User2 user) {
+        List<Document> aggregation =
+                Arrays.asList(new Document("$match", new Document("username", user.getUsername())
+                                                    .append("reviewed", new Document("$exists", true))),
+                            new Document("$unwind", new Document("path", "$reviewed")),
+                            new Document("$group", new Document("_id", "$username")
+                                                    .append("count", new Document("$sum", 1))
+                                                    .append("avgprice", new Document("$avg", "$reviewed.price"))
+                                                    .append("avgduration", new Document("$avg", "$reviewed.duration"))));
+
+        List<Integer> res = new ArrayList<>();
+        User2 doc = null;
+        try {
+            doc = usersCollection.aggregate(aggregation).first();
+        } catch (MongoException e) {
+            return null;
+        }
+
+        if (doc == null)
+            return null;
+
+        res.add(doc.getCount());
+        res.add((int) doc.getAvgPrice());
+        res.add((int) doc.getAvgDuration());
+        return res;
+    }
+
+    public List<User2> searchUserByUsername(String searchedText, int skip, int limit) {
+        try {
+            Pattern pattern = Pattern.compile("^.*" + searchedText + ".*$", Pattern.CASE_INSENSITIVE);
+            Bson usernameFilter = Filters.regex("username", pattern);
+            Bson completeNameFilter = Filters.regex("complete_name", pattern);
+            List<User2> res = usersCollection.find(Filters.or(usernameFilter, completeNameFilter))
+                    .skip(skip)
+                    .limit(limit)
+                    .projection(Projections.exclude("reviewed"))
+                    .into(new ArrayList<>());
+
+            return res;
+        } catch (MongoException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    public boolean checkIfUserExists(String username) {
+        try {
+            User2 user = usersCollection.find(Filters.eq("username", username))
+                    .projection(Projections.exclude("reviewed"))
+                    .first();
+            return (user != null);
+        } catch (MongoException e) {
+            return true;
+        }
+    }
+
+    public boolean addUser(User2 user) {
+        try {
+            usersCollection.insertOne(user);
+            return true;
+        } catch (MongoException e) {
+            return false;
+        }
+    }
+
+    public List<Course2> findCoursesOfferedByUser(User2 user, int skip, int limit) {
+        try {
+            List<Course2> list = coursesCollection.find(Filters.eq("instructor", user.getUsername()))
+                    .projection(Projections.exclude("reviews"))
+                    .skip(skip)
+                    .limit(limit)
+                    .into(new ArrayList<>());
+
+            return list;
+        } catch (MongoException e) {
+            return new ArrayList<>();
+        }
+    }
+
 }
