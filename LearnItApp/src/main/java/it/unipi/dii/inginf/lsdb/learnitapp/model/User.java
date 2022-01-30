@@ -12,7 +12,7 @@ public class User {
     private String password;
     @BsonProperty(value = "complete_name")
     private String completeName;
-    @BsonProperty(value = "date_of_birth")
+    @BsonProperty(value = "birthdate")
     private Date dateOfBirth;
     @BsonProperty(value = "gender")
     private String gender;

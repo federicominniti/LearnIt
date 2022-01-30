@@ -152,8 +152,8 @@ public class ElementsLineController {
         switch (listType) {
             case Utils.COURSES_SUGGESTIONS:
                 int numRelationships = configParams.getNumRelationships();
-                moreCourses = neo4jDriver.findSuggestedCourses(myUser, skipFirstLvl, limitFirstLvl, skipSecondLvl,
-                                                                limitSecondLvl, numRelationships);
+                moreCourses = neo4jDriver.findSuggestedCourses(myUser, skipFirstLvl, 5, skipSecondLvl,
+                                                                5, numRelationships);
                 if (moreCourses != null)
                     Utils.addCoursesSnapshot(itemsHBox, moreCourses);
                 break;

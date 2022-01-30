@@ -196,10 +196,11 @@ public class Utils {
     }
 
     public static void addCoursesSnapshot(HBox courseHBox, List<Course> courses) {
-        for(int i = 0; i<courses.size(); i++) {
-            Pane coursePane = loadCourseSnapshot(courses.get(i));
-            courseHBox.getChildren().add(coursePane);
-        }
+        if(courses != null)
+            for(int i = 0; i<courses.size(); i++) {
+                Pane coursePane = loadCourseSnapshot(courses.get(i));
+                courseHBox.getChildren().add(coursePane);
+            }
     }
 
     public static void addLine(VBox discoverySections, Course course, User user, int type) {

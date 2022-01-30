@@ -219,4 +219,23 @@ public class Course {
     public void setYear(Integer year) {
         this.year = year;
     }
+
+    public void printCourse(){
+        System.out.println("course:");
+        System.out.println("title: "+ this.getTitle());
+        System.out.println("instructor: "+this.getInstructor());
+        if(this.getLanguage()!=null)
+            System.out.println("language: "+this.getLanguage());
+        System.out.println("level: "+this.getLevel());
+        if(this.getDuration()!=null)
+            System.out.println("duration: "+this.getDuration());
+        if(this.getPrice()!=null)
+            System.out.println("price: "+this.getPrice());
+        if(this.getLink()!=null)
+            System.out.println("link: "+this.getLink());
+        if(this.getModality()!=null)
+            System.out.println("modality: "+this.getModality());
+        if(this.getCoursePic()!=null)
+            System.out.println("course_pic: "+this.getCoursePic());
+    }
 }

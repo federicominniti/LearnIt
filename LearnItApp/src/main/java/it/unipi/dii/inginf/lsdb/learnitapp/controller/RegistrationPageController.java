@@ -181,6 +181,8 @@ public class RegistrationPageController {
         if (genderChoiceBox.getValue() != null)
             newUser.setGender(genderChoiceBox.getValue());
 
+        newUser.setRole(0);
+
         return DBOperations.addUser(newUser);
     }
 }

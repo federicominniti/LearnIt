@@ -29,8 +29,15 @@ public class CourseSnapshotController {
             coursePicImage = new ImageView(new Image(course.getCoursePic()));
         }
 
-        durationLabel.setText("Duration: " + course.getDuration() + " hour");
-        priceLabel.setText("Price: " + course.getPrice() + " €");
+        if (course.getDuration() == null)
+            durationLabel.setText("Duration: unknown");
+        else
+            durationLabel.setText("Duration: " + course.getDuration() + " hour");
+
+        if (course.getPrice() == null)
+            priceLabel.setText("Price: Free");
+        else
+            priceLabel.setText("Price: " + course.getDuration() + "€");
 
         this.course = course;
     }

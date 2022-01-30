@@ -10,6 +10,7 @@ import org.neo4j.driver.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.neo4j.driver.Values.NULL;
 import static org.neo4j.driver.Values.parameters;
 
 public class Neo4jDriver implements DBDriver {
@@ -178,8 +179,17 @@ public class Neo4jDriver implements DBDriver {
                         parameters("username", user.getUsername(), "skip", skip, "limit", limit));
 
                 while(result.hasNext()){
-                    Record r = result.next();
-                    courses.add(new Course(r.get("title").asString(), r.get("duration").asDouble(), r.get("price").asDouble(), r.get("pic").asString()));
+                    Record rec = result.next();
+                    Double duration = null;
+                    Double price = null;
+                    String pic = null;
+                    if (rec.get("duration") != NULL)
+                        duration = rec.get("duration").asDouble();
+                    if (rec.get("price") != NULL)
+                        price = rec.get("price").asDouble();
+                    if (rec.get("pic") != NULL)
+                        pic = rec.get("pic").asString();
+                    courses.add(new Course(rec.get("title").asString(), duration, price, pic));
                 }
                 return null;
             });
@@ -282,6 +292,7 @@ public class Neo4jDriver implements DBDriver {
                 Result r = tx.run(
                         "MATCH (c:Course)<-[l:LIKE]-(u:User)<-[f:FOLLOW]-(me:User{username:$username}) " +
                                 "WHERE NOT EXISTS((me)-[:LIKE]->(c)) " +
+                                "WITH DISTINCT(c) as c, COUNT(*) as numUser " +
                                 "RETURN c.title AS title, c.duration AS duration, c.price AS price, c.course_pic AS pic, " +
                                 "COUNT(*) AS numUser " +
                                 "ORDER BY numUser DESC " +
@@ -294,7 +305,7 @@ public class Neo4jDriver implements DBDriver {
                                 "WHERE numRelationships > $numRelationships " +
                                 "MATCH (user)-[:LIKE|:REVIEW]->(c:Course) " +
                                 "WHERE NOT EXISTS((:User{username:$username})-[:LIKE|:REVIEW]->(c)) " +
-                                "RETURN DISTINCT c.title AS title, c.duration AS duration, c.price AS price, c.course_pic AS pic, " +
+                                "RETURN DISTINCT c.title AS title, c.duration AS duration, c.price AS price, c.course_pic AS pic " +
                                 "ORDER BY CASE c.duration WHEN null THEN 0 ELSE c.duration END DESC, " +
                                 "CASE c.price WHEN null THEN 0 ELSE c.price END ASC " +
                                 "SKIP $skipSecondLvl " +
@@ -305,9 +316,15 @@ public class Neo4jDriver implements DBDriver {
                 while (r.hasNext()) {
                     Record rec = r.next();
                     String title = rec.get("title").asString();
-                    double duration = rec.get("duration").asDouble();
-                    double price = rec.get("price").asDouble();
-                    String pic = rec.get("pic").asString();
+                    Double duration = null;
+                    Double price = null;
+                    String pic = null;
+                    if (rec.get("duration") != NULL)
+                        duration = rec.get("duration").asDouble();
+                    if (rec.get("price") != NULL)
+                        price = rec.get("price").asDouble();
+                    if (rec.get("pic") != NULL)
+                        pic = rec.get("pic").asString();
                     suggested.add(new Course(title, duration, price, pic));
                 }
 
@@ -351,10 +368,16 @@ public class Neo4jDriver implements DBDriver {
                                 "limitSecondLvl", limitSecondLvl));
                 while (r.hasNext()) {
                     Record rec = r.next();
+
+                    String gender = null;
+                    String pic = null;
+                    if (rec.get("gender") != NULL)
+                        gender = rec.get("gender").asString();
+                    if (rec.get("pic") != NULL)
+                        pic = rec.get("pic").asString();
+
                     String username = rec.get("username").asString();
-                    String gender = rec.get("gender").asString();
-                    String pic = rec.get("pic").asString();
-                    suggested.add(new User(username, pic, gender));
+                    suggested.add(new User(username, gender, pic));
                 }
 
                 return null;
@@ -403,9 +426,17 @@ public class Neo4jDriver implements DBDriver {
                         "SKIP $skip LIMIT $limit", parameters( "username", user.getUsername(), "skip", skip,
                         "limit", limit));
                 while(result.hasNext()){
-                    Record record = result.next();
-                    courses.add(new Course(record.get("title").asString(), record.get("duration").asDouble(),
-                            record.get("price").asDouble(), record.get("pic").asString()));
+                    Record rec = result.next();
+                    Double duration = null;
+                    Double price = null;
+                    String pic = null;
+                    if (rec.get("duration") != NULL)
+                        duration = rec.get("duration").asDouble();
+                    if (rec.get("price") != NULL)
+                        price = rec.get("price").asDouble();
+                    if (rec.get("pic") != NULL)
+                        pic = rec.get("pic").asString();
+                    courses.add(new Course(rec.get("title").asString(), duration, price, pic));
                 }
                 return courses;
             });
@@ -610,7 +641,8 @@ public class Neo4jDriver implements DBDriver {
             session.readTransaction(tx -> {
 
                 Result r = tx.run("MATCH (:User)-[l:LIKE]->(c:Course) " +
-                                "RETURN c, COUNT (l) AS like_count, "+
+                                "RETURN c.title AS title, c.course_pic AS course_pic, " +
+                                "c.duration AS duration, c.price AS price, COUNT (l) AS like_count, "+
                                 "CASE c.duration WHEN null THEN 0 ELSE CASE c.price "+
                                 "WHEN null THEN 1 ELSE c.duration/c.price END "+
                                 "END " +
@@ -621,7 +653,16 @@ public class Neo4jDriver implements DBDriver {
 
                 while (r.hasNext()) {
                     Record rec = r.next();
-                    Course c = new Course(rec.get("title").asString(), rec.get("duration").asDouble(), rec.get("price").asDouble(), rec.get("course_pic").asString());
+                    Double duration = null;
+                    Double price = null;
+                    String pic = null;
+                    if (rec.get("duration") != NULL)
+                        duration = rec.get("duration").asDouble();
+                    if (rec.get("price") != NULL)
+                        price = rec.get("price").asDouble();
+                    if (rec.get("course_pic") != NULL)
+                        pic = rec.get("course_pic").asString();
+                    Course c = new Course(rec.get("title").asString(), duration, price, pic);
                     courses.add(c);
                 }
                 return null;
@@ -630,7 +671,7 @@ public class Neo4jDriver implements DBDriver {
             return courses;
         }
         catch (Exception ex) {
-            System.err.println("Error while retrieving suggestions from Neo4J");
+            ex.printStackTrace();
             return null;
         }
     }
