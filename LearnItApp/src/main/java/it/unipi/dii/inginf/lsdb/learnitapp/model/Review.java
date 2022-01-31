@@ -71,4 +71,15 @@ public class Review {
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
+
+    @Override
+    public String toString() {
+        return "Review{" +
+                "title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", rating=" + rating +
+                ", timestamp=" + timestamp +
+                ", username='" + username + '\'' +
+                '}';
+    }
 }

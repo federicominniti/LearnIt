@@ -21,6 +21,8 @@ public class DBOperations {
                     return mongoDBDriver.updateCourse(oldCourse, oldCourse);
                 } catch (MongoException e) {
                     mongoLogger.error(e.getMessage());
+                    mongoLogger.error("UPDATE COURSE: ROLLBACK FAILED");
+                    mongoLogger.error(oldCourse.toString());
                 }
             } else {
                 return true;
@@ -38,6 +40,8 @@ public class DBOperations {
                     return true;
                 } catch (MongoException e) {
                     mongoLogger.error(e.getMessage());
+                    mongoLogger.error("DELETE COURSE: ROLLBACK FAILED");
+                    mongoLogger.error(oldCourse.toString());
                     return false;
                 }
             } else {
@@ -60,6 +64,9 @@ public class DBOperations {
                 return false;
             } catch (MongoException e) {
                 mongoLogger.error(e.getMessage());
+                mongoLogger.error("ADD REVIEW: ROLLBACK FAILED");
+                mongoLogger.error(course.toString());
+                mongoLogger.error(newReview.toString());
                 return false;
             }
         }
@@ -80,6 +87,9 @@ public class DBOperations {
                 return false;
             } catch (MongoException e) {
                 mongoLogger.error(e.getMessage());
+                mongoLogger.error("DELETE REVIEW: ROLLBACK FAILED");
+                mongoLogger.error(course.toString());
+                mongoLogger.error(review.toString());
                 return false;
             }
         }
@@ -101,6 +111,8 @@ public class DBOperations {
                 return false;
             } catch (MongoException e) {
                 mongoLogger.error(e.getMessage());
+                mongoLogger.error("ADD COURSE: ROLLBACK FAILED");
+                mongoLogger.error(course.toString());
                 return false;
             }
         }
@@ -119,6 +131,8 @@ public class DBOperations {
             mongoDBDriver.deleteUserCourses(user);
         } catch (MongoException e) {
             mongoLogger.error(e.getMessage());
+            mongoLogger.error("DELETE USER: DELETE USER COURSES FAILED");
+            mongoLogger.error(user.toString());
             return false;
         }
 
@@ -126,6 +140,8 @@ public class DBOperations {
             neo4jDriver.deleteUser(user);
         } catch (Neo4jException e) {
             neo4jLogger.error(e.getMessage());
+            neo4jLogger.error("DELETE USER: FAILED");
+            neo4jLogger.error(user.toString());
             return false;
         }
 
@@ -133,6 +149,8 @@ public class DBOperations {
             mongoDBDriver.deleteUser(user);
         } catch (MongoException e) {
             mongoLogger.error(e.getMessage());
+            mongoLogger.error("DELETE USER: FAILED");
+            mongoLogger.error(user.toString());
             return false;
         }
 
@@ -153,6 +171,8 @@ public class DBOperations {
                 mongoDBDriver.editProfileInfo(oldUser);
             } catch (MongoException e) {
                 mongoLogger.error(e.getMessage());
+                mongoLogger.error("EDIT PROFILE INFO: ROLLBACK FAILED");
+                mongoLogger.error(oldUser.toString());
             }
 
             return false;
@@ -175,6 +195,8 @@ public class DBOperations {
                 mongoDBDriver.deleteUser(newUser);
             } catch (MongoException e) {
                 mongoLogger.error(e.getMessage());
+                mongoLogger.error("ADD USER: ROLLBACK FAILED");
+                mongoLogger.error(newUser.toString());
             }
 
             return false;

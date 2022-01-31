@@ -141,4 +141,29 @@ public class User {
     public void setAvgDuration(Double avgDuration) {
         this.avgDuration = avgDuration;
     }
+
+    private String reviewedToString() {
+        String res = "";
+        for (Course c: reviewedCourses)
+            res += c.toString();
+        return res;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", completeName='" + completeName + '\'' +
+                ", dateOfBirth=" + dateOfBirth +
+                ", gender='" + gender + '\'' +
+                ", email='" + email + '\'' +
+                ", role=" + role +
+                ", profilePic='" + profilePic + '\'' +
+                ", count=" + count +
+                ", avgPrice=" + avgPrice +
+                ", avgDuration=" + avgDuration +
+                ", reviewedCourses=" + reviewedToString() + '\'' +
+                '}';
+    }
 }

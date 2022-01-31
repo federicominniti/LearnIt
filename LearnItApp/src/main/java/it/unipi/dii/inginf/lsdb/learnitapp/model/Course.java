@@ -38,7 +38,22 @@ public class Course {
     @BsonProperty(value="course_pic")
     private String coursePic;
     @BsonProperty(value="new_price")
-    private Integer newPrice;
+    private Double newPrice;
+    @BsonProperty(value = "new_duration")
+    private Double newDuration;
+
+    public void setNewPrice(Double newPrice) {
+        this.newPrice = newPrice;
+    }
+
+    public Double getNewDuration() {
+        return newDuration;
+    }
+
+    public void setNewDuration(Double newDuration) {
+        this.newDuration = newDuration;
+    }
+
     @BsonProperty(value="year")
     private Integer year;
 
@@ -204,14 +219,6 @@ public class Course {
         this.coursePic = coursePic;
     }
 
-    public Integer getNewPrice() {
-        return newPrice;
-    }
-
-    public void setNewPrice(Integer newPrice) {
-        this.newPrice = newPrice;
-    }
-
     public Integer getYear() {
         return year;
     }
@@ -220,22 +227,39 @@ public class Course {
         this.year = year;
     }
 
-    public void printCourse(){
-        System.out.println("course:");
-        System.out.println("title: "+ this.getTitle());
-        System.out.println("instructor: "+this.getInstructor());
-        if(this.getLanguage()!=null)
-            System.out.println("language: "+this.getLanguage());
-        System.out.println("level: "+this.getLevel());
-        if(this.getDuration()!=null)
-            System.out.println("duration: "+this.getDuration());
-        if(this.getPrice()!=null)
-            System.out.println("price: "+this.getPrice());
-        if(this.getLink()!=null)
-            System.out.println("link: "+this.getLink());
-        if(this.getModality()!=null)
-            System.out.println("modality: "+this.getModality());
-        if(this.getCoursePic()!=null)
-            System.out.println("course_pic: "+this.getCoursePic());
+    private String categoryToString() {
+        String res = "";
+        for (String s: category)
+            res += s + ",";
+        return res;
+    }
+
+    private String reviewsToString() {
+        String res = "";
+        for (Review r: reviews)
+            res += r.toString();
+        return res;
+    }
+    @Override
+    public String toString() {
+        return "Course{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", instructor='" + instructor + '\'' +
+                ", language='" + language + '\'' +
+                ", level='" + level + '\'' +
+                ", duration=" + duration +
+                ", price=" + price +
+                ", link='" + link + '\'' +
+                ", modality='" + modality + '\'' +
+                ", num_reviews=" + num_reviews +
+                ", sum_ratings=" + sum_ratings +
+                ", coursePic='" + coursePic + '\'' +
+                ", newPrice=" + newPrice +
+                ", year=" + year +
+                ", category=" + categoryToString() + '\'' +
+                ", reviews=" + reviewsToString() + '\'' +
+                '}';
     }
 }
