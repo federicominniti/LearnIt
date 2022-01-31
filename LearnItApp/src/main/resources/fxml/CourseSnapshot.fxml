@@ -5,6 +5,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="courseSnapshot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="230.0" style="-fx-background-color: white; -fx-background-position: center; -fx-border-radius: 20px; -fx-border-style: solid; -fx-border-color: #006aff#006aff; -fx-border-width: 2px;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.CourseSnapshotController">
    <children>
@@ -13,9 +14,18 @@
             <Image url="@../img/courseDefaultImage.png" />
          </image>
       </ImageView>
-      <Label fx:id="titleLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="3.0" layoutY="16.0" prefHeight="57.0" prefWidth="224.0" text="Title" textAlignment="CENTER" wrapText="true" />
-      <Label fx:id="durationLabel" alignment="CENTER" layoutX="3.0" layoutY="213.0" prefHeight="17.0" prefWidth="224.0" text="Duration " />
-      <Label fx:id="priceLabel" alignment="CENTER" layoutX="3.0" layoutY="186.0" prefHeight="17.0" prefWidth="224.0" text="Price" />
+      <Label fx:id="titleLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="3.0" layoutY="17.0" prefHeight="57.0" prefWidth="224.0" text="Title" textAlignment="CENTER" wrapText="true">
+         <font>
+            <Font size="15.0" />
+         </font></Label>
+      <Label fx:id="durationLabel" alignment="CENTER" layoutX="3.0" layoutY="213.0" prefHeight="17.0" prefWidth="224.0" text="Duration ">
+         <font>
+            <Font size="15.0" />
+         </font></Label>
+      <Label fx:id="priceLabel" alignment="CENTER" layoutX="3.0" layoutY="186.0" prefHeight="17.0" prefWidth="224.0" text="Price">
+         <font>
+            <Font size="15.0" />
+         </font></Label>
    </children>
    <opaqueInsets>
       <Insets />

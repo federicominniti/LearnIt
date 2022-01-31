@@ -6,7 +6,6 @@ import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -15,7 +14,6 @@ public class UserSnapshotController {
     @FXML AnchorPane userSnapshot;
     @FXML private Label usernameLabel;
     @FXML private ImageView userPicImage;
-    @FXML private Label completeNameLabel;
     @FXML private Label genderLabel;
     @FXML private Label totalCoursesLabel;
     private User referredUser;
@@ -37,7 +35,8 @@ public class UserSnapshotController {
         else
             genderLabel.setText("N/S");
 
-        //totalCoursesLabel.setText("Completed courses: " + MongoDBDriver.getInstance().avgStatistics(user).get(0));
+        totalCoursesLabel.setText("Completed courses: " +
+                MongoDBDriver.getInstance().avgStatistics(user).get("count").intValue());
 
         referredUser = user;
     }

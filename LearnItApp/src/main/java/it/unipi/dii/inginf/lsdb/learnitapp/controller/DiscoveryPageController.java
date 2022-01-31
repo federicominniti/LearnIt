@@ -20,6 +20,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Paint;
 
 import java.util.List;
 
@@ -56,6 +57,8 @@ public class DiscoveryPageController {
     public void initialize() {
         mongoDBDriver = MongoDBDriver.getInstance();
         limit = ConfigParams.getLocalConfig().getLimitNumber();
+
+        suggestionsSwitchButton.setCursor(Cursor.HAND);
 
         gridPane = new GridPane();
         gridPane.setAlignment(Pos.CENTER);
@@ -139,7 +142,8 @@ public class DiscoveryPageController {
     private void coursesSuggestions(){
         suggestionsSwitchButton.setOnMouseClicked(clickEvent -> usersSuggestions());
         suggestionsSwitchButton.setText("Courses");
-        suggestionsSwitchButton.setStyle("-fx-background-color: #9370DB; -fx-text-fill: #E6E6FA;");
+        suggestionsSwitchButton.setStyle("-fx-background-color: #9370DB; -fx-background-radius: 13");
+        suggestionsSwitchButton.setTextFill(Paint.valueOf("#E6E6FA"));
         elementsVBox.getChildren().clear();
         Utils.addLine(elementsVBox, null, null, Utils.BEST_RATING);
         Utils.addLine(elementsVBox, null, null, Utils.TRENDING_COURSE);
@@ -151,7 +155,8 @@ public class DiscoveryPageController {
    private void usersSuggestions(){
        suggestionsSwitchButton.setOnMouseClicked(clickEvent -> coursesSuggestions());
        suggestionsSwitchButton.setText("Users");
-       suggestionsSwitchButton.setStyle("-fx-background-color: #E6E6FA; -fx-text-fill: #9370DB;");
+       suggestionsSwitchButton.setStyle("-fx-background-color: #E6E6FA; -fx-background-radius: 13");
+       suggestionsSwitchButton.setTextFill(Paint.valueOf("#9370DB"));
        elementsVBox.getChildren().clear();
        Utils.addLine(elementsVBox, null, null, Utils.BEST_USERS);
        Utils.addLine(elementsVBox, null, loggedUser, Utils.USER_SUGGESTIONS);

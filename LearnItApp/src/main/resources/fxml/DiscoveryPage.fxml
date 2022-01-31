@@ -83,7 +83,7 @@
             <Font name="Arial Bold Italic" size="20.0" />
          </font>
       </Label>
-      <Button fx:id="suggestionsSwitchButton" layoutX="190.0" layoutY="115.0" mnemonicParsing="false" style="-fx-background-radius: 13; -fx-background-color: #9370DB#9370DB #9370DB#9370DB;" text="Courses" textFill="WHITE">
+      <Button fx:id="suggestionsSwitchButton" layoutX="190.0" layoutY="115.0" mnemonicParsing="false" style="-fx-background-radius: 13; -fx-background-color: #9370DB;" text="Courses" textFill="WHITE">
          <font>
             <Font size="15.0" />
          </font>

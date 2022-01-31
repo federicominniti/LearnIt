@@ -193,18 +193,18 @@ public class ProfilePageController {
             //trashBin.setOnMouseClicked(clickEvent -> deleteUserHandler(profileUser, clickEvent));
             //trashBin.setCursor(Cursor.HAND);
             //userInfoVBox.getChildren().add(trashBin);
+        } else if(loggedUser.getRole() == 1 && !isProfileMine){ //gestire eliminazione utente da parte di admin
+            followButton.setText("Delete user");
+            followButton.setOnMouseClicked(clickEvent -> deleteUserHandler(clickEvent));
+            followButton.setCursor(Cursor.HAND);
         }
         else if(isProfileMine){ // personal profile
             followButton.setText("Edit Profile");
             followButton.setOnMouseClicked(clickEvent -> Utils.changeScene(PERSONAL_PAGE, clickEvent));
             followButton.setCursor(Cursor.HAND);
         }
-        else{ // another profile
-            //gestire eliminazione utente da parte di admin
-            followButton.setText("Delete user");
-            followButton.setOnMouseClicked(clickEvent -> deleteUserHandler(clickEvent));
-            followButton.setCursor(Cursor.HAND);
-        }
+        //else{ // another profile
+        //}
 
         loadProfileInformation();
         loadStatistics();

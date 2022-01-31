@@ -4,6 +4,7 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="userSnapshot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="250.0" prefWidth="230.0" style="-fx-background-color: white; -fx-background-position: center; -fx-border-radius: 20px; -fx-border-style: solid; -fx-border-color: #006aff#006aff; -fx-border-width: 2px;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.unipi.dii.inginf.lsdb.learnitapp.controller.UserSnapshotController">
    <children>
@@ -12,9 +13,17 @@
             <Image url="@../img/userDefault.png" />
          </image>
       </ImageView>
-      <Label fx:id="usernameLabel" alignment="CENTER" layoutX="3.0" layoutY="25.0" prefHeight="17.0" prefWidth="223.0" text="Username" />
-      <Label fx:id="completeNameLabel" alignment="CENTER" layoutX="3.0" layoutY="161.0" prefHeight="17.0" prefWidth="223.0" text="Complete name " />
-      <Label fx:id="genderLabel" alignment="CENTER" layoutX="3.0" layoutY="184.0" prefHeight="17.0" prefWidth="223.0" text="Gender" />
-      <Label fx:id="totalCoursesLabel" alignment="CENTER" layoutX="4.0" layoutY="207.0" prefHeight="17.0" prefWidth="223.0" text="Tot Courses" />
+      <Label fx:id="usernameLabel" alignment="CENTER" layoutX="3.0" layoutY="25.0" prefHeight="17.0" prefWidth="223.0" text="Username">
+         <font>
+            <Font name="Arial" size="15.0" />
+         </font></Label>
+      <Label fx:id="genderLabel" alignment="CENTER" layoutX="3.0" layoutY="175.0" prefHeight="17.0" prefWidth="223.0" text="Gender">
+         <font>
+            <Font size="15.0" />
+         </font></Label>
+      <Label fx:id="totalCoursesLabel" alignment="CENTER" layoutX="4.0" layoutY="204.0" prefHeight="17.0" prefWidth="223.0" text="Tot Courses">
+         <font>
+            <Font size="15.0" />
+         </font></Label>
    </children>
 </AnchorPane>

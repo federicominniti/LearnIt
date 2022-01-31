@@ -168,7 +168,7 @@
                   </VBox>
                </right>
             </BorderPane>
-            <VBox fx:id="elementsVBox" layoutX="29.0" layoutY="430.0" prefHeight="2100.0" prefWidth="1042.0" style="-fx-background-color: white;" />
+            <VBox fx:id="elementsVBox" layoutX="29.0" layoutY="430.0" prefWidth="1042.0" style="-fx-background-color: white;" />
          </children>
       </AnchorPane>
    </content>
