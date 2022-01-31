@@ -457,12 +457,18 @@ public class Neo4jDriver implements DBDriver {
                 List<User> users = new ArrayList<>();
                 Result result = tx.run("MATCH (u:User{username: $username})-[:REVIEW]->(c)<-[:REVIEW]-(suggested) " +
                                 "WHERE u<>suggested " +
-                                "RETURN suggested.username, suggested.pic, suggested.gender " +
+                                "RETURN suggested.username as username, suggested.pic as pic, suggested.gender as gender " +
                                 "SKIP $skip LIMIT $limit",
                         parameters( "username", loggedUser.getUsername(), "skip", skip, "limit", limit));
                 while(result.hasNext()){
-                    Record record = result.next();
-                    User u = new User(loggedUser.getUsername(),record.get("gender").asString(), record.get("pic").asString());
+                    Record rec = result.next();
+                    String pic = null;
+                    String gender = null;
+                    if (rec.get("gender") != NULL)
+                        gender = rec.get("gender").asString();
+                    if (rec.get("pic") != NULL)
+                        pic = rec.get("pic").asString();
+                    User u = new User(rec.get("username").asString(), pic, gender);
                     users.add(u);
                 }
                 return users;
@@ -520,13 +526,19 @@ public class Neo4jDriver implements DBDriver {
         {
             session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (a:User{username: $username})<-[:FOLLOW]-(b:User) " +
-                                "RETURN b.username, b.pic, b.gender " +
+                                "RETURN b.username as username, b.pic as pic, b.gender as gender" +
                                 "SKIP " + toSkip + " LIMIT " + limit,
                         parameters( "username", followedUser.getUsername()));
 
                 while(result.hasNext()){
-                    Record record = result.next();
-                    User u = new User(record.get("username").asString(), record.get("pic").asString(), record.get("gender").asString());
+                    Record rec = result.next();
+                    String pic = null;
+                    String gender = null;
+                    if (rec.get("gender") != NULL)
+                        gender = rec.get("gender").asString();
+                    if (rec.get("pic") != NULL)
+                        pic = rec.get("pic").asString();
+                    User u = new User(rec.get("username").asString(), pic, gender);
                     users.add(u);
                 }
 
@@ -584,13 +596,19 @@ public class Neo4jDriver implements DBDriver {
         {
             session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (a:User{username: $username})-[:FOLLOW]->(b:User) " +
-                                "RETURN b.username, b.pic, b.gender " +
+                                "RETURN b.username as username, b.pic as pic, b.gender as gender " +
                                 "SKIP " + toSkip + " LIMIT " + limit,
                         parameters( "username", followedUser.getUsername()));
 
                 while(result.hasNext()){
-                    Record record = result.next();
-                    User u = new User(record.get("username").asString(), record.get("pic").asString(), record.get("gender").asString());
+                    Record rec = result.next();
+                    String pic = null;
+                    String gender = null;
+                    if (rec.get("gender") != NULL)
+                        gender = rec.get("gender").asString();
+                    if (rec.get("pic") != NULL)
+                        pic = rec.get("pic").asString();
+                    User u = new User(rec.get("username").asString(), pic, gender);
                     users.add(u);
                 }
 
@@ -684,14 +702,21 @@ public class Neo4jDriver implements DBDriver {
                 Result r = tx.run("MATCH (u:User)<-[f:FOLLOW]-(u2:User) " +
                                 "OPTIONAL MATCH (u)-[l:LIKE]->(:Course) "+
                                 "WHERE u.username <> u2.username "+
-                                "RETURN DISTINCT u, COUNT(DISTINCT(f)) AS followers, COUNT(DISTINCT(l)) AS likes "+
+                                "WITH DISTINCT (u), COUNT(DISTINCT(f)) AS followers, COUNT(DISTINCT(l)) AS likes "+
+                                "RETURN u.username as username, u.pic as pic, u.gender as gender " +
                                 "ORDER BY followers DESC, likes DESC "+
                                 "LIMIT $limit ",
                         parameters("limit", limit));
 
                 while (r.hasNext()) {
                     Record rec = r.next();
-                    User u = new User(rec.get("username").asString(), rec.get("pic").asString(), rec.get("gender").asString());
+                    String pic = null;
+                    String gender = null;
+                    if (rec.get("gender") != NULL)
+                        gender = rec.get("gender").asString();
+                    if (rec.get("pic") != NULL)
+                        pic = rec.get("pic").asString();
+                    User u = new User(rec.get("username").asString(), pic, gender);
                     users.add(u);
                 }
 
