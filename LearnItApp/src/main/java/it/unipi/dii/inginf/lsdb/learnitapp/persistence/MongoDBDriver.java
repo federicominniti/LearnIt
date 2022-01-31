@@ -9,6 +9,7 @@ import com.mongodb.client.model.*;
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.log.LearnItLogger;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.*;
+import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import org.apache.log4j.Logger;
 import org.bson.Document;
 import org.bson.codecs.configuration.CodecRegistries;
@@ -17,6 +18,7 @@ import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -627,8 +629,15 @@ public class MongoDBDriver implements DBDriver {
     }
 
     public User login(String username, String password) {
+        String shaPass = "";
+        try {
+            shaPass = Utils.toHexString(Utils.getSHA(password));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
         Bson eqUsername = Filters.eq("username", username);
-        Bson eqPass = Filters.eq("password", password);
+        Bson eqPass = Filters.eq("password", shaPass);
         try {
             User loggedUser = usersCollection.find(Filters.and(eqUsername, eqPass)).projection(Projections.exclude("reviewed")).first();
             return loggedUser;
@@ -638,9 +647,16 @@ public class MongoDBDriver implements DBDriver {
     }
 
     public void editProfileInfo(User newInfo) throws MongoException {
+        String shaPass = "";
+        try {
+            shaPass = Utils.toHexString(Utils.getSHA(newInfo.getPassword()));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            return;
+        }
         if (newInfo.getRole() == 1) {
             Bson match = Filters.eq("username", newInfo.getUsername());
-            Bson update = Updates.set("password", newInfo.getPassword());
+            Bson update = Updates.set("password", shaPass);
             usersCollection.updateOne(match, update);
         }
 
@@ -661,7 +677,7 @@ public class MongoDBDriver implements DBDriver {
             updates.add(Updates.set("birthdate", newInfo.getDateOfBirth()));
 
         updates.add(Updates.set("email", newInfo.getEmail()));
-        updates.add(Updates.set("password", newInfo.getPassword()));
+        updates.add(Updates.set("password", shaPass));
         updates.add(Updates.set("complete_name", newInfo.getCompleteName()));
 
         Bson filter = Filters.eq("username", newInfo.getUsername());
@@ -735,7 +751,17 @@ public class MongoDBDriver implements DBDriver {
     }
 
     public void addUser(User user) throws MongoException {
+        String shaPass = "";
+        try {
+            shaPass = Utils.toHexString(Utils.getSHA(user.getPassword()));
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
+        String clear = user.getPassword();
+        user.setPassword(shaPass);
         usersCollection.insertOne(user);
+        user.setPassword(clear);
     }
 
     public List<Course> findCoursesOfferedByUser(User user, int skip, int limit) {
