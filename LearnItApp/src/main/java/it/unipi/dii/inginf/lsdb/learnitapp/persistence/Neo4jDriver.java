@@ -173,7 +173,7 @@ public class Neo4jDriver implements DBDriver {
 
             session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (c:Course)<-[:OFFER]-(u2: User)-[:OFFER]->(c2:Course)<-[:REVIEW]-(u:User {username : $username }) " +
-                                "WHERE NOT ( (u)-[:REVIEW]->(c) ) AND (c.id <> c2.id) AND (u2.username <> u.username)"+
+                                "WHERE NOT EXISTS( (u)-[:REVIEW]->(c) ) AND (c.title <> c2.title) AND (u2.username <> u.username) "+
                                 "RETURN c.title as title, c.duration as duration, c.price as price, c.course_pic as pic " +
                                 "SKIP $skip LIMIT $limit",
                         parameters("username", user.getUsername(), "skip", skip, "limit", limit));
@@ -293,8 +293,7 @@ public class Neo4jDriver implements DBDriver {
                         "MATCH (c:Course)<-[l:LIKE]-(u:User)<-[f:FOLLOW]-(me:User{username:$username}) " +
                                 "WHERE NOT EXISTS((me)-[:LIKE]->(c)) " +
                                 "WITH DISTINCT(c) as c, COUNT(*) as numUser " +
-                                "RETURN c.title AS title, c.duration AS duration, c.price AS price, c.course_pic AS pic, " +
-                                "COUNT(*) AS numUser " +
+                                "RETURN c.title AS title, c.duration AS duration, c.price AS price, c.course_pic AS pic " +
                                 "ORDER BY numUser DESC " +
                                 "SKIP $skipFirstLvl " +
                                 "LIMIT $limitFirstLvl " +
@@ -334,7 +333,7 @@ public class Neo4jDriver implements DBDriver {
             return suggested;
         }
         catch (Exception ex) {
-            System.err.println("Error while retrieving suggestions from Neo4J");
+            ex.printStackTrace();
             return null;
         }
     }
@@ -361,7 +360,7 @@ public class Neo4jDriver implements DBDriver {
                                 "RETURN  user.username AS username, user.gender AS gender, user.pic as pic " +
                                 "ORDER BY numCommonCourses DESC " +
                                 "SKIP $skipSecondLvl " +
-                                "LIMIT $secondLvl",
+                                "LIMIT $limitSecondLvl",
                         parameters("username", user.getUsername(), "followedThreshold", followedThreshold,
                                 "skipFirstLvl", skipFirstLvl, "limitFirstLvl", limitFirstLvl,
                                 "numCommonCourses", numCommonCourses, "skipSecondLvl", skipSecondLvl,
@@ -377,7 +376,7 @@ public class Neo4jDriver implements DBDriver {
                         pic = rec.get("pic").asString();
 
                     String username = rec.get("username").asString();
-                    suggested.add(new User(username, gender, pic));
+                    suggested.add(new User(username, pic, gender));
                 }
 
                 return null;
@@ -386,7 +385,7 @@ public class Neo4jDriver implements DBDriver {
             return suggested;
         }
         catch (Exception ex) {
-            System.err.println("Error while retrieving suggestions from Neo4J");
+            ex.printStackTrace();
             return null;
         }
     }
@@ -527,7 +526,7 @@ public class Neo4jDriver implements DBDriver {
             session.readTransaction(tx -> {
                 Result result = tx.run("MATCH (a:User{username: $username})<-[:FOLLOW]-(b:User) " +
                                 "RETURN b.username as username, b.pic as pic, b.gender as gender" +
-                                "SKIP " + toSkip + " LIMIT " + limit,
+                                " SKIP " + toSkip + " LIMIT " + limit,
                         parameters( "username", followedUser.getUsername()));
 
                 while(result.hasNext()){
@@ -567,7 +566,7 @@ public class Neo4jDriver implements DBDriver {
             return res;
         }
         catch (Exception ex) {
-            System.err.println("Error while retrieving suggestions from Neo4J");
+            ex.printStackTrace();
             return false;
         }
     }
@@ -585,7 +584,7 @@ public class Neo4jDriver implements DBDriver {
             return res;
         }
         catch (Exception ex) {
-            System.err.println("Error while retrieving suggestions from Neo4J");
+            ex.printStackTrace();
             return false;
         }
     }
@@ -647,7 +646,7 @@ public class Neo4jDriver implements DBDriver {
         }
 
         catch (Exception ex) {
-            System.err.println("Error while retrieving suggestions from Neo4J");
+            ex.printStackTrace();
             return null;
         }
     }
@@ -726,7 +725,7 @@ public class Neo4jDriver implements DBDriver {
             return users;
         }
         catch (Exception ex) {
-            System.err.println("Error while retrieving suggestions from Neo4J");
+            ex.printStackTrace();
             return null;
         }
     }

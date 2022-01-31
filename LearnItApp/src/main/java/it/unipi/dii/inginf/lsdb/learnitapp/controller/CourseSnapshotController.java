@@ -25,10 +25,13 @@ public class CourseSnapshotController {
 
     public void setSnapshotCourse(Course course) {
         titleLabel.setText(course.getTitle());
+        /*
         if(course.getCoursePic() != null){
             coursePicImage = new ImageView(new Image(course.getCoursePic()));
         }
 
+
+         */
         if (course.getDuration() == null)
             durationLabel.setText("Duration: unknown");
         else
@@ -37,7 +40,7 @@ public class CourseSnapshotController {
         if (course.getPrice() == null)
             priceLabel.setText("Price: Free");
         else
-            priceLabel.setText("Price: " + course.getDuration() + "€");
+            priceLabel.setText("Price: " + course.getPrice() + "€");
 
         this.course = course;
     }

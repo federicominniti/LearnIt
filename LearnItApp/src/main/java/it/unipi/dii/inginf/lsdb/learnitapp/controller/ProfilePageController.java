@@ -20,8 +20,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Locale;
 
 public class ProfilePageController {
 
@@ -84,7 +86,7 @@ public class ProfilePageController {
     }
 
     private void loadStatistics() {
-        HashMap<String, Integer> stats = mongoDriver.avgStatistics(profileUser);
+        HashMap<String, Double> stats = mongoDriver.avgStatistics(profileUser);
         if (stats == null || stats.get("count") == null || stats.get("count") == 0) {
             reviewedCoursesLabel.setText("Reviewed courses: 0");
             averagePriceLabel.setText("");
@@ -92,15 +94,17 @@ public class ProfilePageController {
             return;
         }
 
-        reviewedCoursesLabel.setText("Reviewed courses: " + stats.get("count"));
+        NumberFormat formatter = NumberFormat.getInstance(Locale.US);
+        formatter.setMaximumFractionDigits(2);
+        reviewedCoursesLabel.setText("Reviewed courses: " + stats.get("count").intValue());
         if (stats.get("avgduration") == null)
             averageDurationLabel.setText("Average hours spent learning: 0");
         else
-            averageDurationLabel.setText("Average hours spent learning" + stats.get("avgduration"));
+            averageDurationLabel.setText("Average hours spent learning: " + formatter.format(stats.get("avgduration")));
         if (stats.get("avgprice") == null)
             averagePriceLabel.setText("Average price of reviewed courses: 0");
         else
-            averagePriceLabel.setText("Average price of reviewed courses:" + stats.get("avgprice"));
+            averagePriceLabel.setText("Average price of reviewed courses: " + formatter.format(stats.get("avgprice")));
     }
 
     public void setProfileUser(User user){

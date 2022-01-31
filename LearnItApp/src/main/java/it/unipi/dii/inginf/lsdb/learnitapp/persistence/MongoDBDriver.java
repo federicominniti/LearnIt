@@ -385,7 +385,7 @@ public class MongoDBDriver implements DBDriver {
         Calendar cal = Calendar.getInstance();
         cal.setTime(d);
 
-        cal.add(Calendar.DATE, -7);
+        cal.add(Calendar.DATE, -60);
 
         Date d2 = cal.getTime();
 
@@ -661,7 +661,7 @@ public class MongoDBDriver implements DBDriver {
         usersCollection.updateOne(filter, Updates.combine(updates));
     }
 
-    public HashMap<String, Integer> avgStatistics(User user) {
+    public HashMap<String, Double> avgStatistics(User user) {
         List<Document> aggregation =
                 Arrays.asList(new Document("$match", new Document("username", user.getUsername())
                                 .append("reviewed", new Document("$exists", true))),
@@ -669,9 +669,13 @@ public class MongoDBDriver implements DBDriver {
                         new Document("$group", new Document("_id", "$username")
                                 .append("count", new Document("$sum", 1))
                                 .append("avgprice", new Document("$avg", "$reviewed.price"))
-                                .append("avgduration", new Document("$avg", "$reviewed.duration"))));
+                                .append("avgduration", new Document("$avg", "$reviewed.duration"))),
+                        new Document("$project", new Document("_id", 0)
+                                        .append("username", "$_id.username")
+                                        .append("count", 1)
+                                        .append("avgprice", 1)
+                                        .append("avgduration", 1)));
 
-        List<Integer> res = new ArrayList<>();
         User doc = null;
         try {
             doc = usersCollection.aggregate(aggregation).first();
@@ -682,9 +686,9 @@ public class MongoDBDriver implements DBDriver {
         if (doc == null)
             return null;
 
-        HashMap<String, Integer> hashMap = new HashMap<>();
+        HashMap<String, Double> hashMap = new HashMap<>();
         if (doc.getCount() != null && doc.getCount() != 0)
-            hashMap.put("count", doc.getCount());
+            hashMap.put("count", doc.getCount().doubleValue());
 
         if (doc.getAvgPrice() != null && doc.getAvgPrice() != 0)
             hashMap.put("avgprice", doc.getAvgPrice());

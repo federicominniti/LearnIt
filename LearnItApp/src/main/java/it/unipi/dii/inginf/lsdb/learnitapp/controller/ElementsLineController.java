@@ -130,12 +130,12 @@ public class ElementsLineController {
             case Utils.MOST_ACTIVE_USERS:
                 moreUsers = mongoDBDriver.mostActiveUsers(limit);
                 if (moreUsers != null)
-                    Utils.addCoursesSnapshot(itemsHBox, moreCourses);
+                    Utils.addUsersSnapshot(itemsHBox, moreUsers);
                 break;
             case Utils.MOST_FOLLOWED_USERS:
                 moreUsers = neo4jDriver.findMostFollowedUsers(limit);
                 if (moreUsers != null)
-                    Utils.addCoursesSnapshot(itemsHBox, moreCourses);
+                    Utils.addUsersSnapshot(itemsHBox, moreUsers);
                 break;
         }
         loadMore();
@@ -165,7 +165,7 @@ public class ElementsLineController {
             case Utils.BEST_USERS:
                 moreUsers = mongoDBDriver.bestUsers(limit);
                 if (moreUsers != null)
-                    Utils.addCoursesSnapshot(itemsHBox, moreCourses);
+                    Utils.addUsersSnapshot(itemsHBox, moreUsers);
                 break;
             case Utils.USER_SUGGESTIONS:
                 int numCommonCourses = configParams.getNumCommonCourses();
@@ -174,6 +174,7 @@ public class ElementsLineController {
                         skipSecondLvl, limitSecondLvl, numCommonCourses);
                 if (moreUsers != null)
                     Utils.addUsersSnapshot(itemsHBox, moreUsers);
+                break;
             case Utils.LIKED_COURSES:
                 moreCourses = neo4jDriver.findCoursesLikedOrCompletedByUser(user, false, skip, limit);
                 if (moreCourses != null)

@@ -27,15 +27,17 @@ public class UserSnapshotController {
 
     public void setSnapshotUser(User user) {
         usernameLabel.setText(user.getUsername());
+        /*
         if(user.getProfilePic() != null)
             userPicImage = new ImageView(new Image(user.getProfilePic()));
         completeNameLabel.setText(user.getCompleteName());
+         */
         if(user.getGender() != null)
             genderLabel.setText(user.getGender());
         else
             genderLabel.setText("N/S");
 
-        totalCoursesLabel.setText("Completed courses: " + MongoDBDriver.getInstance().avgStatistics(user).get(0));
+        //totalCoursesLabel.setText("Completed courses: " + MongoDBDriver.getInstance().avgStatistics(user).get(0));
 
         referredUser = user;
     }

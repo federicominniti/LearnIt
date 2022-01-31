@@ -154,7 +154,7 @@ public class DiscoveryPageController {
        suggestionsSwitchButton.setStyle("-fx-background-color: #E6E6FA; -fx-text-fill: #9370DB;");
        elementsVBox.getChildren().clear();
        Utils.addLine(elementsVBox, null, null, Utils.BEST_USERS);
-       Utils.addLine(elementsVBox, null, null, Utils.USER_SUGGESTIONS);
+       Utils.addLine(elementsVBox, null, loggedUser, Utils.USER_SUGGESTIONS);
        Utils.addLine(elementsVBox, null, null, Utils.MOST_ACTIVE_USERS);
        Utils.addLine(elementsVBox, null, null, Utils.MOST_FOLLOWED_USERS);
    }

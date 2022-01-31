@@ -27,9 +27,9 @@ public class User {
     @BsonProperty(value = "count")
     private Integer count;
     @BsonProperty(value = "avgprice")
-    private Integer avgPrice;
+    private Double avgPrice;
     @BsonProperty(value = "avgduration")
-    private Integer avgDuration;
+    private Double avgDuration;
 
     public User() {
 
@@ -126,19 +126,19 @@ public class User {
         this.count = count;
     }
 
-    public Integer getAvgPrice() {
+    public Double getAvgPrice() {
         return avgPrice;
     }
 
-    public void setAvgPrice(Integer avgPrice) {
+    public void setAvgPrice(Double avgPrice) {
         this.avgPrice = avgPrice;
     }
 
-    public Integer getAvgDuration() {
+    public Double getAvgDuration() {
         return avgDuration;
     }
 
-    public void setAvgDuration(Integer avgDuration) {
+    public void setAvgDuration(Double avgDuration) {
         this.avgDuration = avgDuration;
     }
 }
