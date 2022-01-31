@@ -93,14 +93,23 @@
                      <right>
                         <VBox prefHeight="200.0" prefWidth="372.0" BorderPane.alignment="CENTER">
                            <children>
-                              <Label prefHeight="24.0" prefWidth="981.0" text="Course's information" textFill="#1880e1">
-                                 <font>
-                                    <Font name="System Bold" size="15.0" />
-                                 </font>
+                              <HBox>
                                  <VBox.margin>
                                     <Insets bottom="10.0" />
                                  </VBox.margin>
-                              </Label>
+                                 <children>
+                                    <Label prefHeight="19.0" prefWidth="237.0" text="Course's information" textFill="#1880e1">
+                                       <font>
+                                          <Font name="System Bold" size="15.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="likesLabel" text="Likes: ">
+                                       <font>
+                                          <Font size="15.0" />
+                                       </font>
+                                    </Label>
+                                 </children>
+                              </HBox>
                               <GridPane prefHeight="152.0" prefWidth="300.0" vgap="15.0">
                                  <columnConstraints>
                                     <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="279.87152099609375" minWidth="10.0" prefWidth="233.610107421875" />

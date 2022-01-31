@@ -115,10 +115,9 @@ public class MongoDBDriver implements DBDriver {
             DBObject ping = new BasicDBObject("ping","1");
 
             coursesCollection = database.getCollection("learnit_edited", Course.class);
-            usersCollection = database.getCollection("users", User.class);
+            usersCollection = database.getCollection("users_new", User.class);
 
             User u = usersCollection.find().first();
-            System.out.println(u.getUsername());
             database.runCommand((Bson) ping);
         } catch (Exception e) {
             e.printStackTrace();
@@ -228,17 +227,14 @@ public class MongoDBDriver implements DBDriver {
                     update_snapshots.add(Updates.unset("reviewed.$[elem].course_pic"));
                 }
             } else if (!editedCourse.getCoursePic().equals(oldCourse.getCoursePic())) {
-                System.out.println("pic");
                 update_snapshots.add(Updates.set("reviewed.$[elem].course_pic", editedCourse.getCoursePic()));
             }
 
             if (Double.compare(editedCourse.getPrice(), oldCourse.getPrice()) != 0) {
-                System.out.println("price");
                 update_snapshots.add(Updates.set("reviewed.$[elem].new_price", editedCourse.getPrice()));
             }
 
             if (Double.compare(editedCourse.getDuration(), oldCourse.getDuration()) != 0) {
-                System.out.println("duration");
                 update_snapshots.add(Updates.set("reviewed.$[elem].new_duration", editedCourse.getDuration()));
             }
 
@@ -434,7 +430,6 @@ public class MongoDBDriver implements DBDriver {
         )).into(new ArrayList<>());
 
         for (Course c: doc) {
-            System.out.println(c.getYear());
             annualRatings.put(String.valueOf(c.getYear()), ((double)c.getSum_ratings() / c.getNum_reviews()));
         }
         return annualRatings;

@@ -104,13 +104,7 @@ public class Utils {
             return (ConfigParams) xstream.fromXML(text);
 
         } else {
-            System.out.println("problem con config.xml");
-            //Utils.showAlert("Problem with the configuration file!");
-            try {
-                sleep(5000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            Utils.showErrorAlert("Problem with the configuration file!");
             System.exit(1);
         }
 
@@ -300,6 +294,7 @@ public class Utils {
         while (hexString.length() < 32) {
             hexString.insert(0, '0');
         }
+        System.out.println("SHA" + hexString.toString());
         return hexString.toString();
     }
 }

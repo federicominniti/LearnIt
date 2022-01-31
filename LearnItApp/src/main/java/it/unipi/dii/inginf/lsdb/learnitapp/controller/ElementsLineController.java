@@ -113,9 +113,6 @@ public class ElementsLineController {
                 moreCourses = mongoDBDriver.findBestRatings(limit);
                 if(moreCourses != null)
                     Utils.addCoursesSnapshot(itemsHBox, moreCourses);
-                for(int i = 0; i<moreCourses.size();i++){
-                    System.out.println(moreCourses.get(i));
-                }
                 break;
             case Utils.TRENDING_COURSE:
                 moreCourses = mongoDBDriver.trendingCourses(limit);

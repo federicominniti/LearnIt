@@ -167,6 +167,8 @@ public class DiscoveryPageController {
     private void searchHandler(MouseEvent clickEvent){
         currentI = 0;
         currentJ = 0;
+        allContentAnchorPane.getChildren().remove(discoveryPageLabel);
+        allContentAnchorPane.getChildren().remove(suggestionsSwitchButton);
         RadioButton selected = (RadioButton) searchType.getSelectedToggle();
         String title, level, language;
         double duration, price;
@@ -213,9 +215,15 @@ public class DiscoveryPageController {
         gridPane.getChildren().clear();
         if((searchType.getSelectedToggle() == null && title.equals("") && level.equals("") && language.equals("") &&
                 duration == -1 && price == -1) || (selected.getText().equals("Courses") && title.equals("") && level.equals("") && language.equals("") &&
-                duration == -1 && price == -1) || (selected.getText().equals("Users") && searchTextField.getText().equals(""))) {
+                duration == -1 && price == -1)) {
 
             coursesSuggestions();
+            allContentAnchorPane.getChildren().add(discoveryPageLabel);
+            allContentAnchorPane.getChildren().add(suggestionsSwitchButton);
+        }else if((selected.getText().equals("Users") && searchTextField.getText().equals(""))){
+            usersSuggestions();
+            allContentAnchorPane.getChildren().add(discoveryPageLabel);
+            allContentAnchorPane.getChildren().add(suggestionsSwitchButton);
         } else if(selected.getText().equals("Courses")) {
             addMoreResearchedCourses(title, level, language, duration, price);
         } else if(selected.getText().equals("Users")) {
