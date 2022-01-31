@@ -57,6 +57,7 @@ public class CoursePageController {
     @FXML LineChart<String, Number> annualMeanRatingLineChart;
     @FXML private Label lastModifiedLabel;
     @FXML private ImageView deleteImageView;
+    @FXML private Label likesLabel;
     private XYChart.Series series;
 
 
@@ -64,6 +65,7 @@ public class CoursePageController {
     private Review myReview;
     private int pageNumber = 0;
     private int limit;
+    private int likes;
     private MongoDBDriver mongoDBDriver;
     private Neo4jDriver neo4jDriver;
 
@@ -365,11 +367,15 @@ public class CoursePageController {
             //dislike
             neo4jDriver.dislikeCourse(loggedUser, course);
             likeCourseButton.setText("Like");
+            likes = likes - 1;
+            likesLabel.setText("Like: " + likes);
         }
         else{
             //like
             neo4jDriver.likeCourse(loggedUser, course);
-            likeCourseButton.setText("Dislike");
+            likeCourseButton.setText("Unlike");
+            likes = likes + 1;
+            likesLabel.setText("Like: " + likes);
         }
     }
 
@@ -377,6 +383,8 @@ public class CoursePageController {
         titleLabel.setText(course.getTitle());
         descriptionTextArea.setText(course.getDescription());
         descriptionTextArea.setEditable(isCourseMine);
+        likes = neo4jDriver.getCourseLikes(course);
+        likesLabel.setText("Like: " + likes);
 
         if(course.getCoursePic() != null){
             Image coursePicture;

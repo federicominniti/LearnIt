@@ -59,11 +59,16 @@ public class ReviewSnapshotPageController {
         usernameLabel.setText(review.getUsername());
         usernameLabel.setOnMouseClicked(clickEvent -> visitAuthorProfile(clickEvent));
         profilePicImageView.setOnMouseClicked(clickEvent -> visitAuthorProfile(clickEvent));
-
+        Image profilePicture = new Image(String.valueOf(ReviewSnapshotPageController.class.getResource("/img/userDefault.png")));
+        /*
         if(author.getProfilePic() != null){
-            Image profilePicture = new Image(author.getProfilePic());
-            profilePicImageView.setImage(profilePicture);
-        }
+            try {
+                profilePicture = new Image(author.getProfilePic());
+            } catch (IllegalArgumentException e) {
+                profilePicture = new Image(String.valueOf(ReviewSnapshotPageController.class.getResource("/img/userDefault.png")));
+            }
+        */
+        profilePicImageView.setImage(profilePicture);
 
         if(review.getContent() != null)
             reviewContentLabel.setText(review.getContent());

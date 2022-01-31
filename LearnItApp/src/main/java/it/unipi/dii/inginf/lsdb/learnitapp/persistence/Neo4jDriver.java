@@ -730,6 +730,29 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
+    public int getCourseLikes(Course course) {
+        try (Session session = neo4jDriver.session()) {
+            int res = session.readTransaction(tx -> {
+                Result r = tx.run("MATCH (c:Course {title: $title})<-[l:LIKE]-() " +
+                                    " RETURN count(l) AS count ",
+                        parameters("title", course.getTitle()));
+
+                if (r.hasNext()) {
+                    Record rec = r.next();
+                    return rec.get("count").asInt();
+                }
+
+                return 0;
+            });
+
+            return res;
+        }
+        catch (Exception ex) {
+            ex.printStackTrace();
+            return 0;
+        }
+    }
+
     /*
 
     QUERY DA AGGIUNGERE
