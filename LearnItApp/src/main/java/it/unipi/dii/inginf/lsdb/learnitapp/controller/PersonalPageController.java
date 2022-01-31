@@ -75,9 +75,6 @@ public class PersonalPageController {
         }
 
         birthDate = getValueFromDatePicker();
-        if (birthDate == null) {
-
-        }
         ret = editProfileInfo(birthDate);
 
         if (ret) {

@@ -379,7 +379,12 @@ public class CoursePageController {
         descriptionTextArea.setEditable(isCourseMine);
 
         if(course.getCoursePic() != null){
-            Image coursePicture = new Image(course.getCoursePic());
+            Image coursePicture;
+            try {
+                coursePicture = new Image(course.getCoursePic());
+            } catch (IllegalArgumentException e) {
+                coursePicture =  new Image(String.valueOf(CoursePageController.class.getResource("/img/courseDefaultImage.png")));
+            }
             courseImageImageView.setImage(coursePicture);
             courseImageTextField.setText(course.getCoursePic());
         }
@@ -409,12 +414,18 @@ public class CoursePageController {
         modalityTextField.setText(course.getModality());
         modalityTextField.setPromptText("Unknown");
         modalityTextField.setEditable(isCourseMine);
-        durationTextField.setText(Double.toString(course.getDuration()));
+        if (course.getDuration() == null)
+            durationTextField.setPromptText("Unknown");
+        else
+            durationTextField.setText(Double.toString(course.getDuration()));
+
+        if (course.getPrice() == null)
+            priceTextField.setText("Free");
+        else
+            priceTextField.setText(Double.toString(course.getPrice()));
+
         durationTextField.setEditable(isCourseMine);
-        durationTextField.setPromptText("Unknown");
-        priceTextField.setText(Double.toString(course.getPrice()));
         priceTextField.setEditable(isCourseMine);
-        priceTextField.setPromptText("Unknown");
         courseLinkTextField.setText(course.getLink());
         courseLinkTextField.setPromptText("Unknown");
         courseLinkTextField.setEditable(isCourseMine);
@@ -482,10 +493,13 @@ public class CoursePageController {
                      modality, coursePic);
 
         newCourse.setId(course.getId());
-        course = newCourse;
+        newCourse.setNum_reviews(course.getNum_reviews());
+        newCourse.setSum_ratings(course.getSum_ratings());
 
-        if(DBOperations.updateCourse(newCourse, course))
+        if(DBOperations.updateCourse(newCourse, course)) {
             Utils.showInfoAlert("Course's information updated with success!");
+            course = newCourse;
+        }
         else
             Utils.showErrorAlert("Error in updating course's information.");
     }

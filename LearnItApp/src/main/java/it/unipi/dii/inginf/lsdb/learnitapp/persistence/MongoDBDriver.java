@@ -221,19 +221,23 @@ public class MongoDBDriver implements DBDriver {
             //if this optional fields change, we need to update the snapshots present
             //in the user collection
             List<Bson> update_snapshots = new ArrayList<>();
-            if (!editedCourse.getCoursePic().equals(oldCourse.getCoursePic())) {
-                if (editedCourse.getCoursePic() == null)
-                    update_snapshots.add(Updates.unset("reviewed.[$elem].course_pic"));
-                else
-                    update_snapshots.add(Updates.set("reviewed.[$elem].course_pic", editedCourse.getCoursePic()));
+            if (editedCourse.getCoursePic() == null) {
+                if (oldCourse.getCoursePic() != null) {
+                    update_snapshots.add(Updates.unset("reviewed.$[elem].course_pic"));
+                }
+            } else if (!editedCourse.getCoursePic().equals(oldCourse.getCoursePic())) {
+                System.out.println("pic");
+                update_snapshots.add(Updates.set("reviewed.$[elem].course_pic", editedCourse.getCoursePic()));
             }
 
-            if (editedCourse.getPrice() != oldCourse.getPrice()) {
-                update_snapshots.add(Updates.set("reviewed.[$elem].new_price", editedCourse.getPrice()));
+            if (Double.compare(editedCourse.getPrice(), oldCourse.getPrice()) != 0) {
+                System.out.println("price");
+                update_snapshots.add(Updates.set("reviewed.$[elem].new_price", editedCourse.getPrice()));
             }
 
-            if (editedCourse.getDuration() != oldCourse.getDuration()) {
-                update_snapshots.add(Updates.set("reviewed.[$elem].new_duration", editedCourse.getDuration()));
+            if (Double.compare(editedCourse.getDuration(), oldCourse.getDuration()) != 0) {
+                System.out.println("duration");
+                update_snapshots.add(Updates.set("reviewed.$[elem].new_duration", editedCourse.getDuration()));
             }
 
             //if there are no changes to be made to the snapshots in the user collection
@@ -242,18 +246,19 @@ public class MongoDBDriver implements DBDriver {
                 return true;
             } else {
                 //there is at least one field to change in the snapshots of the user collection
-                coursesCollection.updateOne(filter, updates);
+                coursesCollection.updateOne(filter, Updates.combine(updates));
 
                 Bson exists = Filters.exists("reviewed", true);
                 Bson set = Updates.combine(update_snapshots);
                 UpdateOptions options = new UpdateOptions().arrayFilters(Collections.singletonList(Filters.eq("elem.title", editedCourse.getTitle())));
                 try {
                     //try to perform the update
-                    usersCollection.updateMany(filter, set, options);
+                    usersCollection.updateMany(exists, set, options);
                     return true;
                 } catch (MongoException e) {
                     //if the update goes bad, try to rollback by reupdating the course with old information
                     //and write to log
+                    e.printStackTrace();
                     boolean ret = updateCourse(oldCourse, oldCourse); //rollback
                     if (!ret)
                         mongoLogger.error(e.getMessage());
@@ -468,7 +473,9 @@ public class MongoDBDriver implements DBDriver {
 
     public User getUserByUsername(String username) {
         try {
-            User u = usersCollection.find(Filters.eq("username", username)).first();
+            User u = usersCollection.find(Filters.eq("username", username))
+                    .projection(Projections.exclude("reviewed"))
+                    .first();
             return u;
         } catch (MongoException e) {
             return null;
@@ -623,7 +630,7 @@ public class MongoDBDriver implements DBDriver {
         Bson eqUsername = Filters.eq("username", username);
         Bson eqPass = Filters.eq("password", password);
         try {
-            User loggedUser = usersCollection.find(Filters.and(eqUsername, eqPass)).first();
+            User loggedUser = usersCollection.find(Filters.and(eqUsername, eqPass)).projection(Projections.exclude("reviewed")).first();
             return loggedUser;
         } catch (MongoException e) {
             return null;
