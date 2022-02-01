@@ -39,6 +39,8 @@ public class MongoDBDriver implements DBDriver {
     private static int mongoDBSecondPort;
     private static String mongoDBThirdIP;
     private static int mongoDBThirdPort;
+    private static String mongoDBCollectionCourses;
+    private static String mongoDBCollectionUsers;
 
     private static String mongoDBUsername;
     private static String mongoDBPassword;
@@ -62,6 +64,8 @@ public class MongoDBDriver implements DBDriver {
                 mongoDBUsername = "root";
                 mongoDBPassword = "";
                 runningDefault = true;
+                mongoDBCollectionCourses = "learnit";
+                mongoDBCollectionUsers = "users";
             }
 
             mongoDBInstance.initConnection();
@@ -85,6 +89,9 @@ public class MongoDBDriver implements DBDriver {
         mongoDBUsername = configParams.getMongoDBUsername();
         mongoDBPassword = configParams.getMongoDBPassword();
         mongoDBName = configParams.getMongoDBName();
+        mongoDBCollectionCourses = configParams.getMongoDBCollectionCourses();
+        mongoDBCollectionUsers = configParams.getMongoDBCollectionUsers();
+
     }
 
     @Override
@@ -317,6 +324,7 @@ public class MongoDBDriver implements DBDriver {
     }
 
     //provata
+    //inserire
     public List<Course> findCourses(double priceThreshold, double durationThreshold, String title, String level, String language, int toSkip, int quantity){
 
         List<Course> courses = null;
@@ -372,8 +380,8 @@ public class MongoDBDriver implements DBDriver {
     }
 
     //provata - OK
+    //inserire
     public List<Course> findBestRatings(int limit){ // trasformare come trindingCourses se funziona ???
-
         List<Document> aggregation = Arrays.asList(
                 new Document("$match", new Document("num_reviews", new Document("$gt", 0))),
                 new Document("$addFields", new Document("avg", new Document("$divide",
@@ -388,6 +396,7 @@ public class MongoDBDriver implements DBDriver {
     }
 
     //provata
+    //inserire
     public List<Course> trendingCourses(int limit){
         Date d = new Date();
 
@@ -422,6 +431,7 @@ public class MongoDBDriver implements DBDriver {
     }
 
     //provata
+    //inserire
     public HashMap<String, Double> getCourseAnnualRatings(Course course) {
         HashMap<String, Double> annualRatings = new HashMap<>();
         List<Course> doc = coursesCollection.aggregate(Arrays.asList(
@@ -448,6 +458,7 @@ public class MongoDBDriver implements DBDriver {
         return true;
     }
 
+    //inserire
     public List<User> mostActiveUsers(int limit) {
         Date d = new Date();
         Calendar cal = Calendar.getInstance();
@@ -496,6 +507,7 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
+    //inserire
     public List<User> bestUsers(int limit){
         List<Document> aggregation = Arrays.asList(new Document("$unwind",
                         new Document("path", "$reviewed")),
@@ -511,23 +523,22 @@ public class MongoDBDriver implements DBDriver {
                         new Document("_id",
                                 new Document("username", "$username"))
                                 .append("value",
-                                        new Document("$avg", "$duration_div_price"))
-                                .append("pic",
-                                        new Document("$first", "$pic"))
-                                .append("gender",
-                                        new Document("$first", "$gender"))),
+                                        new Document("$avg", "$duration_div_price"))),
                 new Document("$project",
                         new Document("_id", 0)
                                 .append("username", "$_id.username")
-                                .append("value", "$value")
-                                .append("pic", "$pic")
-                                .append("gender", "$gender")),
+                                .append("value", "$value")),
                 new Document("$sort",
                         new Document("value", 1)),
                 new Document("$limit", limit));
 
         List<User> users = usersCollection.aggregate(aggregation).into(new ArrayList<>());
-        return users;
+        List<String> usernames = new ArrayList<>();
+        for (User u: users)
+            usernames.add(u.getUsername());
+
+        List<User> res = findUserSnapshotsByIds(usernames);
+        return res;
     }
 
     private void addReviewToCourse(Course course, Review review) throws MongoException{
@@ -696,6 +707,7 @@ public class MongoDBDriver implements DBDriver {
         usersCollection.updateOne(filter, Updates.combine(updates));
     }
 
+    //inserire
     public HashMap<String, Double> avgStatistics(User user) {
         List<Document> aggregation =
                 Arrays.asList(new Document("$match", new Document("username", user.getUsername())
@@ -734,6 +746,7 @@ public class MongoDBDriver implements DBDriver {
         return hashMap;
     }
 
+    //inserire
     public List<User> searchUserByUsername(String searchedText, int skip, int limit) {
         try {
             Pattern pattern = Pattern.compile("^.*" + searchedText + ".*$", Pattern.CASE_INSENSITIVE);
@@ -795,7 +808,6 @@ public class MongoDBDriver implements DBDriver {
         Bson filter = Filters.eq("username", user.getUsername());
         usersCollection.deleteOne(filter);
     }
-
 
     public List<Course> getAllUserReviews(User user, int skip, int limit) {
         List<Document> aggregation =
