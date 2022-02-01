@@ -388,7 +388,7 @@ public class MongoDBDriver implements DBDriver {
         Calendar cal = Calendar.getInstance();
         cal.setTime(d);
 
-        cal.add(Calendar.DATE, -60);
+        cal.add(Calendar.DATE, -30);
 
         Date d2 = cal.getTime();
 
@@ -446,7 +446,7 @@ public class MongoDBDriver implements DBDriver {
         Date d = new Date();
         Calendar cal = Calendar.getInstance();
         cal.setTime(d);
-        cal.add(Calendar.DATE, -90);
+        cal.add(Calendar.DATE, -30);
         Date d2 = cal.getTime();
 
         List<Document> aggregation;
