@@ -39,7 +39,7 @@ public class CourseSnapshotController {
         if (course.getNewPrice() != null)
             price = course.getNewPrice();
         else if (course.getPrice() != null)
-            price = course.getNewPrice();
+            price = course.getPrice();
 
         if (duration == 0)
             durationLabel.setText("Duration: unknown");
