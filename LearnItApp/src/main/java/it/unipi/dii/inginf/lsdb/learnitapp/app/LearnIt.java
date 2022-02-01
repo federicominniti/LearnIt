@@ -31,11 +31,6 @@ public class LearnIt extends Application {
         MongoDBDriver m = MongoDBDriver.getInstance();
         Neo4jDriver neo4j = Neo4jDriver.getInstance();
 
-        /*List<Course> courses = m.findBestRatings(10);
-        for (Course c: courses) {
-            System.out.println(c.getTitle());
-        }*/
-
         primaryStage.setOnCloseRequest(windowEvent -> {
             m.closeConnection();
             neo4j.closeConnection();

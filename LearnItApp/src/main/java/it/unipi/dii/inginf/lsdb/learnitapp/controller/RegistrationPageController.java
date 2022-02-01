@@ -2,7 +2,7 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
+import it.unipi.dii.inginf.lsdb.learnitapp.service.LogicService;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
@@ -51,7 +51,7 @@ public class RegistrationPageController {
 
     private void prepareForAdminCreation() {
         learnitLogoImageView.setImage(new Image(
-                String.valueOf(RegistrationPageController.class.getResource("/img/createAdmin.png"))));
+                String.valueOf(RegistrationPageController.class.getResource(Utils.ADMIN_IMAGE))));
         learnitImageView.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
         learnitLogoImageView.setCursor(Cursor.HAND);
         signUpButton.setOnMouseClicked(clickEvent -> createAdmin(clickEvent));
@@ -103,7 +103,7 @@ public class RegistrationPageController {
         newAdmin.setPassword(passwordPasswordField.getText());
         newAdmin.setRole(1);
 
-        boolean ret = DBOperations.addUser(newAdmin);
+        boolean ret = LogicService.addUser(newAdmin);
         if (ret) {
             Utils.showInfoAlert("Admin registered with success");
             Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
@@ -183,6 +183,6 @@ public class RegistrationPageController {
 
         newUser.setRole(0);
 
-        return DBOperations.addUser(newUser);
+        return LogicService.addUser(newUser);
     }
 }

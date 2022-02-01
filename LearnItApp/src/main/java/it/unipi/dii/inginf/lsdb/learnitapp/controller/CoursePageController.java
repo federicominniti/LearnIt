@@ -5,7 +5,7 @@ import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
+import it.unipi.dii.inginf.lsdb.learnitapp.service.LogicService;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
@@ -175,7 +175,7 @@ public class CoursePageController {
     }
 
     public void deleteButtonHandler(){
-        if(DBOperations.deleteReview(myReview, course)){
+        if(LogicService.deleteReview(myReview, course)){
             saveReviewButton.setText("Save");
             myReview = null;
             reviewTitleTextField.setEditable(true);
@@ -220,7 +220,7 @@ public class CoursePageController {
     }
 
     public void deleteCourse(MouseEvent clickEvent) {
-        if (DBOperations.deleteCourse(course)) {
+        if (LogicService.deleteCourse(course)) {
             Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
         }
     }
@@ -261,7 +261,7 @@ public class CoursePageController {
             if(myReview==null) { // add review
                 myReview = new Review(title, comment, rating, currentTimestamp, loggedUser.getUsername());
 
-                if (DBOperations.addReview(myReview, course)) {
+                if (LogicService.addReview(myReview, course)) {
                     Utils.showInfoAlert("Added new review with success!");
 
                 } else {
@@ -387,13 +387,13 @@ public class CoursePageController {
         likesLabel.setText("Like: " + likes);
 
         if(course.getCoursePic() != null){
-            Image coursePicture;
+            /*Image coursePicture;
             try {
                 coursePicture = new Image(course.getCoursePic());
             } catch (IllegalArgumentException e) {
                 coursePicture =  new Image(String.valueOf(CoursePageController.class.getResource("/img/courseDefaultImage.png")));
             }
-            courseImageImageView.setImage(coursePicture);
+            courseImageImageView.setImage(coursePicture);*/
             courseImageTextField.setText(course.getCoursePic());
         }
         courseImageTextField.setPromptText("Unknown");
@@ -504,7 +504,7 @@ public class CoursePageController {
         newCourse.setNum_reviews(course.getNum_reviews());
         newCourse.setSum_ratings(course.getSum_ratings());
 
-        if(DBOperations.updateCourse(newCourse, course)) {
+        if(LogicService.updateCourse(newCourse, course)) {
             Utils.showInfoAlert("Course's information updated with success!");
             course = newCourse;
         }
@@ -515,7 +515,6 @@ public class CoursePageController {
     public void loadAnnualMeanRatingLineChart () {
         HashMap<String, Double> courseAnnualMeanRating = mongoDBDriver.getCourseAnnualRatings(course);
         List<Integer> years = new ArrayList<>();
-        List<Double> means = new ArrayList<>();
         for (String year : courseAnnualMeanRating.keySet()) {
             years.add(Integer.valueOf(year));
         }

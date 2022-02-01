@@ -4,7 +4,7 @@ import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
+import it.unipi.dii.inginf.lsdb.learnitapp.service.LogicService;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
@@ -43,7 +43,7 @@ public class ReviewSnapshotPageController {
     }
 
     public void deleteReview(MouseEvent clickEvent) {
-        DBOperations.deleteReview(review, course);
+        LogicService.deleteReview(review, course);
         container.getChildren().remove(thisBorderPane);
     }
 
@@ -59,7 +59,7 @@ public class ReviewSnapshotPageController {
         usernameLabel.setText(review.getUsername());
         usernameLabel.setOnMouseClicked(clickEvent -> visitAuthorProfile(clickEvent));
         profilePicImageView.setOnMouseClicked(clickEvent -> visitAuthorProfile(clickEvent));
-        Image profilePicture = new Image(String.valueOf(ReviewSnapshotPageController.class.getResource("/img/userDefault.png")));
+        Image profilePicture = new Image(String.valueOf(ReviewSnapshotPageController.class.getResource(Utils.USER_DEFAULT)));
         /*
         if(author.getProfilePic() != null){
             try {

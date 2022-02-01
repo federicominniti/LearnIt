@@ -19,7 +19,6 @@ public class LoginPageController {
 
     private MongoDBDriver mongo;
 
-
     public void initialize() {
         mongo = MongoDBDriver.getInstance();
         loginButton.setOnMouseClicked(clickEvent -> loginHandler(clickEvent));

@@ -3,7 +3,7 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
+import it.unipi.dii.inginf.lsdb.learnitapp.service.LogicService;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
@@ -75,10 +75,10 @@ public class ProfilePageController {
         followerNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(0).toString());
         followingNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(1).toString());
 
-        if(profileUser.getProfilePic() != null){
+        /*if(profileUser.getProfilePic() != null){
             Image profilePicture = new Image(profileUser.getProfilePic());
             propicImageView.setImage(profilePicture);
-        }
+        }*/
 
         if(neo4jDriver.isUserFollowedByUser(usernameLabel.getText(), loggedUser.getUsername()))
             followButton.setText("Unfollow");
@@ -122,7 +122,7 @@ public class ProfilePageController {
             profileContentBorderPane.setPrefHeight(440);
 
             ImageView adminImage = new ImageView(
-                    String.valueOf(PersonalPageController.class.getResource("/img/createAdmin.png")));
+                    String.valueOf(PersonalPageController.class.getResource(Utils.ADMIN_IMAGE)));
             adminImage.setPreserveRatio(true);
             adminImage.setFitHeight(170);
             adminImage.setFitHeight(170);
@@ -183,16 +183,6 @@ public class ProfilePageController {
             passwordVBox.getChildren().add(modifyButton);
             profileContentBorderPane.setRight(passwordVBox);
             BorderPane.setAlignment(passwordVBox, Pos.CENTER);
-            //userInfoVBox.getChildren().remove(followButton);
-            //followButton.setText("Delete user");
-            //ImageView trashBin = new ImageView(new Image(
-            //        String.valueOf(ProfilePageController.class.getResource(Utils.TRASH_BIN))));
-            //trashBin.setPreserveRatio(true);
-            //trashBin.setFitWidth(40);
-            //trashBin.setFitHeight(40);
-            //trashBin.setOnMouseClicked(clickEvent -> deleteUserHandler(profileUser, clickEvent));
-            //trashBin.setCursor(Cursor.HAND);
-            //userInfoVBox.getChildren().add(trashBin);
         } else if(loggedUser.getRole() == 1 && !isProfileMine){ //gestire eliminazione utente da parte di admin
             followButton.setText("Delete user");
             followButton.setOnMouseClicked(clickEvent -> deleteUserHandler(clickEvent));
@@ -228,7 +218,7 @@ public class ProfilePageController {
             newAdmin.setPassword(newPassword);
             newAdmin.setUsername(loggedUser.getUsername());
             newAdmin.setRole(1);
-            if (!DBOperations.editProfileInfo(newAdmin, loggedUser)) {
+            if (!LogicService.editProfileInfo(newAdmin, loggedUser)) {
                 Utils.showErrorAlert("Something has gone wrong");
             }
         }
@@ -242,7 +232,7 @@ public class ProfilePageController {
     }
 
     public void deleteUserHandler(MouseEvent clickEvent) {
-        if (DBOperations.deleteUser(profileUser)) {
+        if (LogicService.deleteUser(profileUser)) {
             Utils.showInfoAlert("User deleted successfully");
             Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
         }

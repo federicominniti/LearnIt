@@ -45,8 +45,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static java.lang.Thread.sleep;
-
 public class Utils {
     //Courses suggestions
     public final static int BEST_RATING = 1;
@@ -79,13 +77,15 @@ public class Utils {
     public static final String STAR_OFF = "/img/star-off.png";
     public static final String TRASH_BIN = "/img/trash-bin.png";
     public static final String USER_DEFAULT = "/img/userDefault.png";
+    public static final String ADMIN_IMAGE = "/img/admin.png";
+
     public static final String LOGIN_PAGE = "/fxml/LoginPage.fxml";
-    public final static String DISCOVERY_PAGE = "/fxml/DiscoveryPage.fxml";
-    public final static String REGISTRATION_PAGE = "/fxml/RegistrationPage.fxml";
-    public final static String PROFILE_PAGE = "/fxml/ProfilePage.fxml";
-    public final static String COURSE_PAGE = "/fxml/CoursePage.fxml";
-    public final static String REVIEW_SNAPSHOT = "/fxml/ReviewSnapshotPage.fxml";
-    public final static String USER_SNAPSHOT = "/fxml/UserSnapshot.fxml";
+    public static final String DISCOVERY_PAGE = "/fxml/DiscoveryPage.fxml";
+    public static final String REGISTRATION_PAGE = "/fxml/RegistrationPage.fxml";
+    public static final String PROFILE_PAGE = "/fxml/ProfilePage.fxml";
+    public static final String COURSE_PAGE = "/fxml/CoursePage.fxml";
+    public static final String REVIEW_SNAPSHOT = "/fxml/ReviewSnapshotPage.fxml";
+    public static final String USER_SNAPSHOT = "/fxml/UserSnapshot.fxml";
 
     public static ConfigParams getParams() {
         if (validConfigParams()) {
@@ -217,14 +217,6 @@ public class Utils {
         try {
             FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/fxml/ElementsLine.fxml"));
             pane = (Pane) loader.load();
-            /*if(type != USER_SUGGESTIONS) {
-                ElementsLineController<Course> coursesLine = (ElementsLineController<Course>) loader.getController();
-                coursesLine.setCoursesUsers(course, type);
-            }
-            else {
-                ElementsLineController<User> coursesLine = (ElementsLineController<User>) loader.getController();
-                coursesLine.setCoursesUsers(user, type);
-            }*/
             ElementsLineController coursesLine = (ElementsLineController) loader.getController();
             coursesLine.setCoursesUsers(course, user, type);
         } catch (IOException e) {
@@ -294,7 +286,7 @@ public class Utils {
         while (hexString.length() < 32) {
             hexString.insert(0, '0');
         }
-        System.out.println("SHA" + hexString.toString());
+
         return hexString.toString();
     }
 }

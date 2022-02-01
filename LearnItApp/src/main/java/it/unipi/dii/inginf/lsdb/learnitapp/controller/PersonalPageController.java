@@ -2,7 +2,7 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
+import it.unipi.dii.inginf.lsdb.learnitapp.service.LogicService;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -51,7 +51,7 @@ public class PersonalPageController {
 
         if (loggedUser.getProfilePic() != null) {
             propicTextField.setText(loggedUser.getProfilePic());
-            profileImageView.setImage(new Image(loggedUser.getProfilePic()));
+        //    profileImageView.setImage(new Image(loggedUser.getProfilePic()));
         }
 
         birthDatePicker.setValue(loggedUser.getDateOfBirth().toInstant()
@@ -143,7 +143,7 @@ public class PersonalPageController {
         editedUser.setCompleteName(complete_name);
         editedUser.setProfilePic(propic);
 
-        if (DBOperations.editProfileInfo(editedUser, loggedUser)) {
+        if (LogicService.editProfileInfo(editedUser, loggedUser)) {
             Session.getLocalSession().setLoggedUser(editedUser);
             return true;
         }

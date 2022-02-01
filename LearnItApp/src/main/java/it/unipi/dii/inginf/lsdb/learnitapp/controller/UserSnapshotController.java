@@ -28,8 +28,10 @@ public class UserSnapshotController {
         /*
         if(user.getProfilePic() != null)
             userPicImage = new ImageView(new Image(user.getProfilePic()));
-        completeNameLabel.setText(user.getCompleteName());
-         */
+
+        */
+        //completeNameLabel.setText(user.getCompleteName());
+
         if(user.getGender() != null)
             genderLabel.setText(user.getGender());
         else

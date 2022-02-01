@@ -1,14 +1,16 @@
-package it.unipi.dii.inginf.lsdb.learnitapp.persistence;
+package it.unipi.dii.inginf.lsdb.learnitapp.service;
 
 import com.mongodb.MongoException;
 import it.unipi.dii.inginf.lsdb.learnitapp.log.LearnItLogger;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Review;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import org.apache.log4j.Logger;
 import org.neo4j.driver.exceptions.Neo4jException;
 
-public class DBOperations {
+public class LogicService {
     private static Neo4jDriver neo4jDriver = Neo4jDriver.getInstance();
     private static MongoDBDriver mongoDBDriver = MongoDBDriver.getInstance();
     private static Logger mongoLogger = LearnItLogger.getMongoLogger();

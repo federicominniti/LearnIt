@@ -2,7 +2,7 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
-import it.unipi.dii.inginf.lsdb.learnitapp.persistence.DBOperations;
+import it.unipi.dii.inginf.lsdb.learnitapp.service.LogicService;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
@@ -109,7 +109,7 @@ public class NewCoursePageController {
         if (!categoriesTextArea.getText().equals(""))
             newCourse.setCategory(categoryList);
 
-        if(DBOperations.addCourse(newCourse)){
+        if(LogicService.addCourse(newCourse)){
             Utils.showInfoAlert("Course added successfully!");
             CoursePageController coursePageController = (CoursePageController) Utils.changeScene(Utils.COURSE_PAGE, clickEvent);
             coursePageController.setCourse(newCourse);

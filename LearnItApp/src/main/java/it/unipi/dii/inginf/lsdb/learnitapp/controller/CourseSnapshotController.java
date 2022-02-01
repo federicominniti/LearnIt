@@ -5,7 +5,6 @@ import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -29,9 +28,7 @@ public class CourseSnapshotController {
         if(course.getCoursePic() != null){
             coursePicImage = new ImageView(new Image(course.getCoursePic()));
         }
-
-
-         */
+        */
         if (course.getDuration() == null)
             durationLabel.setText("Duration: unknown");
         else

@@ -1,7 +1,6 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.config;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
-
 import java.io.IOException;
 
 public class ConfigParams {

@@ -129,14 +129,14 @@ public class DiscoveryPageController {
         usernameLabel.setText(loggedUser.getUsername());
 
         if (loggedUser.getRole() == 1) {
-            profilePic.setImage(new Image(String.valueOf(DiscoveryPageController.class.getResource("/img/createAdmin.png"))));
+            profilePic.setImage(new Image(String.valueOf(DiscoveryPageController.class.getResource(Utils.ADMIN_IMAGE))));
             return;
         }
 
-        if (loggedUser.getProfilePic() == null)
+        /*if (loggedUser.getProfilePic() == null)
             profilePic.setImage(new Image(String.valueOf(DiscoveryPageController.class.getResource(Utils.USER_DEFAULT))));
         else
-            profilePic.setImage(new Image(loggedUser.getProfilePic()));
+            profilePic.setImage(new Image(loggedUser.getProfilePic()));*/
     }
 
     private void coursesSuggestions(){
@@ -167,8 +167,6 @@ public class DiscoveryPageController {
     private void searchHandler(MouseEvent clickEvent){
         currentI = 0;
         currentJ = 0;
-        allContentAnchorPane.getChildren().remove(discoveryPageLabel);
-        allContentAnchorPane.getChildren().remove(suggestionsSwitchButton);
         RadioButton selected = (RadioButton) searchType.getSelectedToggle();
         String title, level, language;
         double duration, price;
@@ -241,6 +239,8 @@ public class DiscoveryPageController {
         languageChoiceBox.setValue(null);
         maxPriceTextField.setText("");
         maxDurationTextField.setText("");
+        allContentAnchorPane.getChildren().remove(discoveryPageLabel);
+        allContentAnchorPane.getChildren().remove(suggestionsSwitchButton);
     }
 
     private void addMoreResearchedCourses(String title, String level, String language, double duration, double price){
