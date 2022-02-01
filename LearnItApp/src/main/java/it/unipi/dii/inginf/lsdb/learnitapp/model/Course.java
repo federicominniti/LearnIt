@@ -50,6 +50,10 @@ public class Course {
         return newDuration;
     }
 
+    public Double getNewPrice() {
+        return newPrice;
+    }
+
     public void setNewDuration(Double newDuration) {
         this.newDuration = newDuration;
     }

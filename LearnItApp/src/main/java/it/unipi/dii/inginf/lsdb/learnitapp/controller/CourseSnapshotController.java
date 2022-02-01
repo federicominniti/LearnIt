@@ -29,15 +29,27 @@ public class CourseSnapshotController {
             coursePicImage = new ImageView(new Image(course.getCoursePic()));
         }
         */
-        if (course.getDuration() == null)
+        double duration = 0;
+        double price = 0;
+        if (course.getNewDuration() != null)
+            duration = course.getNewDuration();
+        else if (course.getDuration() != null)
+            duration = course.getDuration();
+
+        if (course.getNewPrice() != null)
+            price = course.getNewPrice();
+        else if (course.getPrice() != null)
+            price = course.getNewPrice();
+
+        if (duration == 0)
             durationLabel.setText("Duration: unknown");
         else
-            durationLabel.setText("Duration: " + course.getDuration() + " hour");
+            durationLabel.setText("Duration: " + duration + " hour");
 
-        if (course.getPrice() == null)
+        if (price == 0)
             priceLabel.setText("Price: Free");
         else
-            priceLabel.setText("Price: " + course.getPrice() + "€");
+            priceLabel.setText("Price: " + price + "€");
 
         this.course = course;
     }

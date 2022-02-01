@@ -778,4 +778,28 @@ public class MongoDBDriver implements DBDriver {
         usersCollection.deleteOne(filter);
     }
 
+
+    public List<Course> getAllUserReviews(User user, int skip, int limit) {
+        List<Document> aggregation =
+        Arrays.asList(new Document("$match",
+                        new Document("username", user.getUsername())),
+                new Document("$unwind",
+                        new Document("path", "$reviewed")),
+                new Document("$sort",
+                        new Document("reviewed.review_timestamp", -1)),
+                new Document("$skip", skip),
+                new Document("$limit", limit),
+                new Document("$group",
+                        new Document("_id", "$_id")
+                                .append("reviewed",
+                                        new Document("$push", "$reviewed"))));
+
+        User res = usersCollection.aggregate(aggregation).first();
+        if (res == null)
+            return new ArrayList<>();
+        if (res.getReviewedCourses() == null)
+            return new ArrayList<>();
+
+        return res.getReviewedCourses();
+    }
 }

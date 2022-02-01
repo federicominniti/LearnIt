@@ -178,8 +178,8 @@ public class ElementsLineController {
                     Utils.addCoursesSnapshot(itemsHBox, moreCourses);
                 break;
             case Utils.REVIEWED_COURSES:
-                moreCourses = neo4jDriver.findCoursesLikedOrCompletedByUser(user,true ,skip, limit);
-                if (moreCourses != null)
+                moreCourses = mongoDBDriver.getAllUserReviews(user, skip, limit);
+                if (moreCourses != null && moreCourses.size() != 0)
                     Utils.addCoursesSnapshot(itemsHBox, moreCourses);
                 break;
             case Utils.OFFERED_COURSES:
