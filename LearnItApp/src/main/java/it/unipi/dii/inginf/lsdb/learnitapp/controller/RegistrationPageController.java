@@ -2,8 +2,8 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.service.LogicService;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
+import it.unipi.dii.inginf.lsdb.learnitapp.service.LogicService;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -53,6 +53,8 @@ public class RegistrationPageController {
         learnitLogoImageView.setImage(new Image(
                 String.valueOf(RegistrationPageController.class.getResource(Utils.ADMIN_IMAGE))));
         learnitImageView.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
+        learnitLogoImageView.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
+        learnitImageView.setCursor(Cursor.HAND);
         learnitLogoImageView.setCursor(Cursor.HAND);
         signUpButton.setOnMouseClicked(clickEvent -> createAdmin(clickEvent));
         signUpButton.setCursor(Cursor.HAND);

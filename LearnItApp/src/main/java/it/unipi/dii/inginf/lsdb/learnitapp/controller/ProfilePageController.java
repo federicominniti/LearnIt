@@ -3,9 +3,9 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.service.LogicService;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
+import it.unipi.dii.inginf.lsdb.learnitapp.service.LogicService;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -17,7 +17,10 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 
 import java.text.NumberFormat;
@@ -114,6 +117,7 @@ public class ProfilePageController {
 
         if (loggedUser.getRole() == 1 && isProfileMine) { //admin
             pageAnchorPane.getChildren().remove(elementsVBox);
+            completeNameLabel.setVisible(false);
 
             profileContentBorderPane.setPrefHeight(440);
             profileContentBorderPane.getChildren().remove(statisticsVBox);
@@ -183,10 +187,17 @@ public class ProfilePageController {
             passwordVBox.getChildren().add(modifyButton);
             profileContentBorderPane.setRight(passwordVBox);
             BorderPane.setAlignment(passwordVBox, Pos.CENTER);
+            return;
         } else if(loggedUser.getRole() == 1 && !isProfileMine){ //gestire eliminazione utente da parte di admin
-            followButton.setText("Delete user");
-            followButton.setOnMouseClicked(clickEvent -> deleteUserHandler(clickEvent));
-            followButton.setCursor(Cursor.HAND);
+            ImageView trashBin = new ImageView(new Image(
+                    String.valueOf(ProfilePageController.class.getResource(Utils.TRASH_BIN))));
+            trashBin.setPreserveRatio(true);
+            trashBin.setFitWidth(40);
+            trashBin.setFitHeight(40);
+            trashBin.setOnMouseClicked(clickEvent -> deleteUserHandler(clickEvent));
+            trashBin.setCursor(Cursor.HAND);
+            userInfoVBox.getChildren().remove(followButton);
+            userInfoVBox.getChildren().add(trashBin);
         }
         else if(isProfileMine){ // personal profile
             followButton.setText("Edit Profile");

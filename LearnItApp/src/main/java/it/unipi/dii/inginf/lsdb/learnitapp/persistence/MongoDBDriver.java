@@ -24,7 +24,6 @@ import java.util.regex.Pattern;
 
 import static com.mongodb.client.model.Aggregates.limit;
 import static com.mongodb.client.model.Aggregates.skip;
-import static com.mongodb.client.model.Filters.eq;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 
 public class MongoDBDriver implements DBDriver {
@@ -123,7 +122,7 @@ public class MongoDBDriver implements DBDriver {
             database = mongoClient.getDatabase(mongoDBName);
             DBObject ping = new BasicDBObject("ping","1");
 
-            coursesCollection = database.getCollection("learnitpuoitoccare", Course.class);
+            coursesCollection = database.getCollection("learnit", Course.class);
             usersCollection = database.getCollection("users", User.class);
             database.runCommand((Bson) ping);
         } catch (Exception e) {
