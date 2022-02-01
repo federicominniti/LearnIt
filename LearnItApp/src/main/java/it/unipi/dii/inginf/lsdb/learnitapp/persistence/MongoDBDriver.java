@@ -91,7 +91,6 @@ public class MongoDBDriver implements DBDriver {
         mongoDBName = configParams.getMongoDBName();
         mongoDBCollectionCourses = configParams.getMongoDBCollectionCourses();
         mongoDBCollectionUsers = configParams.getMongoDBCollectionUsers();
-
     }
 
     @Override
@@ -129,8 +128,8 @@ public class MongoDBDriver implements DBDriver {
             database = mongoClient.getDatabase(mongoDBName);
             DBObject ping = new BasicDBObject("ping","1");
 
-            coursesCollection = database.getCollection("learnit", Course.class);
-            usersCollection = database.getCollection("users", User.class);
+            coursesCollection = database.getCollection(mongoDBCollectionCourses, Course.class);
+            usersCollection = database.getCollection(mongoDBCollectionUsers, User.class);
             database.runCommand((Bson) ping);
         } catch (Exception e) {
             e.printStackTrace();
