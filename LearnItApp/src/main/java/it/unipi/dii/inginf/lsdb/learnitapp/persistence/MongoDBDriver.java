@@ -48,19 +48,23 @@ public class MongoDBDriver implements DBDriver {
     private static CodecRegistry codecRegistry;
     private static String uriString;
     private static Logger mongoLogger;
+    private static boolean runningDefault;
 
     public static MongoDBDriver getInstance() {
         if (mongoDBInstance == null) {
             try {
-                mongoDBInstance = new MongoDBDriver(ConfigParams.getInstance());
+                //mongoDBInstance = new MongoDBDriver(ConfigParams.getInstance());
+                runningDefault = false;
+                throw new Exception();
             } catch (Exception e) {
+                mongoDBInstance = new MongoDBDriver();
                 uriString = "mongodb://127.0.0.1:27017/";
                 mongoDBName = "db";
                 mongoDBUsername = "root";
                 mongoDBPassword = "";
+                runningDefault = true;
             }
 
-            mongoDBInstance = new MongoDBDriver();
             mongoDBInstance.initConnection();
             mongoLogger = LearnItLogger.getMongoLogger();
         }
@@ -73,51 +77,54 @@ public class MongoDBDriver implements DBDriver {
     }
 
     private MongoDBDriver(ConfigParams configParams) {
-        this.mongoDBPrimaryIP = configParams.getMongoDBPrimaryIP();
-        this.mongoDBPrimaryPort = configParams.getMongoDBPrimaryPort();
-        this.mongoDBSecondIP = configParams.getMongoDBSecondIP();
-        this.mongoDBSecondPort = configParams.getMongoDBSecondPort();
-        this.mongoDBThirdIP = configParams.getMongoDBThirdIP();
-        this.mongoDBThirdPort = configParams.getMongoDBThirdPort();
-        this.mongoDBUsername = configParams.getMongoDBUsername();
-        this.mongoDBPassword = configParams.getMongoDBPassword();
-        this.mongoDBName = configParams.getMongoDBName();
+        mongoDBPrimaryIP = configParams.getMongoDBPrimaryIP();
+        mongoDBPrimaryPort = configParams.getMongoDBPrimaryPort();
+        mongoDBSecondIP = configParams.getMongoDBSecondIP();
+        mongoDBSecondPort = configParams.getMongoDBSecondPort();
+        mongoDBThirdIP = configParams.getMongoDBThirdIP();
+        mongoDBThirdPort = configParams.getMongoDBThirdPort();
+        mongoDBUsername = configParams.getMongoDBUsername();
+        mongoDBPassword = configParams.getMongoDBPassword();
+        mongoDBName = configParams.getMongoDBName();
     }
 
     @Override
     public boolean initConnection() {
         try {
-            uriString = "mongodb://";
-            if (!mongoDBUsername.equals("")) {
-                uriString += mongoDBUsername + ":" + mongoDBPassword + "@";
+            if (!runningDefault) {
+                uriString = "mongodb://";
+                if (!mongoDBUsername.equals("")) {
+                    uriString += mongoDBUsername + ":" + mongoDBPassword + "@";
+                }
+                uriString += mongoDBPrimaryIP + ":" +
+                        mongoDBPrimaryPort + "," +
+                        mongoDBSecondIP + ":" +
+                        mongoDBSecondPort + "," +
+                        mongoDBThirdIP + ":" +
+                        mongoDBThirdPort;
             }
-            //uriString += primaryIP + ":" + primaryPort + "," + secondIP + ":" + secondPort + "," + thirdIP + ":" + thirdPort;
+
             pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
             codecRegistry = CodecRegistries.fromRegistries(
                     MongoClientSettings.getDefaultCodecRegistry(),
-                    CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
-            );
+                    CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build()));
 
-            ConnectionString uri = new ConnectionString("mongodb://127.0.0.1:27017/");
+            ConnectionString uri = new ConnectionString(uriString);
             MongoClientSettings settings = MongoClientSettings.builder()
                     .applyConnectionString(uri)
-                    //.readPreference(ReadPreference.secondaryPreferred())
+                    .readPreference(ReadPreference.nearest())
                     .retryWrites(true)
-                    //.writeConcern(WriteConcern.W2)
+                    .writeConcern(WriteConcern.W1)
                     .codecRegistry(codecRegistry)
                     .build();
 
             mongoClient = MongoClients.create(settings);
 
-            //database = mongoClient.getDatabase(dbName);
-            database = mongoClient.getDatabase("db");
-
+            database = mongoClient.getDatabase(mongoDBName);
             DBObject ping = new BasicDBObject("ping","1");
 
-            coursesCollection = database.getCollection("learnit_edited", Course.class);
-            usersCollection = database.getCollection("users_new", User.class);
-
-            User u = usersCollection.find().first();
+            coursesCollection = database.getCollection("learnitpuoitoccare", Course.class);
+            usersCollection = database.getCollection("users", User.class);
             database.runCommand((Bson) ping);
         } catch (Exception e) {
             e.printStackTrace();
@@ -141,7 +148,7 @@ public class MongoDBDriver implements DBDriver {
     //provata
     public Course getCourseByTitle(String title) {
         try {
-            Course c = coursesCollection.find(Filters.eq("title", title)).projection(Projections.exclude("reviews")).first();
+            Course c = coursesCollection.find(Filters.eq("title", title)).first();
             return c;
         } catch (Exception e) {
             return null;
@@ -473,6 +480,12 @@ public class MongoDBDriver implements DBDriver {
         return res;
     }
 
+    public boolean courseAlreadyExists(String title) {
+        Pattern pattern = Pattern.compile("^.*" + title + ".*$", Pattern.CASE_INSENSITIVE);
+        Course c = coursesCollection.find(Filters.regex("title", pattern)).projection(Projections.exclude("reviews")).first();
+        return c != null;
+    }
+
     public User getUserByUsername(String username) {
         try {
             User u = usersCollection.find(Filters.eq("username", username))
@@ -741,7 +754,8 @@ public class MongoDBDriver implements DBDriver {
 
     public boolean checkIfUserExists(String username) {
         try {
-            User user = usersCollection.find(Filters.eq("username", username))
+            Pattern pattern = Pattern.compile("^.*" + username + ".*$", Pattern.CASE_INSENSITIVE);
+            User user = usersCollection.find(Filters.regex("username", pattern))
                     .projection(Projections.exclude("reviewed"))
                     .first();
             return (user != null);

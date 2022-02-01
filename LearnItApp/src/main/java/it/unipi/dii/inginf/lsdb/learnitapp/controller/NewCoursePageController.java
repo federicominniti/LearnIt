@@ -2,6 +2,7 @@ package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Session;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.service.LogicService;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.collections.FXCollections;
@@ -136,6 +137,11 @@ public class NewCoursePageController {
         }
         if (levelChoiceBox.getValue() == null) {
             Utils.showErrorAlert("Please insert a course level");
+            return false;
+        }
+
+        if (MongoDBDriver.getInstance().courseAlreadyExists(titleTextField.getText())) {
+            Utils.showErrorAlert("Course title already exists!");
             return false;
         }
         return true;

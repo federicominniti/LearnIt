@@ -173,7 +173,7 @@ public class ElementsLineController {
                     Utils.addUsersSnapshot(itemsHBox, moreUsers);
                 break;
             case Utils.LIKED_COURSES:
-                moreCourses = neo4jDriver.findCoursesLikedOrCompletedByUser(user, false, skip, limit);
+                moreCourses = neo4jDriver.findCoursesLikedByUser(user, skip, limit);
                 if (moreCourses != null)
                     Utils.addCoursesSnapshot(itemsHBox, moreCourses);
                 break;

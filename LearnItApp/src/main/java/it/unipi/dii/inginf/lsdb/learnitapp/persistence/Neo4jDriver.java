@@ -407,20 +407,13 @@ public class Neo4jDriver implements DBDriver {
     }
 
     //Find courses liked or completed by a specific user
-    public List<Course> findCoursesLikedOrCompletedByUser(User user, final boolean researchFlag, int skip, int limit) {
-        //0 -> liked
-        //1 -> completed
+    public List<Course> findCoursesLikedByUser(User user, int skip, int limit) {
         try (Session session = neo4jDriver.session())
         {
             List<Course> resultCourses = session.readTransaction((TransactionWork<List<Course>>) tx -> {
-                String relationship;
                 List<Course> courses = new ArrayList<>();
-                if(researchFlag)
-                    relationship = "REVIEW";
-                else
-                    relationship = "LIKE";
 
-                Result result = tx.run("MATCH (u:User{username: $username})-[:"+relationship+"]->(c:Course) " +
+                Result result = tx.run("MATCH (u:User{username: $username})-[:LIKE]->(c:Course) " +
                         "RETURN c.title as title, c.duration as duration, c.price as price, c.course_pic as pic " +
                         "SKIP $skip LIMIT $limit", parameters( "username", user.getUsername(), "skip", skip,
                         "limit", limit));
