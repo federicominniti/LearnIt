@@ -141,7 +141,7 @@ public class MongoDBDriver implements DBDriver {
     //provata
     public Course getCourseByTitle(String title) {
         try {
-            Course c = coursesCollection.find(Filters.eq("title", title)).first();
+            Course c = coursesCollection.find(Filters.eq("title", title)).projection(Projections.exclude("reviews")).first();
             return c;
         } catch (Exception e) {
             return null;
@@ -373,7 +373,7 @@ public class MongoDBDriver implements DBDriver {
                 new Document("$addFields", new Document("avg", new Document("$divide",
                         Arrays.asList("$sum_ratings", "$num_reviews")))),
                 new Document("$sort", new Document("avg", -1)),
-                new Document("$limit", 10),
+                new Document("$limit", limit),
                 new Document("$project", new Document("reviews", 0)));
 
         List<Course> c = coursesCollection.aggregate(aggregation).into(new ArrayList<>());
@@ -454,17 +454,22 @@ public class MongoDBDriver implements DBDriver {
                 new Document("$unwind", new Document("path", "$reviewed")),
                 new Document("$match", new Document("reviewed.review_timestamp", new Document("$gte", d2))),
                 new Document("$group", new Document("_id", new Document("username", "$username"))
-                        .append("pic", new Document("$first", "$pic"))
-                        .append("gender", new Document("$first", "$gender"))
                         .append("count", new Document("$sum", 1))),
                 new Document("$sort", new Document("count", -1)),
                 new Document("$project", new Document("username", "$_id.username")
-                        .append("pic", "$pic")
-                        .append("gender", "$gender")
                         .append("_id", 0)),
                 new Document("$limit", limit));
 
-        List<User> res = usersCollection.aggregate(aggregation).into(new ArrayList<>());
+        List<User> users = usersCollection.aggregate(aggregation).into(new ArrayList<>());
+        List<String> usernames = new ArrayList<>();
+        for (User u: users)
+            usernames.add(u.getUsername());
+
+        return findUserSnapshotsByIds(usernames);
+    }
+
+    private List<User> findUserSnapshotsByIds(List<String> usernames) {
+        List<User> res = usersCollection.find(Filters.in("username", usernames)).projection(Projections.exclude("reviewed")).into(new ArrayList<>());
         return res;
     }
 
