@@ -1,6 +1,7 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.config;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
+
 import java.io.IOException;
 
 public class ConfigParams {
@@ -15,6 +16,8 @@ public class ConfigParams {
     private String mongoDBUsername;
     private String mongoDBPassword;
     private String mongoDBName;
+    private String mongoDBCollectionCourses;
+    private String mongoDBCollectionUsers;
 
     private String neo4jIP;
     private int neo4jPort;
@@ -197,5 +200,21 @@ public class ConfigParams {
 
     public void setFollowedThreshold(int followedThreshold) {
         this.followedThreshold = followedThreshold;
+    }
+
+    public String getMongoDBCollectionCourses() {
+        return mongoDBCollectionCourses;
+    }
+
+    public void setMongoDBCollectionCourses(String mongoDBCollectionCourses) {
+        this.mongoDBCollectionCourses = mongoDBCollectionCourses;
+    }
+
+    public String getMongoDBCollectionUsers() {
+        return mongoDBCollectionUsers;
+    }
+
+    public void setMongoDBCollectionUsers(String mongoDBCollectionUsers) {
+        this.mongoDBCollectionUsers = mongoDBCollectionUsers;
     }
 }

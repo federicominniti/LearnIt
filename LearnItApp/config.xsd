@@ -12,6 +12,8 @@
                 <xs:element name="mongoDBUsername" type="xs:string"/>
                 <xs:element name="mongoDBPassword" type="xs:string"/>
                 <xs:element name="mongoDBName" type="xs:string"/>
+                <xs:element name="mongoDBCollectionCourses" type="xs:string"/>
+                <xs:element name="mongoDBCollectionUsers" type="xs:string"/>
                 <xs:element name="neo4jIP" type="xs:string"/>
                 <xs:element name="neo4jPort" type="xs:int"/>
                 <xs:element name="neo4jUsername" type="xs:string"/>

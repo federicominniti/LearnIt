@@ -8,7 +8,9 @@
     <mongoDBThirdPort>27017</mongoDBThirdPort>
     <mongoDBUsername>root</mongoDBUsername>
     <mongoDBPassword></mongoDBPassword>
-    <mongoDBName>learnitmongo</mongoDBName>
+    <mongoDBName>db</mongoDBName>
+    <mongoDBCollectionCourses>learnit</mongoDBCollectionCourses>
+    <mongoDBCollectionUsers>users</mongoDBCollectionUsers>
     <neo4jIP>127.0.0.1</neo4jIP>
     <neo4jPort>7687</neo4jPort>
     <neo4jUsername>neo4j</neo4jUsername>
