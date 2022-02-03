@@ -87,6 +87,10 @@ public class Utils {
     public static final String REVIEW_SNAPSHOT = "/fxml/ReviewSnapshotPage.fxml";
     public static final String USER_SNAPSHOT = "/fxml/UserSnapshot.fxml";
 
+    /**
+     * Exploits Xstream to easily read from the config.xml and load a ConfigParams instance
+     * @return a ConfigParams object
+     */
     public static ConfigParams getParams() {
         if (validConfigParams()) {
             XStream xstream = new XStream();
@@ -111,6 +115,9 @@ public class Utils {
         return null;
     }
 
+    /**
+     * Validates the config.xml file against the config.xsd XML schema file
+     */
     private static boolean validConfigParams()
     {
         Document document;
