@@ -1,6 +1,5 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.app;
 
-import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
@@ -26,13 +25,12 @@ public class LearnIt extends Application {
         primaryStage.show();
         primaryStage.setResizable(true);
         primaryStage.sizeToScene();
-        ConfigParams.getInstance();
 
-        MongoDBDriver m = MongoDBDriver.getInstance();
+        MongoDBDriver mongo = MongoDBDriver.getInstance();
         Neo4jDriver neo4j = Neo4jDriver.getInstance();
 
         primaryStage.setOnCloseRequest(windowEvent -> {
-            m.closeConnection();
+            mongo.closeConnection();
             neo4j.closeConnection();
             System.exit(0);
         });

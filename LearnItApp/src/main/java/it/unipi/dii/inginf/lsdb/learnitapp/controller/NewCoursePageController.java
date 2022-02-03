@@ -50,6 +50,9 @@ public class NewCoursePageController {
         textLogoImageView.setCursor(Cursor.HAND);
     }
 
+    /**
+     * Handles the creation of the course, carefully unsetting all the empty optional fields
+     */
     private void createButtonHandler(MouseEvent clickEvent){
         if (!validateNonOptionalFields())
             return;
@@ -120,7 +123,10 @@ public class NewCoursePageController {
 
     }
 
-    public boolean validateNonOptionalFields() {
+    /**
+     * Validates non optional fields: description, title, language, level
+     */
+    private boolean validateNonOptionalFields() {
         if(descriptionTextArea.getText().length() < MIN_DESCRIPTION_LEN){
             Utils.showErrorAlert("Too short description");
             return false;

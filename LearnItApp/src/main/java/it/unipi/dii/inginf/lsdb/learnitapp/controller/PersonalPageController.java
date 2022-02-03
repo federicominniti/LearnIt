@@ -65,7 +65,10 @@ public class PersonalPageController {
         profilePageController.setProfileUser(Session.getLocalSession().getLoggedUser());
     }
 
-    public void saveButtonHandler(MouseEvent clickEvent) {
+    /**
+     * Performs all the controls to the edited information and then calls the function to load new data to the database
+     */
+    private void saveButtonHandler(MouseEvent clickEvent) {
         boolean ret;
         Date birthDate;
 
@@ -84,6 +87,9 @@ public class PersonalPageController {
         }
     }
 
+    /**
+     * Validates the new password
+     */
     private boolean validatePassword() {
         if (!passwordPasswordField.getText().equals(confirmPasswordField.getText())) {
             Utils.showErrorAlert("The passwords do not match!");
@@ -96,6 +102,10 @@ public class PersonalPageController {
         return false;
     }
 
+    /**
+     * Retrieves and validates the value from the date picker
+     * @return the Date of birth if it is correct, null otherwise
+     */
     private Date getValueFromDatePicker() {
         Date birthDate = loggedUser.getDateOfBirth();
         if (birthDatePicker.getValue() != null) {
@@ -112,6 +122,10 @@ public class PersonalPageController {
         return birthDate;
     }
 
+    /**
+     * Saves the changed data to the database
+     * @param birthDate the new date of birth set by the user
+     */
     private boolean editProfileInfo(Date birthDate) {
         String password = passwordPasswordField.getText();
         if (password.equals(""))

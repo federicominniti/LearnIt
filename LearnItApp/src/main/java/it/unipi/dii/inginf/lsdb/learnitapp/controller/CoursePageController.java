@@ -35,9 +35,9 @@ public class CoursePageController {
     @FXML private ImageView courseImageImageView;
     @FXML private Button likeCourseButton;
     @FXML private Button editCourseButton;
-    @FXML private ChoiceBox languageChoiceBox;
+    @FXML private ChoiceBox<String> languageChoiceBox;
     @FXML private TextField categoryTextField;
-    @FXML private ChoiceBox levelChoiceBox;
+    @FXML private ChoiceBox<String> levelChoiceBox;
     @FXML private TextField durationTextField;
     @FXML private TextField priceTextField;
     @FXML private TextField modalityTextField;
@@ -61,11 +61,17 @@ public class CoursePageController {
     private XYChart.Series series;
 
 
+    //the course to be loaded in the page
     private Course course;
+    //the review of the currently logged user (if there is one)
     private Review myReview;
+    //pages of already loaded reviews
     private int pageNumber = 0;
+    //limit when loading reviews to be showed
     private int limit;
+    //likes of the course
     private int likes;
+
     private MongoDBDriver mongoDBDriver;
     private Neo4jDriver neo4jDriver;
 
@@ -87,6 +93,15 @@ public class CoursePageController {
         Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
     }
 
+    /**
+     * Used to prepare the page loading all the information about the course.
+     * If the logged user is an admin, they will see the options for deleting course and reviews.
+     * If the logged user is the owner of the course, they will see the option for deleting the course
+     * and edit course information
+     * Other logged user will see some reviews and their review (if they already have written one), with the possibility
+     * of deleting their review (once it has been written), load more reviews from other users and like/unlike the course.
+     * @param snapCourse the snapshot of the course to be fully loaded
+     */
     public void setCourse(Course snapCourse){
         this.course = mongoDBDriver.getCourseByTitle(snapCourse.getTitle());
 
@@ -174,7 +189,7 @@ public class CoursePageController {
         loadMore();
     }
 
-    public void deleteButtonHandler(){
+    private void deleteButtonHandler(){
         if(LogicService.deleteReview(myReview, course)){
             saveReviewButton.setText("Save");
             myReview = null;
@@ -188,6 +203,9 @@ public class CoursePageController {
         }
     }
 
+    /**
+     * Loads more reviews (if there are more to be loaded)
+     */
     private void loadMore(){
         int skip = pageNumber*limit;
         pageNumber++;
@@ -219,12 +237,17 @@ public class CoursePageController {
             createReviewsElements(toAdd, reviewsVBox);
     }
 
-    public void deleteCourse(MouseEvent clickEvent) {
+    private void deleteCourse(MouseEvent clickEvent) {
         if (LogicService.deleteCourse(course)) {
             Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
         }
     }
 
+    /**
+     * Creates the GUI elements for the reviews
+     * @param reviewsList the list of reviews to be shown
+     * @param container the container of the list of reviews
+     */
     private void createReviewsElements(List<Review> reviewsList, VBox container){
         BorderPane reviewBorderPane;
         for(Review r: reviewsList){
@@ -233,6 +256,11 @@ public class CoursePageController {
         }
     }
 
+    /**
+     * Loads the GUI for a single review
+     * @param review the review to be shown
+     * @return a BorderPane container for the review
+     */
     private BorderPane loadSingleReview(Review review) {
         BorderPane borderPane = null;
 
@@ -249,7 +277,10 @@ public class CoursePageController {
         return borderPane;
     }
 
-    public void saveReviewButtonHandler(){
+    /**
+     * Saves the review of the logged user for this course, adjusting the GUI for future editing or deletion
+     */
+    private void saveReviewButtonHandler(){
         if(saveReviewButton.getText().equals("Save")) { // save operation
             int rating = getRatingFromStars();
             User loggedUser = Session.getLocalSession().getLoggedUser();
@@ -302,6 +333,10 @@ public class CoursePageController {
         }
     }
 
+    /**
+     * converts the number of stars to a rating from 1 to 5
+     * @return the rating
+     */
     private int getRatingFromStars(){
         int rating = 0;
         Image starOn = new Image(String.valueOf(CoursePageController.class.getResource(Utils.STAR_ON)));
@@ -314,6 +349,7 @@ public class CoursePageController {
         }
         return rating;
     }
+
 
     private void handleRatingStars(boolean type){
         // true -> activate
@@ -361,6 +397,9 @@ public class CoursePageController {
         }
     }
 
+    /**
+     * Handles the click on the like/unlike button
+     */
     public void likeCourseButtonHandler(){
         User loggedUser = Session.getLocalSession().getLoggedUser();
         if(neo4jDriver.isCourseLikedByUser(course, loggedUser)){
@@ -379,6 +418,10 @@ public class CoursePageController {
         }
     }
 
+    /**
+     * Loads all course information, adjusting the GUI if the logged user is also the owner
+     * @param isCourseMine is true if the course is owned by the logged user, false otherwise
+     */
     private void loadCourseInformation(boolean isCourseMine){
         titleLabel.setText(course.getTitle());
         descriptionTextArea.setText(course.getDescription());
@@ -439,6 +482,9 @@ public class CoursePageController {
         courseLinkTextField.setEditable(isCourseMine);
     }
 
+    /**
+     * Handles the editing of the course information by the logged user (owner)
+     */
     public void editCourseButtonHandler(){
         String categoriesString = categoryTextField.getText();
         List<String> categoryList = null;
@@ -512,7 +558,10 @@ public class CoursePageController {
             Utils.showErrorAlert("Error in updating course's information.");
     }
 
-    public void loadAnnualMeanRatingLineChart () {
+    /**
+     * prepares the graph for the annual mean ratings of the course
+     */
+    private void loadAnnualMeanRatingLineChart () {
         HashMap<String, Double> courseAnnualMeanRating = mongoDBDriver.getCourseAnnualRatings(course);
         List<Integer> years = new ArrayList<>();
         for (String year : courseAnnualMeanRating.keySet()) {

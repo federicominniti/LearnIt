@@ -53,8 +53,11 @@ public class ProfilePageController {
 
     private Neo4jDriver neo4jDriver;
     private MongoDBDriver mongoDriver;
+    //the owner of this profile page
     private User profileUser;
+    //the logged user (it may be different from the owner of the profile page)
     private User loggedUser;
+
     private boolean isProfileMine;
     private int limit;
 
@@ -66,6 +69,9 @@ public class ProfilePageController {
         learnItLabel.setCursor(Cursor.HAND);
     }
 
+    /**
+     * Loads all the profile information of the user
+     */
     private void loadProfileInformation(){
         completeNameLabel.setText(profileUser.getCompleteName());
         usernameLabel.setText(profileUser.getUsername());
@@ -78,16 +84,20 @@ public class ProfilePageController {
         followerNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(0).toString());
         followingNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(1).toString());
 
-        /*if(profileUser.getProfilePic() != null){
+        if(profileUser.getProfilePic() != null){
             Image profilePicture = new Image(profileUser.getProfilePic());
             propicImageView.setImage(profilePicture);
-        }*/
+        }
 
         if(neo4jDriver.isUserFollowedByUser(usernameLabel.getText(), loggedUser.getUsername()))
             followButton.setText("Unfollow");
 
     }
 
+    /**
+     * Loads the number of reviewed course, average price of reviewed courses and
+     * average duration of reviewed courses
+     */
     private void loadStatistics() {
         HashMap<String, Double> stats = mongoDriver.avgStatistics(profileUser);
         if (stats == null || stats.get("count") == null || stats.get("count") == 0) {
@@ -110,6 +120,14 @@ public class ProfilePageController {
             averagePriceLabel.setText("Average price of reviewed courses: " + formatter.format(stats.get("avgprice")));
     }
 
+    /**
+     * Loads the GUI for the profile page.
+     * If the loggedUser is equal to the profileUser, then they will see a button to change their personal information
+     * If the loggedUser is different from the profileUser, they will see the options to follow/unfollow
+     * If the loggedUser is an admin, they will see the option to delete the owner of this profile page
+     * If the admin visit their own profile page, they will only see the options to edit their password
+     * @param user
+     */
     public void setProfileUser(User user){
         loggedUser = Session.getLocalSession().getLoggedUser();
         profileUser = mongoDriver.getUserByUsername(user.getUsername());
@@ -212,7 +230,10 @@ public class ProfilePageController {
         loadSocialLists();
     }
 
-    public void modifyAdminPasswordHandler(PasswordField oldPasswordField, TextField newPasswordTextField,
+    /**
+     * Handles the edit of the password for the admin
+     */
+    private void modifyAdminPasswordHandler(PasswordField oldPasswordField, TextField newPasswordTextField,
                                            TextField repeatPasswordTextField){
 
         String oldPassword = oldPasswordField.getText();
@@ -242,7 +263,10 @@ public class ProfilePageController {
         repeatPasswordTextField.setText("");
     }
 
-    public void deleteUserHandler(MouseEvent clickEvent) {
+    /**
+     * Handles the deletion of a user by the admin
+     */
+    private void deleteUserHandler(MouseEvent clickEvent) {
         if (LogicService.deleteUser(profileUser)) {
             Utils.showInfoAlert("User deleted successfully");
             Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent);
@@ -251,7 +275,11 @@ public class ProfilePageController {
             Utils.showErrorAlert("Something has gone wrong");
     }
 
-    public void followHandler(MouseEvent clickEvent){
+    /**
+     * Handler to follow/unfollow the owner of this profile page
+     * @param clickEvent
+     */
+    private void followHandler(MouseEvent clickEvent){
         User loggedUser = Session.getLocalSession().getLoggedUser();
 
         if(neo4jDriver.isUserFollowedByUser(usernameLabel.getText(), loggedUser.getUsername())){
@@ -268,7 +296,11 @@ public class ProfilePageController {
         }
     }
 
-    public void loadSocialLists(){
+    /**
+     * Loads lists of liked courses, reviewed courses, offered courses, follower users and followed users for
+     * the owner of the profile page
+     */
+    private void loadSocialLists(){
         Utils.addLine(elementsVBox, null, profileUser, Utils.LIKED_COURSES);
         Utils.addLine(elementsVBox, null, profileUser, Utils.REVIEWED_COURSES);
         Utils.addLine(elementsVBox, null, profileUser, Utils.OFFERED_COURSES);

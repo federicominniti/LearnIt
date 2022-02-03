@@ -23,6 +23,10 @@ public class UserSnapshotController {
         userSnapshot.setCursor(Cursor.HAND);
     }
 
+    /**
+     * Loads the GUI for the snapshot of the user
+     * @param user the user snapshot to be shown
+     */
     public void setSnapshotUser(User user) {
         usernameLabel.setText(user.getUsername());
         /*

@@ -27,7 +27,7 @@ public class LoginPageController {
         signUpButton.setCursor(Cursor.HAND);
     }
 
-    public void loginHandler(MouseEvent clickEvent) {
+    private void loginHandler(MouseEvent clickEvent) {
         if (usernameTextField.getText().equals("") || passwordField.getText().equals(""))
             return;
 

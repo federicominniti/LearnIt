@@ -31,6 +31,11 @@ public class ConfigParams {
     private int numCommonCourses;
     private int followedThreshold;
 
+    /**
+     * Returns the instance of the local configuration parameters, creating it if needed
+     * @return the ConfigParams instance
+     * @throws IOException if there are problems when reading from the XML file
+     */
     public static ConfigParams getInstance() throws IOException {
         if (localConfig == null) {
             synchronized (ConfigParams.class) {
@@ -47,112 +52,128 @@ public class ConfigParams {
     }
 
     public static void setLocalConfig(ConfigParams localConfig) {
-            ConfigParams.localConfig = localConfig;
-        }
+        ConfigParams.localConfig = localConfig;
+    }
 
     public String getMongoDBPrimaryIP() {
-            return mongoDBPrimaryIP;
-        }
+        return mongoDBPrimaryIP;
+    }
 
     public void setMongoDBPrimaryIP(String mongoDBPrimaryIP) {
-            this.mongoDBPrimaryIP = mongoDBPrimaryIP;
-        }
+        this.mongoDBPrimaryIP = mongoDBPrimaryIP;
+    }
 
     public int getMongoDBPrimaryPort() {
-            return mongoDBPrimaryPort;
-        }
+        return mongoDBPrimaryPort;
+    }
 
     public void setMongoDBPrimaryPort(int mongoDBPrimaryPort) {
-            this.mongoDBPrimaryPort = mongoDBPrimaryPort;
-        }
+        this.mongoDBPrimaryPort = mongoDBPrimaryPort;
+    }
 
     public String getMongoDBSecondIP() {
-            return mongoDBSecondIP;
-        }
+        return mongoDBSecondIP;
+    }
 
     public void setMongoDBSecondIP(String mongoDBSecondIP) {
-            this.mongoDBSecondIP = mongoDBSecondIP;
-        }
+        this.mongoDBSecondIP = mongoDBSecondIP;
+    }
 
     public int getMongoDBSecondPort() {
-            return mongoDBSecondPort;
-        }
+        return mongoDBSecondPort;
+    }
 
     public void setMongoDBSecondPort(int mongoDBSecondPort) {
-            this.mongoDBSecondPort = mongoDBSecondPort;
-        }
+        this.mongoDBSecondPort = mongoDBSecondPort;
+    }
 
     public String getMongoDBThirdIP() {
-            return mongoDBThirdIP;
-        }
+        return mongoDBThirdIP;
+    }
 
     public void setMongoDBThirdIP(String mongoDBThirdIP) {
-            this.mongoDBThirdIP = mongoDBThirdIP;
-        }
+        this.mongoDBThirdIP = mongoDBThirdIP;
+    }
 
     public int getMongoDBThirdPort() {
-            return mongoDBThirdPort;
-        }
+        return mongoDBThirdPort;
+    }
 
     public void setMongoDBThirdPort(int mongoDBThirdPort) {
-            this.mongoDBThirdPort = mongoDBThirdPort;
-        }
+        this.mongoDBThirdPort = mongoDBThirdPort;
+    }
 
     public String getMongoDBUsername() {
-            return mongoDBUsername;
-        }
+        return mongoDBUsername;
+    }
 
     public void setMongoDBUsername(String mongoDBUsername) {
-            this.mongoDBUsername = mongoDBUsername;
-        }
+        this.mongoDBUsername = mongoDBUsername;
+    }
 
     public String getMongoDBPassword() {
-            return mongoDBPassword;
-        }
+        return mongoDBPassword;
+    }
 
     public void setMongoDBPassword(String mongoDBPassword) {
-            this.mongoDBPassword = mongoDBPassword;
-        }
+        this.mongoDBPassword = mongoDBPassword;
+    }
 
     public String getMongoDBName() {
-            return mongoDBName;
-        }
+        return mongoDBName;
+    }
 
     public void setMongoDBName(String mongoDBName) {
-            this.mongoDBName = mongoDBName;
-        }
+        this.mongoDBName = mongoDBName;
+    }
+
+    public String getMongoDBCollectionCourses() {
+        return mongoDBCollectionCourses;
+    }
+
+    public void setMongoDBCollectionCourses(String mongoDBCollectionCourses) {
+        this.mongoDBCollectionCourses = mongoDBCollectionCourses;
+    }
+
+    public String getMongoDBCollectionUsers() {
+        return mongoDBCollectionUsers;
+    }
+
+    public void setMongoDBCollectionUsers(String mongoDBCollectionUsers) {
+        this.mongoDBCollectionUsers = mongoDBCollectionUsers;
+    }
 
     public String getNeo4jIP() {
-            return neo4jIP;
-        }
+        return neo4jIP;
+    }
 
     public void setNeo4jIP(String neo4jIP) {
-            this.neo4jIP = neo4jIP;
-        }
+        this.neo4jIP = neo4jIP;
+    }
 
     public int getNeo4jPort() {
-            return neo4jPort;
-        }
+        return neo4jPort;
+    }
 
     public void setNeo4jPort(int neo4jPort) {
-            this.neo4jPort = neo4jPort;
-        }
+        this.neo4jPort = neo4jPort;
+    }
 
     public String getNeo4jUsername() {
-            return neo4jUsername;
-        }
+        return neo4jUsername;
+    }
 
     public void setNeo4jUsername(String neo4jUsername) {
-            this.neo4jUsername = neo4jUsername;
-        }
+        this.neo4jUsername = neo4jUsername;
+    }
 
     public String getNeo4jPassword() {
-            return neo4jPassword;
-        }
+        return neo4jPassword;
+    }
 
     public void setNeo4jPassword(String neo4jPassword) {
-            this.neo4jPassword = neo4jPassword;
-        }
+        this.neo4jPassword = neo4jPassword;
+    }
 
     public int getLimitNumber() {
         return limitNumber;
@@ -200,21 +221,5 @@ public class ConfigParams {
 
     public void setFollowedThreshold(int followedThreshold) {
         this.followedThreshold = followedThreshold;
-    }
-
-    public String getMongoDBCollectionCourses() {
-        return mongoDBCollectionCourses;
-    }
-
-    public void setMongoDBCollectionCourses(String mongoDBCollectionCourses) {
-        this.mongoDBCollectionCourses = mongoDBCollectionCourses;
-    }
-
-    public String getMongoDBCollectionUsers() {
-        return mongoDBCollectionUsers;
-    }
-
-    public void setMongoDBCollectionUsers(String mongoDBCollectionUsers) {
-        this.mongoDBCollectionUsers = mongoDBCollectionUsers;
     }
 }

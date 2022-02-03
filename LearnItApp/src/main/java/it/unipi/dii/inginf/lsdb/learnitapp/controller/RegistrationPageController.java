@@ -49,6 +49,9 @@ public class RegistrationPageController {
 
     }
 
+    /**
+     * Prepares the GUI for the creation of a new admin, disabling all the fields but username and password
+     */
     private void prepareForAdminCreation() {
         learnitLogoImageView.setImage(new Image(
                 String.valueOf(RegistrationPageController.class.getResource(Utils.ADMIN_IMAGE))));
@@ -74,6 +77,9 @@ public class RegistrationPageController {
         profilePictureLabel.setDisable(true);
     }
 
+    /**
+     * Prepares the GUI for the registration of Standard Users
+     */
     private void prepareForStandardUserCreation() {
         genderChoiceBox.getItems().add("Male");
         genderChoiceBox.getItems().add("Female");
@@ -91,7 +97,10 @@ public class RegistrationPageController {
         signUpButton.setCursor(Cursor.HAND);
     }
 
-    public void createAdmin(MouseEvent clickEvent) {
+    /**
+     * Creates an admin user
+     */
+    private void createAdmin(MouseEvent clickEvent) {
         if (validateUsernameAndPassword())
             return;
 
@@ -131,6 +140,9 @@ public class RegistrationPageController {
         }
     }
 
+    /**
+     * Validates username and password entered by the user
+     */
     private boolean validateUsernameAndPassword() {
         if (!passwordPasswordField.getText().equals(confirmPasswordField.getText())) {
             Utils.showErrorAlert("The passwords do not match!");
@@ -148,6 +160,9 @@ public class RegistrationPageController {
         return false;
     }
 
+    /**
+     * Validates all non-optional fields needed for the registration
+     */
     private boolean validateNonOptionalFields() {
         if (emailTextField.getText().equals("") || completeNameTextField.getText().equals("")) {
             Utils.showErrorAlert("Please fill all non-optional fields");
@@ -169,6 +184,9 @@ public class RegistrationPageController {
         return !validateUsernameAndPassword();
     }
 
+    /**
+     * Completes the registration of the user by adding it to the database
+     */
     private boolean registerUser() {
         User newUser = new User();
         newUser.setUsername(usernameTextField.getText());

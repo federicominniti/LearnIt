@@ -112,12 +112,18 @@ public class DiscoveryPageController {
         );
     }
 
+    /**
+     * Redirects to the profile page of the logged user
+     */
     private void myProfile(MouseEvent clickEvent){
         ProfilePageController profilePageController =
                 (ProfilePageController) Utils.changeScene(Utils.PROFILE_PAGE, clickEvent);
         profilePageController.setProfileUser(loggedUser);
     }
 
+    /**
+     * Loads the user's information to be shown in the page
+     */
     private void fillInterfaceElements() {
         searchType = new ToggleGroup();
         coursesRadio.setToggleGroup(searchType);
@@ -139,6 +145,9 @@ public class DiscoveryPageController {
             profilePic.setImage(new Image(loggedUser.getProfilePic()));*/
     }
 
+    /**
+     * Loads to the GUI the suggestions for the courses
+     */
     private void coursesSuggestions(){
         suggestionsSwitchButton.setOnMouseClicked(clickEvent -> usersSuggestions());
         suggestionsSwitchButton.setText("Courses");
@@ -152,6 +161,9 @@ public class DiscoveryPageController {
         Utils.addLine(elementsVBox, null, null, Utils.MOST_LIKED_COURSES);
     }
 
+    /**
+     * Loads to the GUI the suggestions for the users
+     */
    private void usersSuggestions(){
        suggestionsSwitchButton.setOnMouseClicked(clickEvent -> coursesSuggestions());
        suggestionsSwitchButton.setText("Users");
@@ -164,6 +176,9 @@ public class DiscoveryPageController {
        Utils.addLine(elementsVBox, null, null, Utils.MOST_FOLLOWED_USERS);
    }
 
+    /**
+     * Handler for the search functionality
+     */
     private void searchHandler(MouseEvent clickEvent){
         currentI = 0;
         currentJ = 0;
@@ -243,6 +258,14 @@ public class DiscoveryPageController {
         allContentAnchorPane.getChildren().remove(suggestionsSwitchButton);
     }
 
+    /**
+     * Loads more courses after a search
+     * @param title the searched title
+     * @param level the searched level
+     * @param language the searched language
+     * @param duration the searched duration threshold
+     * @param price the searched price threshold
+     */
     private void addMoreResearchedCourses(String title, String level, String language, double duration, double price){
         List<Course> searchedCourses = mongoDBDriver.findCourses(price, duration, title, level, language, ((currentI*4)+currentJ), limit);
         for(int i = currentI; i<currentI + 4; i++){
@@ -281,6 +304,10 @@ public class DiscoveryPageController {
         }
     }
 
+    /**
+     * Loads more users after a search
+     * @param username the searched username
+     */
     private void addMoreResearchedUsers(String username) {
         List<User> searchedUsers;
         if (currentI == 0)

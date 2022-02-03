@@ -15,6 +15,7 @@ public class CourseSnapshotController {
     @FXML private ImageView coursePicImage;
     @FXML private Label durationLabel;
     @FXML private Label priceLabel;
+    //the snapshot of the course to be shown
     private Course course;
 
     public void initialize(){
@@ -22,6 +23,10 @@ public class CourseSnapshotController {
         courseSnapshot.setOnMouseClicked(mouseEvent -> showCompleteCourseInfo(mouseEvent));
     }
 
+    /**
+     * Prepares GUI for the snapshot of the course
+     * @param course the snapshot to be shown
+     */
     public void setSnapshotCourse(Course course) {
         titleLabel.setText(course.getTitle());
         /*
@@ -54,6 +59,9 @@ public class CourseSnapshotController {
         this.course = course;
     }
 
+    /**
+     * Redirects to the course page
+     */
     private void showCompleteCourseInfo(MouseEvent mouseEvent){
         CoursePageController coursePageController =
                 (CoursePageController) Utils.changeScene(Utils.COURSE_PAGE, mouseEvent);

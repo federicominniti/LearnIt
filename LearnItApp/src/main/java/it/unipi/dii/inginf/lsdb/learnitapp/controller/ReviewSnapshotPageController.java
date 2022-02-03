@@ -27,9 +27,12 @@ public class ReviewSnapshotPageController {
     @FXML private BorderPane thisBorderPane;
     @FXML private ImageView deleteImageView;
 
+    // the container of the review in the course page
     private VBox container;
 
+    //the reviewed course
     private Course course;
+    //the review to be shown
     private Review review;
 
     public void initialize() {
@@ -42,11 +45,17 @@ public class ReviewSnapshotPageController {
             deleteImageView.setVisible(false);
     }
 
+    /**
+     * Handler to delete the review from the GUI of the course page
+     */
     public void deleteReview(MouseEvent clickEvent) {
         LogicService.deleteReview(review, course);
         container.getChildren().remove(thisBorderPane);
     }
 
+    /**
+     * Load review information
+     */
     private void loadReviewInformation(){
         User author = MongoDBDriver.getInstance().getUserByUsername(review.getUsername());
         if(review.getTitle()!=null)
@@ -88,7 +97,7 @@ public class ReviewSnapshotPageController {
         this.course = course;
     }
 
-    public void visitAuthorProfile(MouseEvent mouseEvent){
+    private void visitAuthorProfile(MouseEvent mouseEvent){
         User author = new User();
         author.setUsername(review.getUsername());
 

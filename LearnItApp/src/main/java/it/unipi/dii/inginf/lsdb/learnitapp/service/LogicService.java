@@ -16,6 +16,12 @@ public class LogicService {
     private static Logger mongoLogger = LearnItLogger.getMongoLogger();
     private static Logger neo4jLogger = LearnItLogger.getNeo4jLogger();
 
+    /**
+     * Updates the information about a course
+     * If the update fails on Neo4J, try to rollback by reupdating mongo with the old information
+     * If the rollback fails, write to log the information about the error and the information about the course
+     * to be restored
+     */
     public static boolean updateCourse(Course newCourse, Course oldCourse){
         if (mongoDBDriver.updateCourse(newCourse, oldCourse)) {
             if (!neo4jDriver.updateCourse(newCourse)) {
@@ -33,6 +39,12 @@ public class LogicService {
         return false;
     }
 
+    /**
+     * Deletes a course
+     * If the delete operation fails on Neo4J, try to rollback by re-adding the course to mongo
+     * If the rollback fails, write to log the information about the error and the information about the course
+     * to be restored
+     */
     public static boolean deleteCourse(Course course) {
         Course oldCourse = mongoDBDriver.getCourseByTitle(course.getTitle());
         if (mongoDBDriver.deleteCourse(course)) {
@@ -53,6 +65,12 @@ public class LogicService {
         return false;
     }
 
+    /**
+     * Adds a review to a course
+     * If the add fails on Neo4J, try to rollback by deleting the review on mongo
+     * If the rollback fails, write to log the information about the error and the information about the course
+     * and the review
+     */
     public static boolean addReview(Review newReview, Course course){
         try {
             mongoDBDriver.addReview(course, newReview);
@@ -76,6 +94,12 @@ public class LogicService {
         return true;
     }
 
+    /**
+     * Deletes a review from a course
+     * If the delete operation fails on Neo4J, try to rollback by re-adding to mongo the review
+     * If the rollback fails, write to log the information about the error and the information about the course
+     * and the review
+     */
     public static boolean deleteReview(Review review, Course course){
         try {
             mongoDBDriver.deleteReview(course, review, false);
@@ -100,6 +124,11 @@ public class LogicService {
     }
 
 
+    /**
+     * Adds a new course to the databases
+     * If the add fails on Neo4J, try to rollback by deleting the course from mongo
+     * If the rollback fails, write to log the information about the error and the information about the course
+     */
     public static boolean addCourse(Course course){
         try {
             mongoDBDriver.addCourse(course);
@@ -122,6 +151,10 @@ public class LogicService {
         return true;
     }
 
+    /**
+     * Deletes a user from the databases
+     * If one of the operation goes bad, write to log the information about the error and the user to be deleted
+     */
     public static boolean deleteUser(User user) {
         try {
             mongoDBDriver.deleteUserReviews(user);
@@ -159,6 +192,12 @@ public class LogicService {
         return true;
     }
 
+    /**
+     * Updates the information about a user
+     * If the update fails on Neo4J, try to rollback by reupdating mongo with the old information
+     * If the rollback fails, write to log the information about the error and the information about the user
+     * to be restored
+     */
     public static boolean editProfileInfo(User newUser, User oldUser) {
         try {
             mongoDBDriver.editProfileInfo(newUser);
@@ -183,6 +222,11 @@ public class LogicService {
         return true;
     }
 
+    /**
+     * Adds a new user to the databases
+     * If the add fails on Neo4J, try to rollback by deleting the user from mongo
+     * If the rollback fails, write to log the information about the error and the information about the user
+     */
     public static boolean addUser(User newUser) {
         try {
             mongoDBDriver.addUser(newUser);

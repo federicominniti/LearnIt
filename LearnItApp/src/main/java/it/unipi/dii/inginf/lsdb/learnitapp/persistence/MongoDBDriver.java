@@ -54,9 +54,7 @@ public class MongoDBDriver implements DBDriver {
     public static MongoDBDriver getInstance() {
         if (mongoDBInstance == null) {
             try {
-                //mongoDBInstance = new MongoDBDriver(ConfigParams.getInstance());
-                runningDefault = false;
-                throw new Exception();
+                mongoDBInstance = new MongoDBDriver(ConfigParams.getInstance());
             } catch (Exception e) {
                 mongoDBInstance = new MongoDBDriver();
                 uriString = "mongodb://127.0.0.1:27017/";
@@ -145,12 +143,18 @@ public class MongoDBDriver implements DBDriver {
             mongoClient.close();
     }
 
-    //provata - ok
+    /**
+     * Adds a course to the database
+     * @param newCourse the course to be created
+     */
     public void addCourse(Course newCourse) throws MongoException {
         coursesCollection.insertOne(newCourse);
     }
 
-    //provata
+    /**
+     * Returns a course with a certain title
+     * @param title the title of the course
+     */
     public Course getCourseByTitle(String title) {
         try {
             Course c = coursesCollection.find(Filters.eq("title", title)).first();
@@ -160,6 +164,16 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
+    /**
+     * Updates the information of a course
+     * If oldCourse is null, only reviews (and redundancies about reviews) will be updated
+     * If oldCourse is not null, only information about the course (that are not reviews or reviews redundancies)
+     * will be updated
+     * Course snapshots embedded in the user collection will be updated if the price or duration or picture of a course
+     * changes
+     * @param editedCourse the course to be updated
+     * @param oldCourse the old course information
+     */
     public boolean updateCourse(Course editedCourse, Course oldCourse) throws MongoException {
         if (oldCourse == null) {
             //this is the case when you want to update the course reviews only
@@ -279,7 +293,9 @@ public class MongoDBDriver implements DBDriver {
 
     }
 
-    //non cancellare snapshot
+    /**
+     * Deletes a course from the courses collection
+     */
     public boolean deleteCourse(Course toBeDeleted) {
         try {
             Bson match = Filters.eq("_id", toBeDeleted.getId());
@@ -291,13 +307,17 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
-    //non cancellare snapshot su collection utenti
+    /**
+     * Deletes all the courses offered by a user
+     */
     public void deleteUserCourses(User user) throws MongoException { // aggiungere indice per la find ???
         Bson deleteFilter = Filters.eq("instructor", user.getUsername());
         coursesCollection.deleteMany(deleteFilter);
     }
 
-    //fare solo updatecourse aggiornata con aggiornamento ridondanze
+    /**
+     * Edits the information about a specific review of a course
+     */
     public boolean editReview(Course course, Review review){
         List<Review> reviews = course.getReviews();
         int count = 0;
@@ -315,15 +335,25 @@ public class MongoDBDriver implements DBDriver {
         return updateCourse(course, null);
     }
 
-    //rivedere ma va bene
-    //new
+    /**
+     * Deletes all the reviews of a certain user
+     */
     public void deleteUserReviews(User user) throws MongoException {
         Bson pullFilter = Updates.pull("reviews", Filters.eq("username", user.getUsername()));
         coursesCollection.updateMany(Filters.empty(), pullFilter);
     }
 
-    //provata
-    //inserire
+    /**
+     * Finds all courses with certain parameters
+     * @param priceThreshold the max price
+     * @param durationThreshold the max duration
+     * @param title the searched title
+     * @param level the selected level
+     * @param language the selected language
+     * @param toSkip courses to be skipped
+     * @param quantity the quantity to be loaded
+     * @return a list of Course
+     */
     public List<Course> findCourses(double priceThreshold, double durationThreshold, String title, String level, String language, int toSkip, int quantity){
 
         List<Course> courses = null;
@@ -378,8 +408,11 @@ public class MongoDBDriver implements DBDriver {
         return courses;
     }
 
-    //provata - OK
-    //inserire
+    /**
+     * Finds the courses with the best rating
+     * @param limit the max number of courses to return
+     * @return a list of Course
+     */
     public List<Course> findBestRatings(int limit){ // trasformare come trindingCourses se funziona ???
         List<Document> aggregation = Arrays.asList(
                 new Document("$match", new Document("num_reviews", new Document("$gt", 0))),
@@ -394,8 +427,11 @@ public class MongoDBDriver implements DBDriver {
         return c;
     }
 
-    //provata
-    //inserire
+    /**
+     * Finds the courses that received most reviews during the last 30 days
+     * @param limit the max quantity of courses to return
+     * @return a list of Course
+     */
     public List<Course> trendingCourses(int limit){
         Date d = new Date();
 
@@ -429,8 +465,10 @@ public class MongoDBDriver implements DBDriver {
         return res;
     }
 
-    //provata
-    //inserire
+    /**
+     * Groups reviews by year and calculates the mean rating for every past year
+     * @return a HashMap associating a year with a mean rating
+     */
     public HashMap<String, Double> getCourseAnnualRatings(Course course) {
         HashMap<String, Double> annualRatings = new HashMap<>();
         List<Course> doc = coursesCollection.aggregate(Arrays.asList(
@@ -450,14 +488,11 @@ public class MongoDBDriver implements DBDriver {
         return annualRatings;
     }
 
-    public boolean checkCourseExists(String title) {
-        Course c = coursesCollection.find(Filters.eq("title", title)).projection(Projections.include("title")).first();
-        if (c == null)
-            return false;
-        return true;
-    }
-
-    //inserire
+    /**
+     * Calculates the users that have written the highest number of reviews in the last 30 days
+     * @param limit the max number of users to return
+     * @return a list of User
+     */
     public List<User> mostActiveUsers(int limit) {
         Date d = new Date();
         Calendar cal = Calendar.getInstance();
@@ -489,12 +524,19 @@ public class MongoDBDriver implements DBDriver {
         return res;
     }
 
+    /**
+     * Checks if a course with same title exists (case insensitive)
+     * @param title the title to be checked
+     */
     public boolean courseAlreadyExists(String title) {
         Pattern pattern = Pattern.compile("^.*" + title + ".*$", Pattern.CASE_INSENSITIVE);
         Course c = coursesCollection.find(Filters.regex("title", pattern)).projection(Projections.exclude("reviews")).first();
         return c != null;
     }
 
+    /**
+     * Return the information about a user based on its username
+     */
     public User getUserByUsername(String username) {
         try {
             User u = usersCollection.find(Filters.eq("username", username))
@@ -506,7 +548,9 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
-    //inserire
+    /**
+     * Calculates the users that are the most skilled when choosing courses, based on their duration and price
+     */
     public List<User> bestUsers(int limit){
         List<Document> aggregation = Arrays.asList(new Document("$unwind",
                         new Document("path", "$reviewed")),
@@ -540,6 +584,9 @@ public class MongoDBDriver implements DBDriver {
         return res;
     }
 
+    /**
+     * Adds a review to a course
+     */
     private void addReviewToCourse(Course course, Review review) throws MongoException{
         List<Review> reviewsList = course.getReviews();
         if (reviewsList == null)
@@ -551,6 +598,9 @@ public class MongoDBDriver implements DBDriver {
         updateCourse(course, null);
     }
 
+    /**
+     * Adds a snapshot of a reviewed course to the document of a user, together with the review timestamp
+     */
     private void addSnapshotCourseToUser(Course course, Review review) throws MongoException{
         Document d = new Document("title", course.getTitle())
                 .append("review_timestamp", review.getTimestamp());
@@ -569,6 +619,13 @@ public class MongoDBDriver implements DBDriver {
 
     }
 
+    /**
+     * Handles the whole process of adding a review to a course, updating redundancies of the course
+     * and adding the snapshot of the course to the document of the user
+     * @param course
+     * @param review
+     * @return
+     */
     public boolean addReview(Course course, Review review){
         try{
             addReviewToCourse(course, review);
@@ -605,10 +662,15 @@ public class MongoDBDriver implements DBDriver {
         coursesCollection.updateOne(courseFilter, pullFilter);
     }
 
+    /**
+     * Deletes a review from a course
+     * @param redundanciesRollback defines if updating the redundancies of the course or not
+     */
     public boolean deleteReview(Course course, Review review, boolean redundanciesRollback){
         List<Review> reviewsList  = course.getReviews();
         reviewsList.remove(review);
-        if(redundanciesRollback) { //rollback of an add review operation. In this case we must update redundancies to
+        if(redundanciesRollback) {
+            //rollback of an add review operation. In this case we must update redundancies to
             // avoid to fake them
             course.setNum_reviews(course.getNum_reviews() - 1);
             course.setSum_ratings(course.getSum_ratings() - review.getRating());
@@ -637,6 +699,10 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
+    /**
+     * Gets the review of the user for a certain course, if there exists one
+     * @return the Review object or null
+     */
     public Review getCourseReviewByUser(Course course, User user) {
         Course c = coursesCollection.find(Filters.eq("_id", course.getId())).projection(Projections.elemMatch(
                 "reviews", Filters.eq("username", user.getUsername()))).first();
@@ -650,6 +716,9 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
+    /**
+     * Checks if the password submitted by a user is the same as the hash saved in the database
+     */
     public User login(String username, String password) {
         String shaPass = "";
         try {
@@ -668,6 +737,9 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
+    /**
+     * Updates the information about a user
+     */
     public void editProfileInfo(User newInfo) throws MongoException {
         String shaPass = "";
         try {
@@ -706,7 +778,10 @@ public class MongoDBDriver implements DBDriver {
         usersCollection.updateOne(filter, Updates.combine(updates));
     }
 
-    //inserire
+    /**
+     * Calculates the average statistics of a user:
+     * average money spent on courses, average duration of reviewed courses and total number of reviewed courses
+     */
     public HashMap<String, Double> avgStatistics(User user) {
         List<Document> aggregation =
                 Arrays.asList(new Document("$match", new Document("username", user.getUsername())
@@ -745,7 +820,9 @@ public class MongoDBDriver implements DBDriver {
         return hashMap;
     }
 
-    //inserire
+    /**
+     * Search functionality for users, confronts the searched text with the username and the complete name
+     */
     public List<User> searchUserByUsername(String searchedText, int skip, int limit) {
         try {
             Pattern pattern = Pattern.compile("^.*" + searchedText + ".*$", Pattern.CASE_INSENSITIVE);
@@ -775,6 +852,9 @@ public class MongoDBDriver implements DBDriver {
         }
     }
 
+    /**
+     * Adds a new user to the database
+     */
     public void addUser(User user) throws MongoException {
         String shaPass = "";
         try {
@@ -789,6 +869,9 @@ public class MongoDBDriver implements DBDriver {
         user.setPassword(clear);
     }
 
+    /**
+     * Finds all courses where the specified user is the instructor
+     */
     public List<Course> findCoursesOfferedByUser(User user, int skip, int limit) {
         try {
             List<Course> list = coursesCollection.find(Filters.eq("instructor", user.getUsername()))
@@ -808,6 +891,9 @@ public class MongoDBDriver implements DBDriver {
         usersCollection.deleteOne(filter);
     }
 
+    /**
+     * Gets all the reviewed courses of a user
+     */
     public List<Course> getAllUserReviews(User user, int skip, int limit) {
         List<Document> aggregation =
         Arrays.asList(new Document("$match",
