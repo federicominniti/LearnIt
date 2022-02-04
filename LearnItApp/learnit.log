@@ -1,0 +1,51 @@
+ERROR 2022-02-04 11:57:03,581 [it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver|LogicService.java:244] - Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=127.0.0.1:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused}}]
+ERROR 2022-02-04 11:57:03,587 [it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver|LogicService.java:245] - ADD USER: ROLLBACK FAILED
+ERROR 2022-02-04 11:57:03,600 [it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver|LogicService.java:246] - it.unipi.dii.inginf.lsdb.learnitapp.model.User@5b7bd437[
+  username=provaerrore
+  completeName=prova
+  dateOfBirth=1999-02-19
+  gender=Female
+  email=email@email.com
+  profilePic=picture
+]
+ERROR 2022-02-04 12:02:30,936 [it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver|LogicService.java:57] - Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=127.0.0.1:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused}}]
+ERROR 2022-02-04 12:02:30,943 [it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver|LogicService.java:58] - DELETE COURSE: ROLLBACK FAILED
+ERROR 2022-02-04 12:02:30,958 [it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver|LogicService.java:59] - it.unipi.dii.inginf.lsdb.learnitapp.model.Course@628c89f2[
+  title=Spanish for Beginners. The Complete Method. Level 1
+  description=The complete, non-stop SPEAKING Spanish course:  Mastery of the basics for BEGINNERS - in a matter of hours, not years.
+  instructor=adamanderson
+  language=English
+  level=Beginner
+  category=[Teaching & Academics, Language Learning, Spanish Language]
+  price=131.0
+  duration=4.0
+  modality=<null>
+  numReviews=3
+  sumRatings=12
+  link=https://www.udemy.com/course/el-metodo-spanish-1/
+  coursePic=https://i.imgur.com/R7KOk45.png
+]
+ERROR 2022-02-04 12:54:36,998 [it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver|LogicService.java:117] - Timed out after 30000 ms while waiting to connect. Client view of cluster state is {type=UNKNOWN, servers=[{address=127.0.0.1:27017, type=UNKNOWN, state=CONNECTING, exception={com.mongodb.MongoSocketOpenException: Exception opening socket}, caused by {java.net.ConnectException: Connection refused}}]
+ERROR 2022-02-04 12:54:37,005 [it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver|LogicService.java:118] - DELETE REVIEW: ROLLBACK FAILED
+ERROR 2022-02-04 12:54:37,019 [it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver|LogicService.java:119] - it.unipi.dii.inginf.lsdb.learnitapp.model.Course@553220eb[
+  title=4 Soft Skills for Videographers & Photographers To Succeed
+  description=Skills needed to grow your business, packaged in a single course.
+  instructor=montehaworth
+  language=English
+  level=Intermediate
+  category=<null>
+  price=110.0
+  duration=1.0
+  modality=<null>
+  numReviews=16
+  sumRatings=71
+  link=https://www.udemy.com/course/4-soft-skills-for-videographers-photographers-to-succeed/
+  coursePic=https://i.imgur.com/R7KOk45.png
+]
+ERROR 2022-02-04 12:54:37,020 [it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver|LogicService.java:120] - it.unipi.dii.inginf.lsdb.learnitapp.model.Review@ea10413[
+  username=benanderson
+  title=Really good
+  content=
+  rating=4
+  timestamp=Sat Oct 09 02:00:00 CEST 2021
+]

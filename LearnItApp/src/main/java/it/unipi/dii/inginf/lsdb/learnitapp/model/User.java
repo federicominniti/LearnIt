@@ -1,5 +1,7 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import java.util.Date;
@@ -149,6 +151,7 @@ public class User {
         return res;
     }
 
+    /*
     @Override
     public String toString() {
         return "User{" +
@@ -165,5 +168,19 @@ public class User {
                 ", avgDuration=" + avgDuration +
                 ", reviewedCourses=" + reviewedToString() + '\'' +
                 '}';
+    }
+
+     */
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                .append("username", username)
+                .append("completeName", completeName)
+                .append("dateOfBirth", dateOfBirth)
+                .append("gender", gender)
+                .append("email", email)
+                .append("profilePic", profilePic)
+                .toString();
     }
 }

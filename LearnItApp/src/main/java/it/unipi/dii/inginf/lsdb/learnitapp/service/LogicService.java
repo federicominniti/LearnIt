@@ -109,7 +109,8 @@ public class LogicService {
 
         if (!neo4jDriver.deleteReview(course, review.getUsername())) {
             try {
-                mongoDBDriver.deleteReview(course, review, false);
+                System.out.println("qui");
+                mongoDBDriver.addReview(course, review);
                 return false;
             } catch (MongoException e) {
                 mongoLogger.error(e.getMessage());
@@ -243,9 +244,8 @@ public class LogicService {
                 mongoLogger.error(e.getMessage());
                 mongoLogger.error("ADD USER: ROLLBACK FAILED");
                 mongoLogger.error(newUser.toString());
+                return false;
             }
-
-            return false;
         }
 
         return true;

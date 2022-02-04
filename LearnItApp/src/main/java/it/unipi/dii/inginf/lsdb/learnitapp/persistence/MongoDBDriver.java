@@ -54,7 +54,9 @@ public class MongoDBDriver implements DBDriver {
     public static MongoDBDriver getInstance() {
         if (mongoDBInstance == null) {
             try {
-                mongoDBInstance = new MongoDBDriver(ConfigParams.getInstance());
+                //mongoDBInstance = new MongoDBDriver(ConfigParams.getInstance());
+                runningDefault = true;
+                throw new Exception();
             } catch (Exception e) {
                 mongoDBInstance = new MongoDBDriver();
                 uriString = "mongodb://127.0.0.1:27017/";
@@ -62,8 +64,8 @@ public class MongoDBDriver implements DBDriver {
                 mongoDBUsername = "root";
                 mongoDBPassword = "";
                 runningDefault = true;
-                mongoDBCollectionCourses = "learnit";
-                mongoDBCollectionUsers = "users";
+                mongoDBCollectionCourses = "learnit_edited";
+                mongoDBCollectionUsers = "users_new";
             }
 
             mongoDBInstance.initConnection();
@@ -189,12 +191,8 @@ public class MongoDBDriver implements DBDriver {
             if (editedCourse.getNum_reviews() > 0)
                 update_num = Updates.set(("num_reviews"), editedCourse.getNum_reviews());
 
-            try {
-                coursesCollection.updateOne(filter, Updates.combine(update_reviews, update_sum, update_num));
-                return true;
-            } catch(MongoException e) {
-                return false;
-            }
+            coursesCollection.updateOne(filter, Updates.combine(update_reviews, update_sum, update_num));
+            return true;
         } else {
 
             //case of update course info only (not reviews)
@@ -284,8 +282,11 @@ public class MongoDBDriver implements DBDriver {
                     //and write to log
                     e.printStackTrace();
                     boolean ret = updateCourse(oldCourse, oldCourse); //rollback
-                    if (!ret)
+                    if (!ret) {
                         mongoLogger.error(e.getMessage());
+                        mongoLogger.error("UPDATE COURSE INFORMATION: ROLLBACK FAILED");
+                        mongoLogger.error(oldCourse.toString());
+                    }
                     return false;
                 }
             }
@@ -605,10 +606,10 @@ public class MongoDBDriver implements DBDriver {
         Document d = new Document("title", course.getTitle())
                 .append("review_timestamp", review.getTimestamp());
 
-        if (course.getDuration() != 0)
+        if (course.getDuration() != null && course.getDuration() != 0)
             d.append("duration", course.getDuration());
 
-        if (course.getPrice() != 0)
+        if (course.getPrice() != null && course.getPrice() != 0)
             d.append("price", course.getPrice());
 
         if (course.getCoursePic() != null)
@@ -626,12 +627,8 @@ public class MongoDBDriver implements DBDriver {
      * @param review
      * @return
      */
-    public boolean addReview(Course course, Review review){
-        try{
-            addReviewToCourse(course, review);
-        }catch (MongoException e){
-            return false;
-        }
+    public boolean addReview(Course course, Review review) throws MongoException{
+        addReviewToCourse(course, review);
 
         String exception;
         try{
@@ -646,6 +643,9 @@ public class MongoDBDriver implements DBDriver {
             deleteReview(course, review, true);
         } catch (MongoException e){
             mongoLogger.error(exception);
+            mongoLogger.error("ADD COURSE SNAPSHOT TO USER: ROLLBACK FAILED");
+            mongoLogger.error(course.toString());
+            mongoLogger.error(review.toString());
         }
         return false;
     }
@@ -666,7 +666,7 @@ public class MongoDBDriver implements DBDriver {
      * Deletes a review from a course
      * @param redundanciesRollback defines if updating the redundancies of the course or not
      */
-    public boolean deleteReview(Course course, Review review, boolean redundanciesRollback){
+    public boolean deleteReview(Course course, Review review, boolean redundanciesRollback) throws MongoException{
         List<Review> reviewsList  = course.getReviews();
         reviewsList.remove(review);
         if(redundanciesRollback) {
@@ -676,11 +676,7 @@ public class MongoDBDriver implements DBDriver {
             course.setSum_ratings(course.getSum_ratings() - review.getRating());
             return updateCourse(course, null);
         }else {
-            try {
-                deleteReviewFromCourses(course, review);
-            } catch (MongoException e) {
-                return false;
-            }
+            deleteReviewFromCourses(course, review);
 
             String exception;
             try {
@@ -694,6 +690,9 @@ public class MongoDBDriver implements DBDriver {
                 addSnapshotCourseToUser(course, review);
             } catch (MongoException e){
                 mongoLogger.error(exception);
+                mongoLogger.error("DELETE COURSE SNAPSHOT FROM USER: ROLLBACK FAILED");
+                mongoLogger.error(course.toString());
+                mongoLogger.error(review.toString());
             }
             return false;
         }

@@ -1,5 +1,7 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.model;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import java.util.Date;
@@ -72,6 +74,7 @@ public class Review {
         this.timestamp = timestamp;
     }
 
+    /*
     @Override
     public String toString() {
         return "Review{" +
@@ -81,5 +84,18 @@ public class Review {
                 ", timestamp=" + timestamp +
                 ", username='" + username + '\'' +
                 '}';
+    }
+
+     */
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                .append("username", username)
+                .append("title", title)
+                .append("content", content)
+                .append("rating", rating)
+                .append("timestamp", timestamp)
+                .toString();
     }
 }

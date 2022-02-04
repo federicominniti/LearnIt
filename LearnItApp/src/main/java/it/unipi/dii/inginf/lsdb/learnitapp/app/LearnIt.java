@@ -1,5 +1,6 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.app;
 
+import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
@@ -26,6 +27,7 @@ public class LearnIt extends Application {
         primaryStage.setResizable(true);
         primaryStage.sizeToScene();
 
+        ConfigParams.getInstance();
         MongoDBDriver mongo = MongoDBDriver.getInstance();
         Neo4jDriver neo4j = Neo4jDriver.getInstance();
 

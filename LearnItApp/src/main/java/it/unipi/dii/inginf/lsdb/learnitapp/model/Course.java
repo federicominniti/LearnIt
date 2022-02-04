@@ -1,8 +1,10 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.model;
 
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 import java.util.List;
 
@@ -244,6 +246,7 @@ public class Course {
             res += r.toString();
         return res;
     }
+    /*
     @Override
     public String toString() {
         return "Course{" +
@@ -266,4 +269,26 @@ public class Course {
                 ", reviews=" + reviewsToString() + '\'' +
                 '}';
     }
+
+     */
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
+                .append("title", title)
+                .append("description", description)
+                .append("instructor", instructor)
+                .append("language", language)
+                .append("level", level)
+                .append("category", category)
+                .append("price", price)
+                .append("duration", duration)
+                .append("modality", modality)
+                .append("numReviews", num_reviews)
+                .append("sumRatings", sum_ratings)
+                .append("link", link)
+                .append("coursePic", coursePic)
+                .toString();
+    }
 }
+
