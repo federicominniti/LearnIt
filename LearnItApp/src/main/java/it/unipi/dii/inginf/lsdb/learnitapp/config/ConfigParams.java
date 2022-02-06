@@ -1,8 +1,23 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.config;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.AnyTypePermission;
+import com.thoughtworks.xstream.security.NullPermission;
+import com.thoughtworks.xstream.security.PrimitiveTypePermission;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 public class ConfigParams {
     private static volatile ConfigParams localConfig;
@@ -34,17 +49,69 @@ public class ConfigParams {
     /**
      * Returns the instance of the local configuration parameters, creating it if needed
      * @return the ConfigParams instance
-     * @throws IOException if there are problems when reading from the XML file
      */
-    public static ConfigParams getInstance() throws IOException {
+    public static ConfigParams getInstance() {
         if (localConfig == null) {
             synchronized (ConfigParams.class) {
                 if (localConfig == null) {
-                    localConfig = Utils.getParams();
+                    localConfig = getParams();
                 }
             }
         }
     return localConfig;
+    }
+
+    /**
+     * Exploits Xstream to easily read from the config.xml and load a ConfigParams instance
+     * @return a ConfigParams object
+     */
+    public static ConfigParams getParams() {
+        if (validConfigParams()) {
+            XStream xstream = new XStream();
+            xstream.addPermission(AnyTypePermission.ANY);
+            xstream.addPermission(NullPermission.NULL);   // allow "null"
+            xstream.addPermission(PrimitiveTypePermission.PRIMITIVES);
+            String text = null;
+
+            try {
+                text = new String(Files.readAllBytes(Paths.get("config.xml")));
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+
+            return (ConfigParams) xstream.fromXML(text);
+
+        } else {
+            Utils.showErrorAlert("Problem with the configuration file!");
+            System.exit(1);
+        }
+
+        return null;
+    }
+
+    /**
+     * Validates the config.xml file against the config.xsd XML schema file
+     */
+    private static boolean validConfigParams()
+    {
+        Document document;
+        try
+        {
+            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            document = documentBuilder.parse("config.xml");
+            Schema schema = schemaFactory.newSchema(new StreamSource("config.xsd"));
+            schema.newValidator().validate(new DOMSource(document));
+        }
+        catch (Exception e) {
+            if (e instanceof SAXException)
+                System.err.println("Validation Error: " + e.getMessage());
+            else
+                System.err.println(e.getMessage());
+
+            return false;
+        }
+        return true;
     }
 
     public static ConfigParams getLocalConfig() {

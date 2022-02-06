@@ -87,59 +87,6 @@ public class Utils {
     public static final String REVIEW_SNAPSHOT = "/fxml/ReviewSnapshotPage.fxml";
     public static final String USER_SNAPSHOT = "/fxml/UserSnapshot.fxml";
 
-    /**
-     * Exploits Xstream to easily read from the config.xml and load a ConfigParams instance
-     * @return a ConfigParams object
-     */
-    public static ConfigParams getParams() {
-        if (validConfigParams()) {
-            XStream xstream = new XStream();
-            xstream.addPermission(AnyTypePermission.ANY);
-            xstream.addPermission(NullPermission.NULL);   // allow "null"
-            xstream.addPermission(PrimitiveTypePermission.PRIMITIVES);
-            String text = null;
-
-            try {
-                text = new String(Files.readAllBytes(Paths.get("config.xml")));
-            } catch (Exception e) {
-                System.err.println(e.getMessage());
-            }
-
-            return (ConfigParams) xstream.fromXML(text);
-
-        } else {
-            Utils.showErrorAlert("Problem with the configuration file!");
-            System.exit(1);
-        }
-
-        return null;
-    }
-
-    /**
-     * Validates the config.xml file against the config.xsd XML schema file
-     */
-    private static boolean validConfigParams()
-    {
-        Document document;
-        try
-        {
-            DocumentBuilder documentBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-            SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            document = documentBuilder.parse("config.xml");
-            Schema schema = schemaFactory.newSchema(new StreamSource("config.xsd"));
-            schema.newValidator().validate(new DOMSource(document));
-        }
-        catch (Exception e) {
-            if (e instanceof SAXException)
-                System.err.println("Validation Error: " + e.getMessage());
-            else
-                System.err.println(e.getMessage());
-
-            return false;
-        }
-        return true;
-    }
-
     public static boolean isPasswordSecure(String password){
         Pattern pattern = Pattern.compile("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$");
         Matcher matcher = pattern.matcher(password);

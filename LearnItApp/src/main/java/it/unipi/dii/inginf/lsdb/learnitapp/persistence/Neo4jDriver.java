@@ -34,7 +34,7 @@ public class Neo4jDriver implements DBDriver {
     {
         if (instance == null)
         {
-            instance = new Neo4jDriver(Utils.getParams());
+            instance = new Neo4jDriver(ConfigParams.getInstance());
             instance.initConnection();
         }
         return instance;
