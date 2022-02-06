@@ -64,7 +64,7 @@ public class ProfilePageController {
     public void initialize() {
         neo4jDriver = Neo4jDriver.getInstance();
         mongoDriver = MongoDBDriver.getInstance();
-        limit = ConfigParams.getLocalConfig().getLimitNumber();
+        limit = ConfigParams.getInstance().getLimitNumber();
         learnItLabel.setOnMouseClicked(clickEvent -> Utils.changeScene(Utils.DISCOVERY_PAGE, clickEvent));
         learnItLabel.setCursor(Cursor.HAND);
     }
@@ -206,7 +206,8 @@ public class ProfilePageController {
             profileContentBorderPane.setRight(passwordVBox);
             BorderPane.setAlignment(passwordVBox, Pos.CENTER);
             return;
-        } else if(loggedUser.getRole() == 1 && !isProfileMine){ //gestire eliminazione utente da parte di admin
+        } else if(loggedUser.getRole() == 1 && !isProfileMine && profileUser.getRole() == 0){
+            //the admin can delete other users profile, but only if they are not admins
             ImageView trashBin = new ImageView(new Image(
                     String.valueOf(ProfilePageController.class.getResource(Utils.TRASH_BIN))));
             trashBin.setPreserveRatio(true);
@@ -221,9 +222,10 @@ public class ProfilePageController {
             followButton.setText("Edit Profile");
             followButton.setOnMouseClicked(clickEvent -> Utils.changeScene(PERSONAL_PAGE, clickEvent));
             followButton.setCursor(Cursor.HAND);
+        } else {
+            followButton.setDisable(false);
+            followButton.setOnMouseClicked(clickEvent -> followHandler(clickEvent));
         }
-        //else{ // another profile
-        //}
 
         loadProfileInformation();
         loadStatistics();
@@ -292,6 +294,7 @@ public class ProfilePageController {
             // Follow operation
             neo4jDriver.followUser(loggedUser, profileUser);
             followButton.setText("Unfollow");
+            System.out.println("qui");
             followerNumberLabel.setText(Integer.toString((Integer.parseInt(followerNumberLabel.getText())+1)));
         }
     }
