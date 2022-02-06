@@ -100,10 +100,10 @@ public class CoursePageController {
      * and edit course information
      * Other logged user will see some reviews and their review (if they already have written one), with the possibility
      * of deleting their review (once it has been written), load more reviews from other users and like/unlike the course.
-     * @param snapCourse the snapshot of the course to be fully loaded
+     * @param c the course to be fully loaded
      */
-    public void setCourse(Course snapCourse){
-        this.course = mongoDBDriver.getCourseByTitle(snapCourse.getTitle());
+    public void setCourse(Course c){
+        this.course = c;
 
         moreReviewsImageView.setOnMouseClicked(clickEvent -> loadMore());
         moreReviewsImageView.setCursor(Cursor.HAND);

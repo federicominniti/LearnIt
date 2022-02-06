@@ -80,7 +80,7 @@ public class ElementsLineController {
                 headerLabel.setText("Liked courses");
                 break;
             case Utils.REVIEWED_COURSES:
-                headerLabel.setText("Reviewed courses");
+                headerLabel.setText("History of completed courses");
                 break;
             case Utils.OFFERED_COURSES:
                 headerLabel.setText("Offered courses");

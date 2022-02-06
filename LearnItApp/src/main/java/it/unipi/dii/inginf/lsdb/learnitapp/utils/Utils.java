@@ -123,7 +123,7 @@ public class Utils {
     public static void showInfoAlert (String text) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(text);
-        alert.setHeaderText("Confirm Message");
+        alert.setHeaderText("Message for the user:");
         alert.setTitle("Information");
         ImageView imageView = new ImageView(
                 new Image(String.valueOf(Utils.class.getResource("/img/success.png"))));

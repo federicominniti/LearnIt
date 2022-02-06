@@ -1,6 +1,7 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.controller;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
+import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
@@ -63,8 +64,13 @@ public class CourseSnapshotController {
      * Redirects to the course page
      */
     private void showCompleteCourseInfo(MouseEvent mouseEvent){
-        CoursePageController coursePageController =
-                (CoursePageController) Utils.changeScene(Utils.COURSE_PAGE, mouseEvent);
-        coursePageController.setCourse(course);
+        Course fullCourse = MongoDBDriver.getInstance().getCourseByTitle(course.getTitle());
+        if (fullCourse == null) {
+            Utils.showInfoAlert("Sorry, this course doesn't exist anymore");
+        } else {
+            CoursePageController coursePageController =
+                    (CoursePageController) Utils.changeScene(Utils.COURSE_PAGE, mouseEvent);
+            coursePageController.setCourse(fullCourse);
+        }
     }
 }
