@@ -94,7 +94,8 @@ public class ElementsLineController {
         }
 
         loadData();
-        if(listType != Utils.BEST_RATING && listType != Utils.TRENDING_COURSE && listType != Utils.MOST_LIKED_COURSES){
+        if(listType != Utils.BEST_RATING && listType != Utils.TRENDING_COURSE && listType != Utils.MOST_LIKED_COURSES
+          && listType != Utils.BEST_USERS && listType != Utils.MOST_ACTIVE_USERS && listType != Utils.MOST_FOLLOWED_USERS){
             buttonImage.setImage(new Image(
                     String.valueOf(ElementsLineController.class.getResource(Utils.READ_MORE))));
             buttonImage.setPreserveRatio(true);
@@ -134,6 +135,11 @@ public class ElementsLineController {
                 if (moreUsers != null)
                     Utils.addUsersSnapshot(itemsHBox, moreUsers);
                 break;
+            case Utils.BEST_USERS:
+                moreUsers = mongoDBDriver.bestUsers(limit);
+                if (moreUsers != null)
+                    Utils.addUsersSnapshot(itemsHBox, moreUsers);
+                break;
         }
         loadMore();
     }
@@ -158,11 +164,6 @@ public class ElementsLineController {
                 moreCourses = neo4jDriver.findSuggestedCoursesByCompletedCourses(myUser, skip, limit);
                 if (moreCourses != null)
                     Utils.addCoursesSnapshot(itemsHBox, moreCourses);
-                break;
-            case Utils.BEST_USERS:
-                moreUsers = mongoDBDriver.bestUsers(limit);
-                if (moreUsers != null)
-                    Utils.addUsersSnapshot(itemsHBox, moreUsers);
                 break;
             case Utils.USER_SUGGESTIONS:
                 int numCommonCourses = configParams.getNumCommonCourses();
