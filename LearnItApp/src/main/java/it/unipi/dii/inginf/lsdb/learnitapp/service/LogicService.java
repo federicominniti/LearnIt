@@ -23,10 +23,10 @@ public class LogicService {
      * to be restored
      */
     public static boolean updateCourse(Course newCourse, Course oldCourse){
-        if (mongoDBDriver.updateCourse(newCourse, oldCourse)) {
+        if (mongoDBDriver.updateCourse(newCourse, oldCourse, null)) {
             if (!neo4jDriver.updateCourse(newCourse)) {
                 try {
-                    return mongoDBDriver.updateCourse(oldCourse, oldCourse);
+                    return mongoDBDriver.updateCourse(oldCourse, oldCourse, null);
                 } catch (MongoException e) {
                     mongoLogger.error(e.getMessage());
                     mongoLogger.error("UPDATE COURSE: ROLLBACK FAILED");
@@ -72,14 +72,21 @@ public class LogicService {
      * and the review
      */
     public static boolean addReview(Review newReview, Course course){
+        boolean ret;
         try {
-            mongoDBDriver.addReview(course, newReview);
+            //if review is added to course and course snapshot is added to user -> everything ok
+            ret = mongoDBDriver.addReview(course, newReview, false);
         } catch (MongoException e) {
             return false;
         }
 
+        //if ret is false -> something has gone wrong above
+        if (!ret)
+            return false;
+
         if (!neo4jDriver.addReview(course, newReview.getUsername())) {
             try {
+                //try to rollback on mongodb, we need to delete both review and course snapshot
                 mongoDBDriver.deleteReview(course, newReview, true);
                 return false;
             } catch (MongoException e) {
@@ -101,16 +108,22 @@ public class LogicService {
      * and the review
      */
     public static boolean deleteReview(Review review, Course course){
+        boolean ret;
         try {
-            mongoDBDriver.deleteReview(course, review, false);
+            //we need to delete both the review and the course snapshot from the user
+            ret = mongoDBDriver.deleteReview(course, review, false);
         } catch (MongoException e) {
             return false;
         }
 
+        //if ret is false -> something has gone wrong above
+        if (!ret)
+            return false;
+
         if (!neo4jDriver.deleteReview(course, review.getUsername())) {
             try {
                 System.out.println("qui");
-                mongoDBDriver.addReview(course, review);
+                mongoDBDriver.addReview(course, review, true);
                 return false;
             } catch (MongoException e) {
                 mongoLogger.error(e.getMessage());
