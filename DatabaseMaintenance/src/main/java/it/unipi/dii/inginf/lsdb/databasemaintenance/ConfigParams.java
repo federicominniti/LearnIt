@@ -32,6 +32,16 @@ public class ConfigParams {
     private String mongoDBUsername;
     private String mongoDBPassword;
     private String mongoDBName;
+    private String mongoDBCollectionCourses;
+
+    public String getMongoDBCollectionCourses() {
+        return mongoDBCollectionCourses;
+    }
+
+    public void setMongoDBCollectionCourses(String mongoDBCollectionCourses) {
+        this.mongoDBCollectionCourses = mongoDBCollectionCourses;
+    }
+
     private int maxReviews;
     private int maxReviewsAfterDiscard;
 

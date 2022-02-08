@@ -9,6 +9,7 @@
     <mongoDBUsername>root</mongoDBUsername>
     <mongoDBPassword></mongoDBPassword>
     <mongoDBName>learnitmongo</mongoDBName>
-    <maxReviews>1000</maxReviews>
-    <maxReviewsAfterDiscard>50</maxReviewsAfterDiscard>
+    <mongoDBCollectionCourses>learnit_edited</mongoDBCollectionCourses>
+    <maxReviews>10</maxReviews>
+    <maxReviewsAfterDiscard>5</maxReviewsAfterDiscard>
 </it.unipi.dii.inginf.lsdb.databasemaintenance.ConfigParams>

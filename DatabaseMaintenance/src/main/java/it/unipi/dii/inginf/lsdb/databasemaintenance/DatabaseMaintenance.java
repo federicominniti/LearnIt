@@ -54,6 +54,27 @@ public class DatabaseMaintenance {
                 toDelete.add(r);
         }
 
+        if (reviews.size() - toDelete.size() < params.getMaxReviewsAfterDiscard()) {
+            return deleteOldReviews(c);
+        }
+
+        for (Review r: toDelete)
+            reviews.remove(r);
+
+        c.setReviews(reviews);
+        return c;
+    }
+
+    public static Course deleteOldReviews(Course c) {
+        List<Review> reviews = c.getReviews();
+        reviews.sort(Review::compareTo);
+        List<Review> toDelete = new ArrayList<>();
+        for (int i = 0; i < reviews.size(); i++) {
+            if (i > params.getMaxReviewsAfterDiscard())
+                break;
+            toDelete.add(reviews.get(i));
+        }
+
         for (Review r: toDelete)
             reviews.remove(r);
 

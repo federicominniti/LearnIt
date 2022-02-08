@@ -16,7 +16,7 @@ public class Course {
     @BsonProperty(value = "description")
     private String description;
     @BsonProperty(value = "instructor")
-    private User instructor;
+    private String  instructor;
     @BsonProperty(value = "language")
     private String language;
     @BsonProperty(value = "category")
@@ -40,6 +40,14 @@ public class Course {
     @BsonProperty(value = "course_pic")
     private String coursePic;
 
+    public ObjectId getId() {
+        return id;
+    }
+
+    public void setId(ObjectId id) {
+        this.id = id;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -54,14 +62,6 @@ public class Course {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public User getInstructor() {
-        return instructor;
-    }
-
-    public void setInstructor(User instructor) {
-        this.instructor = instructor;
     }
 
     public String getLanguage() {
@@ -120,12 +120,12 @@ public class Course {
         this.modality = modality;
     }
 
-    public String getCoursePic() {
-        return coursePic;
+    public List<Review> getReviews() {
+        return reviews;
     }
 
-    public void setCoursePic(String coursePic) {
-        this.coursePic = coursePic;
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 
     public int getNum_reviews() {
@@ -144,20 +144,12 @@ public class Course {
         this.sum_ratings = sum_ratings;
     }
 
-    public ObjectId getId() {
-        return id;
+    public String getCoursePic() {
+        return coursePic;
     }
 
-    public void setId(ObjectId id) {
-        this.id = id;
-    }
-
-    public List<Review> getReviews() {
-        return reviews;
-    }
-
-    public void setReviews(List<Review> reviews) {
-        this.reviews = reviews;
+    public void setCoursePic(String coursePic) {
+        this.coursePic = coursePic;
     }
 
     public Course() {

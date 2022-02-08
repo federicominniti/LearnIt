@@ -12,6 +12,7 @@
                 <xs:element name="mongoDBUsername" type="xs:string"/>
                 <xs:element name="mongoDBPassword" type="xs:string"/>
                 <xs:element name="mongoDBName" type="xs:string"/>
+                <xs:element name="mongoDBCollectionCourses" type="xs:string"/>
                 <xs:element name="maxReviews" type="xs:int"/>
                 <xs:element name="maxReviewsAfterDiscard" type="xs:int"/>
             </xs:sequence>

@@ -4,7 +4,7 @@ import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import java.util.Date;
 
-public class Review {
+public class Review implements Comparable<Review> {
     @BsonProperty(value = "title")
     private String title;
     @BsonProperty(value = "content")
@@ -58,5 +58,10 @@ public class Review {
 
     public void setRating(int rating) {
         this.rating = rating;
+    }
+
+    @Override
+    public int compareTo(Review o) {
+        return o.getTimestamp().compareTo(getTimestamp());
     }
 }

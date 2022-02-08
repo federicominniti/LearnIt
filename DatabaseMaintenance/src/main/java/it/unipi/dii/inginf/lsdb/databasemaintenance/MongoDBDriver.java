@@ -1,107 +1,116 @@
 package it.unipi.dii.inginf.lsdb.databasemaintenance;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.ConnectionString;
-import com.mongodb.DBObject;
-import com.mongodb.MongoClientSettings;
+import com.mongodb.*;
 import com.mongodb.client.*;
-import com.mongodb.client.model.Aggregates;
-import com.mongodb.client.model.Filters;
-import com.mongodb.client.model.Updates;
-import org.bson.BsonDocument;
-import org.bson.BsonValue;
+import com.mongodb.client.model.*;
 import org.bson.Document;
-import org.bson.codecs.BsonArrayCodec;
-import org.bson.codecs.DecoderContext;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
-import org.bson.json.JsonReader;
 import org.bson.types.ObjectId;
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static com.mongodb.client.model.Aggregates.limit;
-import static com.mongodb.client.model.Aggregates.skip;
-import static com.mongodb.client.model.Filters.eq;
-import static java.util.Arrays.asList;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 
 public class MongoDBDriver {
     private static MongoDBDriver mongoDBInstance;
 
-    private MongoClient mongoClient;
-    private MongoDatabase database;
-    private MongoCollection<Course> collection;
-    private String mongoDBPrimaryIP;
-    private int mongoDBPrimaryPort;
-    private String mongoDBSecondIP;
-    private int mongoDBSecondPort;
-    private String mongoDBThirdIP;
-    private int mongoDBThirdPort;
+    private static MongoClient mongoClient;
+    private static MongoDatabase database;
+    private static MongoCollection<Course> coursesCollection;
+    private static String mongoDBPrimaryIP;
+    private static int mongoDBPrimaryPort;
+    private static String mongoDBSecondIP;
+    private static int mongoDBSecondPort;
+    private static String mongoDBThirdIP;
+    private static int mongoDBThirdPort;
+    private static String mongoDBCollectionCourses;
 
-    private String mongoDBusername;
-    private String mongoDBpassword;
-    private String mongoDBName;
-    private CodecRegistry pojoCodecRegistry;
-    private CodecRegistry codecRegistry;
+    private static String mongoDBUsername;
+    private static String mongoDBPassword;
+    private static String mongoDBName;
+    private static CodecRegistry pojoCodecRegistry;
+    private static CodecRegistry codecRegistry;
+    private static String uriString;
+    private static boolean runningDefault;
 
     public static MongoDBDriver getInstance() {
         if (mongoDBInstance == null) {
-            mongoDBInstance = new MongoDBDriver(ConfigParams.getLocalConfig());
+            try {
+                //mongoDBInstance = new MongoDBDriver(ConfigParams.getInstance());
+                runningDefault = false;
+                throw new Exception();
+            } catch (Exception e) {
+                mongoDBInstance = new MongoDBDriver();
+                uriString = "mongodb://127.0.0.1:27017/";
+                mongoDBName = "db";
+                mongoDBUsername = "root";
+                mongoDBPassword = "";
+                runningDefault = true;
+                mongoDBCollectionCourses = "learnit_edited";
+            }
+
             mongoDBInstance.initConnection();
         }
 
         return mongoDBInstance;
     }
 
+    private MongoDBDriver() {
+
+    }
+
     private MongoDBDriver(ConfigParams configParams) {
-        this.mongoDBPrimaryIP = configParams.getMongoDBPrimaryIP();
-        this.mongoDBPrimaryPort = configParams.getMongoDBPrimaryPort();
-        this.mongoDBSecondIP = configParams.getMongoDBSecondIP();
-        this.mongoDBSecondPort = configParams.getMongoDBSecondPort();
-        this.mongoDBThirdIP = configParams.getMongoDBThirdIP();
-        this.mongoDBThirdPort = configParams.getMongoDBThirdPort();
-        this.mongoDBusername = configParams.getMongoDBUsername();
-        this.mongoDBpassword = configParams.getMongoDBPassword();
-        this.mongoDBName = configParams.getMongoDBName();
+        mongoDBPrimaryIP = configParams.getMongoDBPrimaryIP();
+        mongoDBPrimaryPort = configParams.getMongoDBPrimaryPort();
+        mongoDBSecondIP = configParams.getMongoDBSecondIP();
+        mongoDBSecondPort = configParams.getMongoDBSecondPort();
+        mongoDBThirdIP = configParams.getMongoDBThirdIP();
+        mongoDBThirdPort = configParams.getMongoDBThirdPort();
+        mongoDBUsername = configParams.getMongoDBUsername();
+        mongoDBPassword = configParams.getMongoDBPassword();
+        mongoDBName = configParams.getMongoDBName();
+        mongoDBCollectionCourses = configParams.getMongoDBCollectionCourses();
     }
 
     public boolean initConnection() {
         try {
-            String uriString = "mongodb://";
-            if (!mongoDBusername.equals("")) {
-                uriString += mongoDBusername + ":" + mongoDBpassword + "@";
+            if (!runningDefault) {
+                uriString = "mongodb://";
+                if (!mongoDBUsername.equals("")) {
+                    uriString += mongoDBUsername + ":" + mongoDBPassword + "@";
+                }
+                uriString += mongoDBPrimaryIP + ":" +
+                        mongoDBPrimaryPort + "," +
+                        mongoDBSecondIP + ":" +
+                        mongoDBSecondPort + "," +
+                        mongoDBThirdIP + ":" +
+                        mongoDBThirdPort;
             }
-            //uriString += primaryIP + ":" + primaryPort + "," + secondIP + ":" + secondPort + "," + thirdIP + ":" + thirdPort;
+
             pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
             codecRegistry = CodecRegistries.fromRegistries(
                     MongoClientSettings.getDefaultCodecRegistry(),
-                    CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build())
-            );
+                    CodecRegistries.fromProviders(PojoCodecProvider.builder().automatic(true).build()));
 
-            ConnectionString uri = new ConnectionString("mongodb://127.0.0.1:27017/");
+            ConnectionString uri = new ConnectionString(uriString);
             MongoClientSettings settings = MongoClientSettings.builder()
                     .applyConnectionString(uri)
-                    //.readPreference(ReadPreference.secondaryPreferred())
+                    .readPreference(ReadPreference.nearest())
                     .retryWrites(true)
-                    //.writeConcern(WriteConcern.W2)
+                    .writeConcern(WriteConcern.W1)
                     .codecRegistry(codecRegistry)
                     .build();
 
             mongoClient = MongoClients.create(settings);
 
-            //database = mongoClient.getDatabase(dbName);
-            database = mongoClient.getDatabase("db");
-
+            database = mongoClient.getDatabase(mongoDBName);
             DBObject ping = new BasicDBObject("ping","1");
 
-            collection = database.getCollection("learnitprova", Course.class);
+            coursesCollection = database.getCollection(mongoDBCollectionCourses, Course.class);
             database.runCommand((Bson) ping);
         } catch (Exception e) {
-            System.err.println("MongoDB unavailable");
+            e.printStackTrace();
             return false;
         }
 
@@ -117,12 +126,12 @@ public class MongoDBDriver {
     public boolean updateReviews(ObjectId id, List<Review> reviews) {
         Bson update = new Document("reviews", reviews);
         Bson updateOperation = new Document("$set", update);
-        return collection.updateOne(new Document("_id", id), updateOperation).wasAcknowledged();
+        return coursesCollection.updateOne(new Document("_id", id), updateOperation).wasAcknowledged();
     }
 
     public MongoCursor<Course> fetchBigDocuments(int maxReviews) {
         Bson filter = Filters.and(Filters.exists("reviews"), Filters.where("this.reviews.length > " + maxReviews));
-        MongoCursor<Course> bigCourses = collection.find(filter).cursor();
+        MongoCursor<Course> bigCourses = coursesCollection.find(filter).cursor();
         return bigCourses;
     }
 
