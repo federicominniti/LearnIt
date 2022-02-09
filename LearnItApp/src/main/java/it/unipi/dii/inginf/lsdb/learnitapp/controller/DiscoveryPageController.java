@@ -229,11 +229,15 @@ public class DiscoveryPageController {
         if((searchType.getSelectedToggle() == null && title.equals("") && level.equals("") && language.equals("") &&
                 duration == -1 && price == -1) || (selected.getText().equals("Courses") && title.equals("") && level.equals("") && language.equals("") &&
                 duration == -1 && price == -1)) {
+            if (loggedUser.getRole() == 1)
+                return;
 
             coursesSuggestions();
             allContentAnchorPane.getChildren().add(discoveryPageLabel);
             allContentAnchorPane.getChildren().add(suggestionsSwitchButton);
         }else if((selected.getText().equals("Users") && searchTextField.getText().equals(""))){
+            if (loggedUser.getRole() == 1)
+                return;
             usersSuggestions();
             allContentAnchorPane.getChildren().add(discoveryPageLabel);
             allContentAnchorPane.getChildren().add(suggestionsSwitchButton);
