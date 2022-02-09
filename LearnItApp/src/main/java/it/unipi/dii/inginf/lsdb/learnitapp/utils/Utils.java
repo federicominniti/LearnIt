@@ -161,12 +161,6 @@ public class Utils {
     }
 
     private static Pane loadElementsLine(Course course, User user, int type) {
-        //coursesUsersLine
-        // 0 -> courses
-        // 1 -> users
-        //buttonLoadMore
-        // 0 -> no button
-        // 1 -> yes button
         Pane pane = null;
         try {
             FXMLLoader loader = new FXMLLoader(Utils.class.getResource("/fxml/ElementsLine.fxml"));

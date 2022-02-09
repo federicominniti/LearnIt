@@ -17,7 +17,6 @@ import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.regex.Pattern;
@@ -925,9 +924,5 @@ public class MongoDBDriver implements DBDriver {
             return new ArrayList<>();
 
         return res.getReviewedCourses();
-    }
-
-    public void addReviewRollback(Course course, Review review, String username) {
-
     }
 }

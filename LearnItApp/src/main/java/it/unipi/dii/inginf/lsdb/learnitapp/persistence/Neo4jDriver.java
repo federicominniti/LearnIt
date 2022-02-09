@@ -3,7 +3,6 @@ package it.unipi.dii.inginf.lsdb.learnitapp.persistence;
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
 import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
-import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.*;
 
