@@ -7,7 +7,6 @@ public class Session {
     public static Session getLocalSession()
     {
         if(localSession == null) {
-            System.out.println("qui");
             localSession = new Session();
         }
         return localSession;
