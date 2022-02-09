@@ -54,7 +54,8 @@ public class MongoDBDriver implements DBDriver {
         if (mongoDBInstance == null) {
             try {
                 mongoDBInstance = new MongoDBDriver(ConfigParams.getInstance());
-                runningDefault = false;
+                runningDefault = true;
+                throw new Exception();
             } catch (Exception e) {
                 mongoDBInstance = new MongoDBDriver();
                 uriString = "mongodb://127.0.0.1:27017/";

@@ -6,7 +6,7 @@
     <mongoDBSecondPort>27020</mongoDBSecondPort>
     <mongoDBThirdIP>172.16.4.75</mongoDBThirdIP>
     <mongoDBThirdPort>27020</mongoDBThirdPort>
-    <mongoDBUsername></mongoDBUsername>
+    <mongoDBUsername>root</mongoDBUsername>
     <mongoDBPassword></mongoDBPassword>
     <mongoDBName>db</mongoDBName>
     <mongoDBCollectionCourses>courses</mongoDBCollectionCourses>
