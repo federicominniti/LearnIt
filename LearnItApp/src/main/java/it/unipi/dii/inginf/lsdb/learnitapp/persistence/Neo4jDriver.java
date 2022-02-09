@@ -166,6 +166,9 @@ public class Neo4jDriver implements DBDriver {
         return false;
     }
 
+    /**
+     * Suggests the user some courses having the same instructor of other courses they already have reviewed
+     */
     public List<Course> findSuggestedCoursesByCompletedCourses(User user, int skip, int limit){
         List<Course> courses = new ArrayList<>();
 
@@ -284,6 +287,16 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
+    /**
+     *
+     * @param user
+     * @param skipFirstLvl
+     * @param limitFirstLvl
+     * @param skipSecondLvl
+     * @param limitSecondLvl
+     * @param numRelationships
+     * @return
+     */
     public List<Course> findSuggestedCourses(User user, int skipFirstLvl, int limitFirstLvl, int skipSecondLvl,
                                              int limitSecondLvl, int numRelationships) {
         List<Course> suggested = new ArrayList<>();
@@ -406,7 +419,9 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //Find courses liked or completed by a specific user
+    /**
+     * Finds all courses liked by a user
+     */
     public List<Course> findCoursesLikedByUser(User user, int skip, int limit) {
         try (Session session = neo4jDriver.session())
         {
@@ -441,59 +456,9 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    //Find suggested users that have participated to the same courses of you
-    public List<User> findSuggestedUsers(User loggedUser, int skip, int limit) {
-        try (Session session = neo4jDriver.session())
-        {
-            List<User> resultUsers = session.readTransaction(tx -> {
-                List<User> users = new ArrayList<>();
-                Result result = tx.run("MATCH (u:User{username: $username})-[:REVIEW]->(c)<-[:REVIEW]-(suggested) " +
-                                "WHERE u<>suggested " +
-                                "RETURN suggested.username as username, suggested.pic as pic, suggested.gender as gender " +
-                                "SKIP $skip LIMIT $limit",
-                        parameters( "username", loggedUser.getUsername(), "skip", skip, "limit", limit));
-                while(result.hasNext()){
-                    Record rec = result.next();
-                    String pic = null;
-                    String gender = null;
-                    if (rec.get("gender") != NULL)
-                        gender = rec.get("gender").asString();
-                    if (rec.get("pic") != NULL)
-                        pic = rec.get("pic").asString();
-                    User u = new User(rec.get("username").asString(), pic, gender);
-                    users.add(u);
-                }
-                return users;
-            });
-            return resultUsers;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
-    public boolean offerCourse(User user, Course course) {
-        try (Session session = neo4jDriver.session()) {
-            session.writeTransaction((TransactionWork<Void>) tx -> {
-                tx.run( "MATCH (u:User {username: $username}) " +
-                                "CREATE (c:Course {title: $title, duration: $duration, price: $price})<-[:OFFER]-(u)",
-                        parameters("title", course.getTitle(),
-                                "duration", course.getDuration(),
-                                "price", course.getPrice(), "username", user.getUsername()));
-                return null;
-            });
-            return true;
-        }
-        catch (Exception ex) {
-            System.err.println("Error in adding a new course in Neo4J");
-            return false;
-        }
-    }
-
-
+    /**
+     * Checks if a user is followed by another user
+     */
     public boolean isUserFollowedByUser(String followed, String follower){
         try (Session session = neo4jDriver.session())
         {
@@ -512,6 +477,9 @@ public class Neo4jDriver implements DBDriver {
         return false;
     }
 
+    /**
+     * Finds all the users following a certain user
+     */
     public List<User> findFollowerUsers(User followedUser, int toSkip, int limit){
         List<User> users = new ArrayList<>();
         try (Session session = neo4jDriver.session())
@@ -546,6 +514,9 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
+    /**
+     * Checks if a course is liked by a user
+     */
     public boolean isCourseLikedByUser(Course course, User user) {
         try (Session session = neo4jDriver.session()) {
             boolean res = session.readTransaction(tx -> {
@@ -564,6 +535,9 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
+    /**
+     * Checks if the user has already written a review for a certain course
+     */
     public boolean isCourseReviewedByUser(Course course, User user) {
         try (Session session = neo4jDriver.session()) {
             boolean res = session.readTransaction(tx -> {
@@ -582,6 +556,9 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
+    /**
+     * Finds all users followed by a certain user
+     */
     public List<User> findFollowedUsers(User followedUser, int toSkip, int limit){
         List<User> users = new ArrayList<>();
         try (Session session = neo4jDriver.session())
@@ -616,6 +593,9 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
+    /**
+     * Finds the number of following and follower users for a certain user in a single query
+     */
     public List<Integer> getFollowStats(User u) {
         List<Integer> followStats = new ArrayList<>();
         try (Session session = neo4jDriver.session()) {
@@ -644,7 +624,6 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    // nuova, ricontrollare
     public List<Course> findMostLikedCourses(int limit){
         List<Course> courses = new ArrayList<>();
         try (Session session = neo4jDriver.session()) {
@@ -686,7 +665,6 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
-    // nuova, ricontrollare
     public List<User> findMostFollowedUsers(int limit){
         List<User> users = new ArrayList<>();
         try (Session session = neo4jDriver.session()) {
@@ -723,6 +701,9 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
+    /**
+     * Returns the number of likes received by a course
+     */
     public int getCourseLikes(Course course) {
         try (Session session = neo4jDriver.session()) {
             int res = session.readTransaction(tx -> {
@@ -745,20 +726,4 @@ public class Neo4jDriver implements DBDriver {
             return 0;
         }
     }
-
-    /*
-
-    QUERY DA AGGIUNGERE
-
-        Most liked courses
-
-        Most followed users
-
-        Suggested users
-
-        Suggested courses
-
-        Find suggested courses considering instructors of the others courses you  have completed
-     */
-
 }

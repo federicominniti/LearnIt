@@ -1,6 +1,8 @@
 package it.unipi.dii.inginf.lsdb.learnitapp.app;
 
 import it.unipi.dii.inginf.lsdb.learnitapp.config.ConfigParams;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.Course;
+import it.unipi.dii.inginf.lsdb.learnitapp.model.User;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.MongoDBDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.persistence.Neo4jDriver;
 import it.unipi.dii.inginf.lsdb.learnitapp.utils.Utils;
