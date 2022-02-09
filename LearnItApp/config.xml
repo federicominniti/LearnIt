@@ -6,12 +6,12 @@
     <mongoDBSecondPort>27020</mongoDBSecondPort>
     <mongoDBThirdIP>172.16.4.75</mongoDBThirdIP>
     <mongoDBThirdPort>27020</mongoDBThirdPort>
-    <mongoDBUsername>root</mongoDBUsername>
+    <mongoDBUsername></mongoDBUsername>
     <mongoDBPassword></mongoDBPassword>
     <mongoDBName>db</mongoDBName>
     <mongoDBCollectionCourses>courses</mongoDBCollectionCourses>
     <mongoDBCollectionUsers>users</mongoDBCollectionUsers>
-    <neo4jIP>127.0.0.1</neo4jIP>
+    <neo4jIP>172.16.4.75</neo4jIP>
     <neo4jPort>7687</neo4jPort>
     <neo4jUsername>neo4j</neo4jUsername>
     <neo4jPassword>password</neo4jPassword>
