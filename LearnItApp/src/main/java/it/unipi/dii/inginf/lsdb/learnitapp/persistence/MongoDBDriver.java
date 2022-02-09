@@ -63,8 +63,8 @@ public class MongoDBDriver implements DBDriver {
                 mongoDBUsername = "root";
                 mongoDBPassword = "";
                 runningDefault = true;
-                mongoDBCollectionCourses = "learnit_edited";
-                mongoDBCollectionUsers = "users_new";
+                mongoDBCollectionCourses = "courses";
+                mongoDBCollectionUsers = "users";
             }
 
             mongoDBInstance.initConnection();
