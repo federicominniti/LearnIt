@@ -85,8 +85,14 @@ public class ProfilePageController {
         followingNumberLabel.setText(neo4jDriver.getFollowStats(profileUser).get(1).toString());
 
         if(profileUser.getProfilePic() != null){
-            Image profilePicture = new Image(profileUser.getProfilePic());
-            propicImageView.setImage(profilePicture);
+            Image profilePic;
+            try {
+                //profilePic = new Image(profileUser.getProfilePic());
+                throw new IllegalArgumentException();
+            } catch (IllegalArgumentException e) {
+                profilePic =  new Image(String.valueOf(CoursePageController.class.getResource("/img/userDefault.png")));
+            }
+            propicImageView.setImage(profilePic);
         }
 
         if(neo4jDriver.isUserFollowedByUser(usernameLabel.getText(), loggedUser.getUsername()))

@@ -430,13 +430,14 @@ public class CoursePageController {
         likesLabel.setText("Like: " + likes);
 
         if(course.getCoursePic() != null){
-            /*Image coursePicture;
+            Image coursePicture;
             try {
-                coursePicture = new Image(course.getCoursePic());
+                //coursePicture = new Image(course.getCoursePic());
+                throw new IllegalArgumentException();
             } catch (IllegalArgumentException e) {
                 coursePicture =  new Image(String.valueOf(CoursePageController.class.getResource("/img/courseDefaultImage.png")));
             }
-            courseImageImageView.setImage(coursePicture);*/
+            courseImageImageView.setImage(coursePicture);
             courseImageTextField.setText(course.getCoursePic());
         }
         courseImageTextField.setPromptText("Unknown");
