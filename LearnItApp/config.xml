@@ -9,7 +9,7 @@
     <mongoDBUsername>root</mongoDBUsername>
     <mongoDBPassword></mongoDBPassword>
     <mongoDBName>db</mongoDBName>
-    <mongoDBCollectionCourses>learnit</mongoDBCollectionCourses>
+    <mongoDBCollectionCourses>courses</mongoDBCollectionCourses>
     <mongoDBCollectionUsers>users</mongoDBCollectionUsers>
     <neo4jIP>127.0.0.1</neo4jIP>
     <neo4jPort>7687</neo4jPort>
