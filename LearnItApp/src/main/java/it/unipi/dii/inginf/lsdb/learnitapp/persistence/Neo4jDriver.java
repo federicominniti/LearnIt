@@ -288,14 +288,11 @@ public class Neo4jDriver implements DBDriver {
     }
 
     /**
-     *
-     * @param user
-     * @param skipFirstLvl
-     * @param limitFirstLvl
-     * @param skipSecondLvl
-     * @param limitSecondLvl
-     * @param numRelationships
-     * @return
+     * This query recommends courses to a specified user based on two levels of suggestion: the first levels suggests
+     * courses liked by most users followed by the users, while the second level finds the courses liked by the users
+     * (having at least "numRelationships" liked courses in common with this user) followed by users already followed
+     * by this user. Second level suggested courses are returned only if they are not already reviewed or liked by this user
+     * and are ordered by decreasing duration and ascending price.
      */
     public List<Course> findSuggestedCourses(User user, int skipFirstLvl, int limitFirstLvl, int skipSecondLvl,
                                              int limitSecondLvl, int numRelationships) {
@@ -351,6 +348,13 @@ public class Neo4jDriver implements DBDriver {
         }
     }
 
+    /**
+     * This query recommends users to a specified user based on two levels of suggestion: the first level suggests
+     * not followed users who are followed by at least "followedThreshold" users followed by the specified user,
+     * ordered by total number of followers in common between the users, while the second level recommends those users
+     * (not followed by the user) who like at least "numCommonCourses" courses also liked by the specified user,
+     * ordered by the total number of liked courses in common between the users.
+     */
     public List<User> findSuggestedUsers(User user, int followedThreshold, int skipFirstLvl, int limitFirstLvl,
                                          int skipSecondLvl, int limitSecondLvl, int numCommonCourses) {
         List<User> suggested = new ArrayList<>();

@@ -86,6 +86,7 @@ public class DiscoveryPageController {
 
         createNewCourseButton.setCursor(Cursor.HAND);
         if (loggedUser.getRole() == 1) {
+            createNewCourseButton.setPrefSize(160, 33);
             createNewCourseButton.setText("Create new admin");
             createNewCourseButton.setStyle("-fx-background-color: lightpink;" +
                     "-fx-background-radius: 13px;" + "-fx-text-fill: red");
