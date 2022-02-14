@@ -38,7 +38,7 @@ public class MongoDBDriver {
         if (mongoDBInstance == null) {
             try {
                 //mongoDBInstance = new MongoDBDriver(ConfigParams.getInstance());
-                runningDefault = false;
+                runningDefault = true;
                 throw new Exception();
             } catch (Exception e) {
                 mongoDBInstance = new MongoDBDriver();
@@ -122,13 +122,17 @@ public class MongoDBDriver {
             mongoClient.close();
     }
 
-    //provata
     public boolean updateReviews(ObjectId id, List<Review> reviews) {
         Bson update = new Document("reviews", reviews);
         Bson updateOperation = new Document("$set", update);
         return coursesCollection.updateOne(new Document("_id", id), updateOperation).wasAcknowledged();
     }
 
+    /**
+     * Fetches documents of courses with a large amount of reviews
+     * @param maxReviews the number of reviews necessary to be considered a "big" document
+     * @return a cursor to iterate over big documents
+     */
     public MongoCursor<Course> fetchBigDocuments(int maxReviews) {
         Bson filter = Filters.and(Filters.exists("reviews"), Filters.where("this.reviews.length > " + maxReviews));
         MongoCursor<Course> bigCourses = coursesCollection.find(filter).cursor();
