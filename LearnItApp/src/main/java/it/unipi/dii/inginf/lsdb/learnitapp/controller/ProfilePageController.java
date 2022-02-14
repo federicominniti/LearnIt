@@ -142,7 +142,7 @@ public class ProfilePageController {
         if (loggedUser.getRole() == 1 && isProfileMine) { //admin
             pageAnchorPane.getChildren().remove(elementsVBox);
             completeNameLabel.setVisible(false);
-
+            usernameLabel.setText(loggedUser.getUsername());
             profileContentBorderPane.setPrefHeight(440);
             profileContentBorderPane.getChildren().remove(statisticsVBox);
             profileContentBorderPane.getChildren().remove(userBorderPane);
