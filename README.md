@@ -15,6 +15,8 @@ Here you can find datasets used in this project.
 
 The complete documentation is available [here1](documentation.pdf); there is also a presentation of the project [here2](presentation.pdf).
 
+(Repository for large scale and multi structured databases' project)
+
 ## Main goals are:
 - To create an application (in this case with a GUI) that handle a large amount of data using NoSQL databases
 - To use real datasets and preprocess them in order to uniform their content
