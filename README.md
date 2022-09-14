@@ -26,5 +26,5 @@ The complete documentation is available [here1](documentation.pdf); there is als
 
 ## Preview
 <p align="center">
-  <img src="preview.png" alt="preview" width="800px"/> 
+  <img src="preview.png" alt="preview" width="700px"/> 
 </p>
