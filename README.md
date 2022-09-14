@@ -5,7 +5,8 @@ LearnIt! is an e-learning social network. Users can find courses to follow, read
 Furthermore users can receive suggestions, on interensting courses or users to follow, based on their tastes.
 
 LearnIt! is designed to handle a large amount of data that is typical of the social-network era, ensuring good performances, with NoSQL database.
-In particular the two different databases used in the application are MongoDB and Neo4J.
+In particular the two different databases used in the application are MongoDB (in a cluster of three nodes) and Neo4J. MongoDB is mainly used for storage of users' data and Neo4J for recommendation functionalities.
+
 
 Here you can find datasets used in this project.
  https://drive.google.com/drive/folders/1OOGafF7gf2bamXVXPgTNMvoj-C9HFSXq?usp=sharing
