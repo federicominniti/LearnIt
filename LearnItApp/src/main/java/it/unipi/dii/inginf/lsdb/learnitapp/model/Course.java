@@ -43,23 +43,6 @@ public class Course {
     private Double newPrice;
     @BsonProperty(value = "new_duration")
     private Double newDuration;
-
-    public void setNewPrice(Double newPrice) {
-        this.newPrice = newPrice;
-    }
-
-    public Double getNewDuration() {
-        return newDuration;
-    }
-
-    public Double getNewPrice() {
-        return newPrice;
-    }
-
-    public void setNewDuration(Double newDuration) {
-        this.newDuration = newDuration;
-    }
-
     @BsonProperty(value="year")
     private Integer year;
 
@@ -103,6 +86,22 @@ public class Course {
             this.modality = modality;
         if(coursePic!=null)
             this.coursePic = coursePic;
+    }
+    
+    public void setNewPrice(Double newPrice) {
+        this.newPrice = newPrice;
+    }
+
+    public Double getNewDuration() {
+        return newDuration;
+    }
+
+    public Double getNewPrice() {
+        return newPrice;
+    }
+
+    public void setNewDuration(Double newDuration) {
+        this.newDuration = newDuration;
     }
 
     public ObjectId getId() {
