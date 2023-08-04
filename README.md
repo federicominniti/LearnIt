@@ -9,9 +9,9 @@ In particular the two different databases used in the application are MongoDB (i
 
 
 Here you can find datasets used in this project.
- https://drive.google.com/drive/folders/1OOGafF7gf2bamXVXPgTNMvoj-C9HFSXq?usp=sharing
+ https://drive.google.com/drive/folders/1TngW57xt-bW7Yj9am2QRlHCL_yTuj4zZ?usp=drive_link
  
-[Here](requirements.pdf) are present the requirements of the project.
+[Here](requirements.pdf) there are the requirements of the project.
 
 The complete documentation is available [here1](documentation.pdf); there is also a presentation of the project [here2](presentation.pdf).
 
