@@ -18,8 +18,8 @@ The complete documentation is available [here1](documentation.pdf); there is als
 (Repository for large scale and multi structured databases' project)
 
 ## Main goals are:
-- To create an application (in this case with a GUI) that handle a large amount of data using NoSQL databases
-- To use real datasets and preprocess them in order to uniform their content
+- To create an application (in this case with a GUI) that handle a large amount of data using NoSQL databases;
+- To use real datasets and preprocess them in order to uniform their content.
 
 ## Project structure
  - `LearnItApp`: the Java(17) application module
